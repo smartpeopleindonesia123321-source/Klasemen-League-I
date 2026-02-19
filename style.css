@@ -7,109 +7,126 @@
 }
 
 body {
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0;
     font-family: 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), 
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), 
                 url("https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1920&q=80");
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    color: white;
-    min-height: 100vh;
+    background-size: cover; background-attachment: fixed;
+    color: white; min-height: 100vh;
 }
 
-.container {
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 10px;
-    box-sizing: border-box;
-}
+.container { width: 100%; max-width: 800px; margin: 0 auto; padding: 10px; box-sizing: border-box; }
 
-h1 {
-    font-size: clamp(20px, 6vw, 32px);
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin: 15px 0;
-    text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
-}
+h1 { font-size: clamp(20px, 6vw, 32px); text-align: center; text-transform: uppercase; letter-spacing: 2px; margin: 15px 0; }
+
+#status { text-align: center; padding: 5px; font-size: 11px; color: var(--accent); margin-bottom: 5px; height: 15px; }
 
 .table-container {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* SETTING TABEL PADAT (REQUEST USER) */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+th { 
+    padding: 12px 5px; text-transform: uppercase; font-size: 11px; 
+    color: var(--accent); background: rgba(30, 64, 175, 0.8); 
 }
 
-th {
-    padding: 8px 4px;
-    text-transform: uppercase;
-    font-size: 12px;
-    color: var(--accent);
-    background: rgba(30, 64, 175, 0.9);
-    border-bottom: 2px solid rgba(255,255,255,0.1);
+td { padding: 8px 5px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+.team-wrapper { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px;
+    padding-left: 10px;
 }
 
-td {
-    padding: 4px 4px; /* Kecil biar tetap muat */
-    text-align: center;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+.team-logo { 
+    width: 40px; 
+    height: 40px; 
+    object-fit: cover; 
+    border-radius: 50%; 
+    flex-shrink: 0; 
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
-tr {
-    line-height: 1.1; /* Rapetin tinggi baris */
-}
-
-/* WRAPPER IKON + NAMA */
-.team-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    text-align: left;
-}
-
-.team-logo {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
-    flex-shrink: 0;
-    border-radius: 3px;
-}
-
-.team-name {
-    text-align: left !important;
-    padding-left: 10px !important;
-    max-width: 150px;
+.team-name { 
+    font-weight: 500;
+    font-size: 18px;
+    color: #fff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: left;
 }
 
-/* RANK COLORS */
 .rank-1 td:first-child { background: var(--gold); color: #000; font-weight: bold; }
 .rank-2 td:first-child { background: var(--silver); color: #fff; font-weight: bold; }
 .rank-3 td:first-child { background: var(--bronze); color: #fff; font-weight: bold; }
 
-.relegation-row {
-    border-left: 4px solid #ff4d4d;
-    background: rgba(255, 77, 77, 0.1);
+.up { color: #00ff88; font-size: 10px; font-weight: bold; }
+.down { color: #ff4d4d; font-size: 10px; font-weight: bold; }
+.stay { color: #666; font-size: 10px; }
+
+.sparkline-canvas { width: 60px !important; height: 20px !important; }
+
+tr { transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+.toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+.toast {
+    background: rgba(30, 64, 175, 0.95);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-top: 10px;
+    border-left: 4px solid var(--accent);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation: slideIn 0.5s ease forwards, fadeOut 0.5s ease forwards 4s;
 }
 
-/* INDIKATOR */
-.up { color: #00ff88; font-weight: bold; font-size: 11px; }
-.down { color: #ff4d4d; font-weight: bold; font-size: 11px; }
-.stay { color: #888; font-size: 11px; }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes fadeOut { to { opacity: 0; transform: translateY(-20px); } }
 
-#status { text-align: center; padding: 5px; font-size: 11px; color: var(--accent); }
+.rank-1 { position: relative; box-shadow: inset 0 0 20px rgba(246, 211, 101, 0.2); }
+.rank-1 .team-name { text-shadow: 0 0 10px rgba(246, 211, 101, 0.8); font-weight: bold; }
+
+/* --- PERBAIKAN ZONA DEGRADASI --- */
+/* Gunakan selector yang lebih kuat agar background merah muncul */
+#mainTable tbody tr.degradasi {
+    background: rgba(220, 38, 38, 0.3) !important; /* Merah lebih tegas */
+    border-left: 4px solid #ef4444; /* Kasih garis merah di samping kiri baris */
+}
+
+#mainTable tbody tr.degradasi td:first-child {
+    background: #dc2626 !important; /* Posisi (angka) jadi merah pekat */
+    color: #fff !important;
+}
+
+#mainTable tbody tr.degradasi .team-name {
+    color: #fca5a5 !important; /* Nama jadi merah muda terang */
+}
+
+#music-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 1000;
+  border: 2px solid #edb211; /* Warna emas ala UCL */
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s;
+}
+
+#music-container:hover {
+  transform: scale(1.1);
+}

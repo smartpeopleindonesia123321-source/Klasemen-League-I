@@ -1,0 +1,3 @@
+localStorage.removeItem('rankHistory');
+localStorage.removeItem('savedRank');
+location.reload();

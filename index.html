@@ -2,111 +2,44 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FOOTBALL LEAGUE-I | Pro Mobile</title>
-    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
     <h1>FOOTBALL LEAGUE-I</h1>
-    <div id="status">SINKRONISASI DATA LIVE...</div>
+    <div id="status">SINKRONISASI DATA...</div>
 
     <div class="table-container">
         <table id="mainTable">
             <thead>
                 <tr>
-                    <th width="10%">Pos</th>
+                    <th width="8%">Pos</th>
                     <th style="text-align: left; padding-left: 15px;">Nama Tim</th>
-                    <th width="15%">Pt</th>
-                    <th width="15%">GD</th>
-                    <th width="15%">+/-</th>
+                    <th width="10%">Pt</th>
+                    <th width="10%">GD</th>
+                    <th width="20%">Trend</th>
+                    <th width="12%">+/-</th>
                 </tr>
             </thead>
-            <tbody>
-                </tbody>
+            <tbody></tbody>
         </table>
     </div>
 </div>
 
-<script>
-    // URL CSV dari Google Sheets (Pastikan urutan: Nama, Point, GD, Logo)
-    const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=0&single=true&output=csv';
+<script src="script.js"></script>
+<audio id="bgMusic" loop>
+  <source src="ucl-theme.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
 
-    async function fetchData() {
-        try {
-            const response = await fetch(sheetUrl + '&cache=' + new Date().getTime());
-            const rawData = await response.text();
-            
-            const lastRankMap = JSON.parse(localStorage.getItem('savedRank')) || {};
-            const currentRankMap = {};
-
-            const rows = rawData.split('\n').slice(1);
-            let players = rows.map(row => {
-                const cols = row.split(',');
-                return {
-                    nama: cols[0]?.replace(/"/g, '').trim(),
-                    point: parseInt(cols[1]) || 0,
-                    goals: parseInt(cols[2]) || 0,
-                    logo: cols[3]?.replace(/"/g, '').trim() || '' // Kolom D untuk Logo
-                };
-            }).filter(p => p.nama);
-
-            // Sorting: Point (Tinggi ke Rendah), lalu GD (Tinggi ke Rendah)
-            players.sort((a, b) => b.point - a.point || b.goals - a.goals);
-
-            const tbody = document.querySelector("#mainTable tbody");
-            tbody.innerHTML = "";
-
-            players.forEach((p, i) => {
-                const rankNow = i + 1;
-                currentRankMap[p.nama] = rankNow;
-
-                // Logika Panah Naik/Turun
-                let changeHtml = '<span class="stay">0</span>';
-                if (lastRankMap[p.nama]) {
-                    const diff = lastRankMap[p.nama] - rankNow;
-                    if (diff > 0) changeHtml = `<span class="up">▲${diff}</span>`;
-                    else if (diff < 0) changeHtml = `<span class="down">▼${Math.abs(diff)}</span>`;
-                }
-
-                const tr = document.createElement("tr");
-                
-                // Highlight Rank
-                if (rankNow === 1) tr.className = "rank-1";
-                else if (rankNow === 2) tr.className = "rank-2";
-                else if (rankNow === 3) tr.className = "rank-3";
-                else if (rankNow >= players.length - 1) tr.className = "relegation-row";
-
-                // Gunakan logo default jika kolom logo di Sheets kosong
-                const finalLogo = p.logo || 'https://cdn-icons-png.flaticon.com/512/33/33736.png';
-
-                tr.innerHTML = `
-                    <td>${rankNow}</td>
-                    <td class="team-name">
-                        <div class="team-wrapper">
-                            <img src="${finalLogo}" class="team-logo" alt="icon">
-                            <span>${p.nama}</span>
-                        </div>
-                    </td>
-                    <td><strong>${p.point}</strong></td>
-                    <td>${p.goals}</td>
-                    <td>${changeHtml}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            localStorage.setItem('savedRank', JSON.stringify(currentRankMap));
-            document.getElementById('status').style.display = 'none';
-
-        } catch (err) {
-            document.getElementById('status').innerText = "KONEKSI BERMASALAH";
-        }
-    }
-
-    window.onload = fetchData;
-</script>
-
+<div id="music-container" onclick="toggleMusic()">
+  <span id="music-icon">🔇</span> </div>
 </body>
 </html>
+
+
+
