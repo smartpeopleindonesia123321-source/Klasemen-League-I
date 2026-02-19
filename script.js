@@ -13,27 +13,26 @@ const animalDatabase = {
     "Dicky": { sp: "Dicky sang Raja Kingkong", atk: 98, def: 98, spd: 65, desc: "Benteng pertahanan terakhir." }
 };
 
-// --- SISTEM MUSIK ---
+// --- MUSIK ENGINE ---
 const audio = document.getElementById('uclMusic');
-let playing = false;
+let isPlaying = false;
+const musicBtn = document.createElement('div');
+musicBtn.className = 'music-control';
+musicBtn.innerHTML = '🔇';
+document.body.appendChild(musicBtn);
 
-function setupMusic() {
-    const musicBtn = document.createElement('div');
-    musicBtn.className = 'music-control';
-    musicBtn.innerHTML = '🔇';
-    document.body.appendChild(musicBtn);
-
-    musicBtn.onclick = () => {
-        if (!playing) {
-            audio.play().catch(() => alert("Klik layar dulu bro baru bisa putar musik!"));
+musicBtn.addEventListener('click', () => {
+    if (!isPlaying) {
+        audio.play().then(() => {
             musicBtn.innerHTML = '🔊';
-        } else {
-            audio.pause();
-            musicBtn.innerHTML = '🔇';
-        }
-        playing = !playing;
-    };
-}
+            isPlaying = true;
+        }).catch(err => alert("Klik layar dulu bro baru bisa play!"));
+    } else {
+        audio.pause();
+        musicBtn.innerHTML = '🔇';
+        isPlaying = false;
+    }
+});
 
 async function fetchData() {
     try {
@@ -73,6 +72,7 @@ async function fetchData() {
 
 function renderTable(players) {
     const table = document.querySelector("#mainTable tbody");
+    if (!table) return;
     table.innerHTML = "";
 
     players.forEach((p, i) => {
@@ -80,33 +80,31 @@ function renderTable(players) {
         const rankSekarang = i + 1;
         const selisih = p.rankLama - rankSekarang;
 
-        // Sparkline Logic
         let yEnd = 10, color = "#64748b";
         if (selisih > 0) { yEnd = 2; color = "#22c55e"; }
         else if (selisih < 0) { yEnd = 18; color = "#ef4444"; }
 
-        const sparkline = `
-            <svg width="40" height="20" style="display:block; margin:auto">
-                <polyline fill="none" stroke="${color}" stroke-width="2" points="0,10 20,10 40,${yEnd}" />
-                <circle cx="40" cy="${yEnd}" r="2" fill="${color}" />
-            </svg>`;
+        const sparkline = `<svg width="40" height="20" style="display:block;margin:auto"><polyline fill="none" stroke="${color}" stroke-width="2" points="0,10 20,10 40,${yEnd}"/><circle cx="40" cy="${yEnd}" r="2" fill="${color}"/></svg>`;
 
         let trendText = `<span style="color:#64748b">-</span>`;
         if (selisih > 0) trendText = `<span style="color:#22c55e">▲ ${selisih}</span>`;
         else if (selisih < 0) trendText = `<span style="color:#ef4444">▼ ${Math.abs(selisih)}</span>`;
 
-        // Baris Khusus
-        if (i === 0) tr.classList.add("rank-1");
-        else if (i === 1) tr.classList.add("rank-2");
-        else if (i === 2) tr.classList.add("rank-3");
-        // Zona Degradasi (3 Terbawah)
-        if (i >= players.length - 3 && players.length > 3) tr.classList.add("degradasi");
+        // Atur Class Baris
+        if (rankSekarang === 1) tr.classList.add("rank-1");
+        else if (rankSekarang === 2) tr.classList.add("rank-2");
+        else if (rankSekarang === 3) tr.classList.add("rank-3");
+        
+        // ZONA DEGRADASI (Otomatis 3 terbawah)
+        if (rankSekarang > players.length - 3) {
+            tr.classList.add("degradasi");
+        }
 
         tr.innerHTML = `
             <td>${rankSekarang}</td>
             <td style="text-align:left">
                 <div class="team-wrapper">
-                    <img src="${p.logo}" class="team-logo" onclick="openModal('${p.nama}')" onerror="this.src='https://via.placeholder.com/40'">
+                    <img src="${p.logo}" class="team-logo" onclick="openModal('${p.nama}')">
                     <span class="team-name">${p.nama}</span>
                 </div>
             </td>
@@ -122,19 +120,17 @@ function renderTable(players) {
 function openModal(name) {
     const data = animalDatabase[name] || { sp: "Misterius", atk: 50, def: 50, spd: 50, desc: "-" };
     document.getElementById('modalBody').innerHTML = `
-        <h2 style="font-size:16px; color:var(--accent); text-transform:uppercase">${data.sp}</h2>
+        <h2 style="font-size:18px; color:var(--accent); text-transform:uppercase; margin-bottom:15px">${data.sp}</h2>
         <div class="stat-item"><span>ATK</span><div class="progress-bg"><div class="progress-fill atk" style="width:${data.atk}%"></div></div><span>${data.atk}</span></div>
         <div class="stat-item"><span>DEF</span><div class="progress-bg"><div class="progress-fill def" style="width:${data.def}%"></div></div><span>${data.def}</span></div>
         <div class="stat-item"><span>SPD</span><div class="progress-bg"><div class="progress-fill spd" style="width:${data.spd}%"></div></div><span>${data.spd}</span></div>
-        <p style="font-size:11px; font-style:italic; color:#ccc; margin-top:10px; background:rgba(0,0,0,0.3); padding:8px; border-radius:5px;">"${data.desc}"</p>
+        <p style="font-size:12px; color:#ccc; margin-top:15px; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; line-height:1.4">"${data.desc}"</p>
     `;
     document.getElementById('animalModal').style.display = 'block';
 }
 
 function closeModal() { document.getElementById('animalModal').style.display = 'none'; }
-function closeModalOutside(e) { if(e.target.id === 'animalModal') closeModal(); }
+window.onclick = function(e) { if(e.target.className === 'modal-overlay') closeModal(); }
 
-// JALANKAN
-setupMusic();
 fetchData();
 setInterval(fetchData, 30000);
