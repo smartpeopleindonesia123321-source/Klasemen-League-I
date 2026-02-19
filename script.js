@@ -13,6 +13,28 @@ const animalDatabase = {
     "Dicky": { sp: "Dicky sang Raja Kingkong", atk: 98, def: 98, spd: 65, desc: "Benteng pertahanan terakhir." }
 };
 
+// --- SISTEM MUSIK ---
+const audio = document.getElementById('uclMusic');
+let playing = false;
+
+function setupMusic() {
+    const musicBtn = document.createElement('div');
+    musicBtn.className = 'music-control';
+    musicBtn.innerHTML = '🔇';
+    document.body.appendChild(musicBtn);
+
+    musicBtn.onclick = () => {
+        if (!playing) {
+            audio.play().catch(() => alert("Klik layar dulu bro baru bisa putar musik!"));
+            musicBtn.innerHTML = '🔊';
+        } else {
+            audio.pause();
+            musicBtn.innerHTML = '🔇';
+        }
+        playing = !playing;
+    };
+}
+
 async function fetchData() {
     try {
         const response = await fetch(`${sheetUrl}&nocache=${new Date().getTime()}`);
@@ -25,10 +47,8 @@ async function fetchData() {
             const cols = lines[i].split(',').map(c => c.replace(/^"|"$/g, '').trim());
             if (cols[0]) {
                 players.push({
-                    nama: cols[0],
-                    point: parseInt(cols[1]) || 0,
-                    goals: parseInt(cols[2]) || 0,
-                    logo: cols[3] || ''
+                    nama: cols[0], point: parseInt(cols[1]) || 0,
+                    goals: parseInt(cols[2]) || 0, logo: cols[3] || ''
                 });
             }
         }
@@ -60,14 +80,14 @@ function renderTable(players) {
         const rankSekarang = i + 1;
         const selisih = p.rankLama - rankSekarang;
 
-        // SPARKLINE LOGIC
-        let yStart = 10, yEnd = 10, color = "#64748b";
+        // Sparkline Logic
+        let yEnd = 10, color = "#64748b";
         if (selisih > 0) { yEnd = 2; color = "#22c55e"; }
         else if (selisih < 0) { yEnd = 18; color = "#ef4444"; }
 
         const sparkline = `
             <svg width="40" height="20" style="display:block; margin:auto">
-                <polyline fill="none" stroke="${color}" stroke-width="2" points="0,${yStart} 20,${yStart} 40,${yEnd}" />
+                <polyline fill="none" stroke="${color}" stroke-width="2" points="0,10 20,10 40,${yEnd}" />
                 <circle cx="40" cy="${yEnd}" r="2" fill="${color}" />
             </svg>`;
 
@@ -75,9 +95,12 @@ function renderTable(players) {
         if (selisih > 0) trendText = `<span style="color:#22c55e">▲ ${selisih}</span>`;
         else if (selisih < 0) trendText = `<span style="color:#ef4444">▼ ${Math.abs(selisih)}</span>`;
 
+        // Baris Khusus
         if (i === 0) tr.classList.add("rank-1");
         else if (i === 1) tr.classList.add("rank-2");
         else if (i === 2) tr.classList.add("rank-3");
+        // Zona Degradasi (3 Terbawah)
+        if (i >= players.length - 3 && players.length > 3) tr.classList.add("degradasi");
 
         tr.innerHTML = `
             <td>${rankSekarang}</td>
@@ -99,11 +122,11 @@ function renderTable(players) {
 function openModal(name) {
     const data = animalDatabase[name] || { sp: "Misterius", atk: 50, def: 50, spd: 50, desc: "-" };
     document.getElementById('modalBody').innerHTML = `
-        <h2 style="font-size:16px; color:var(--accent)">${data.sp}</h2>
+        <h2 style="font-size:16px; color:var(--accent); text-transform:uppercase">${data.sp}</h2>
         <div class="stat-item"><span>ATK</span><div class="progress-bg"><div class="progress-fill atk" style="width:${data.atk}%"></div></div><span>${data.atk}</span></div>
         <div class="stat-item"><span>DEF</span><div class="progress-bg"><div class="progress-fill def" style="width:${data.def}%"></div></div><span>${data.def}</span></div>
         <div class="stat-item"><span>SPD</span><div class="progress-bg"><div class="progress-fill spd" style="width:${data.spd}%"></div></div><span>${data.spd}</span></div>
-        <p style="font-size:11px; font-style:italic; color:#ccc">"${data.desc}"</p>
+        <p style="font-size:11px; font-style:italic; color:#ccc; margin-top:10px; background:rgba(0,0,0,0.3); padding:8px; border-radius:5px;">"${data.desc}"</p>
     `;
     document.getElementById('animalModal').style.display = 'block';
 }
@@ -111,5 +134,7 @@ function openModal(name) {
 function closeModal() { document.getElementById('animalModal').style.display = 'none'; }
 function closeModalOutside(e) { if(e.target.id === 'animalModal') closeModal(); }
 
+// JALANKAN
+setupMusic();
 fetchData();
 setInterval(fetchData, 30000);
