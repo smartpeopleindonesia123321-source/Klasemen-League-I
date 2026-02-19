@@ -9,55 +9,63 @@
 
 body {
     margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200');
+    background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.95)), url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200');
     background-size: cover; background-attachment: fixed; color: white; min-height: 100vh;
 }
 
 .container { width: 100%; max-width: 850px; margin: 0 auto; padding: 10px; }
-h1 { text-align: center; letter-spacing: 2px; text-shadow: 0 0 10px var(--accent); }
-#status { text-align: center; font-size: 11px; color: var(--accent); margin-bottom: 10px; }
+h1 { text-align: center; letter-spacing: 2px; text-shadow: 0 0 15px var(--accent); margin-top: 30px; }
+#status { text-align: center; font-size: 11px; color: var(--accent); margin-bottom: 10px; font-weight: bold; }
 
-.table-container { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
-.info-banner { background: rgba(255,255,255,0.1); padding: 10px; text-align: center; font-size: 12px; }
+.table-container { background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.info-banner { background: rgba(255,255,255,0.1); padding: 12px; text-align: center; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
 table { width: 100%; border-collapse: collapse; }
-th { padding: 15px 5px; background: rgba(30, 64, 175, 0.8); color: var(--accent); font-size: 11px; text-transform: uppercase; }
-td { padding: 12px 5px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+th { padding: 15px 5px; background: rgba(30, 64, 175, 0.9); color: var(--accent); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 15px; }
 
-.team-wrapper { display: flex; align-items: center; gap: 12px; padding-left: 10px; }
+/* HOVER ICON PEMAIN - DIPERKUAT */
+.team-wrapper { display: flex; align-items: center; gap: 12px; padding-left: 15px; }
 .team-logo { 
-    width: 40px; height: 40px; border-radius: 50%; cursor: pointer; 
+    width: 45px; height: 45px; border-radius: 50%; cursor: pointer; 
     border: 2px solid #fff; background: #fff; object-fit: cover;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Biar smooth pas membesar */
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: block;
 }
-.team-logo:hover { transform: scale(1.25); border-color: var(--accent); z-index: 10; }
+.team-logo:hover { 
+    transform: scale(1.4) rotate(5deg); 
+    border-color: var(--accent); 
+    box-shadow: 0 0 20px var(--accent);
+    z-index: 99;
+}
 
-/* Rank Styling */
-.rank-1 td:first-child { background: var(--gold); color: #000; font-weight: bold; }
-.rank-2 td:first-child { background: var(--silver); }
-.rank-3 td:first-child { background: var(--bronze); }
-.degradasi td:first-child { background: var(--danger) !important; color: white; font-weight: bold; }
-.degradasi { background: rgba(255, 75, 43, 0.1) !important; }
+/* RANKING STYLING */
+.rank-1 td:first-child { background: var(--gold) !important; color: #000 !important; font-weight: 800; }
+.rank-2 td:first-child { background: var(--silver) !important; color: #fff; }
+.rank-3 td:first-child { background: var(--bronze) !important; color: #fff; }
 
-/* MODAL FIFA CARD */
-.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; }
-.modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 25px; border-radius: 20px; border: 2px solid var(--accent); width: 280px; box-shadow: 0 0 30px rgba(0,242,255,0.2); }
-.close-btn { float: right; cursor: pointer; font-size: 24px; color: #666; }
+/* ZONA DEGRADASI - MERAH DEGRADASI */
+.degradasi td:first-child { 
+    background: var(--danger) !important; 
+    color: white !important; 
+    font-weight: 800;
+}
+.degradasi { background: rgba(255, 75, 43, 0.15) !important; }
 
-.stat-item { display: flex; align-items: center; margin-bottom: 12px; font-size: 12px; font-weight: bold; }
-.stat-item span:first-child { width: 35px; color: #aaa; }
+/* MODAL & STATS */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; backdrop-filter: blur(5px); }
+.modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 25px; border-radius: 20px; border: 2px solid var(--accent); width: 290px; }
+.stat-item { display: flex; align-items: center; margin-bottom: 12px; font-weight: bold; font-size: 12px; }
 .progress-bg { flex-grow: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin: 0 10px; overflow: hidden; }
-.progress-fill { height: 100%; transition: width 1s ease-in-out; }
-
+.progress-fill { height: 100%; transition: width 1.5s ease-out; }
 .atk { background: linear-gradient(90deg, #ff4b2b, #ff416c); }
 .def { background: linear-gradient(90deg, #1fddff, #0072ff); }
 .spd { background: linear-gradient(90deg, #00f260, #0575e6); }
 
-.ok-btn { width: 100%; padding: 12px; background: var(--accent); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; color: #000; }
-
-/* MUSIC CONTROL */
+/* TOMBOL MUSIK - POSISI FIXED */
 .music-control { 
-    position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; 
-    background: rgba(0,0,0,0.8); border: 2px solid var(--accent); border-radius: 50%; 
-    display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10000; 
+    position: fixed; bottom: 25px; right: 25px; width: 50px; height: 50px; 
+    background: #000; border: 2px solid var(--accent); border-radius: 50%; 
+    display: flex; align-items: center; justify-content: center; cursor: pointer; 
+    z-index: 9999; box-shadow: 0 0 15px var(--accent); font-size: 20px;
 }
