@@ -4,18 +4,17 @@
     --gold: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
     --silver: linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%);
     --bronze: linear-gradient(135deg, #d97706 0%, #78350f 100%);
+    --danger: linear-gradient(135deg, #ff4b2b 0%, #ff416c 100%);
 }
 
 body {
-    margin: 0; padding: 0;
-    font-family: 'Segoe UI', sans-serif;
+    margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif;
     background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200');
-    background-size: cover; background-attachment: fixed;
-    color: white; min-height: 100vh;
+    background-size: cover; background-attachment: fixed; color: white; min-height: 100vh;
 }
 
 .container { width: 100%; max-width: 850px; margin: 0 auto; padding: 10px; }
-h1 { text-align: center; letter-spacing: 2px; color: #fff; text-shadow: 0 0 10px var(--accent); }
+h1 { text-align: center; letter-spacing: 2px; text-shadow: 0 0 10px var(--accent); }
 #status { text-align: center; font-size: 11px; color: var(--accent); margin-bottom: 10px; }
 
 .table-container { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
@@ -25,28 +24,40 @@ table { width: 100%; border-collapse: collapse; }
 th { padding: 15px 5px; background: rgba(30, 64, 175, 0.8); color: var(--accent); font-size: 11px; text-transform: uppercase; }
 td { padding: 12px 5px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
 
-.team-wrapper { display: flex; align-items: center; gap: 10px; padding-left: 10px; }
-.team-logo { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid #fff; background: #fff; object-fit: cover; }
-.team-name { font-weight: 600; }
+.team-wrapper { display: flex; align-items: center; gap: 12px; padding-left: 10px; }
+.team-logo { 
+    width: 40px; height: 40px; border-radius: 50%; cursor: pointer; 
+    border: 2px solid #fff; background: #fff; object-fit: cover;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Biar smooth pas membesar */
+}
+.team-logo:hover { transform: scale(1.25); border-color: var(--accent); z-index: 10; }
 
-/* Posisi Warna */
+/* Rank Styling */
 .rank-1 td:first-child { background: var(--gold); color: #000; font-weight: bold; }
 .rank-2 td:first-child { background: var(--silver); }
 .rank-3 td:first-child { background: var(--bronze); }
+.degradasi td:first-child { background: var(--danger) !important; color: white; font-weight: bold; }
+.degradasi { background: rgba(255, 75, 43, 0.1) !important; }
 
-/* FIFA CARD MODAL */
+/* MODAL FIFA CARD */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; }
-.modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 25px; border-radius: 20px; border: 2px solid var(--accent); width: 280px; }
-.close-btn { float: right; cursor: pointer; font-size: 20px; }
+.modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 25px; border-radius: 20px; border: 2px solid var(--accent); width: 280px; box-shadow: 0 0 30px rgba(0,242,255,0.2); }
+.close-btn { float: right; cursor: pointer; font-size: 24px; color: #666; }
 
 .stat-item { display: flex; align-items: center; margin-bottom: 12px; font-size: 12px; font-weight: bold; }
-.stat-item span:first-child { width: 35px; }
+.stat-item span:first-child { width: 35px; color: #aaa; }
 .progress-bg { flex-grow: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin: 0 10px; overflow: hidden; }
-.progress-fill { height: 100%; transition: width 1s; }
+.progress-fill { height: 100%; transition: width 1s ease-in-out; }
 
-/* WARNA STATS */
 .atk { background: linear-gradient(90deg, #ff4b2b, #ff416c); }
 .def { background: linear-gradient(90deg, #1fddff, #0072ff); }
 .spd { background: linear-gradient(90deg, #00f260, #0575e6); }
 
-.ok-btn { width: 100%; padding: 10px; background: var(--accent); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+.ok-btn { width: 100%; padding: 12px; background: var(--accent); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; color: #000; }
+
+/* MUSIC CONTROL */
+.music-control { 
+    position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; 
+    background: rgba(0,0,0,0.8); border: 2px solid var(--accent); border-radius: 50%; 
+    display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10000; 
+}
