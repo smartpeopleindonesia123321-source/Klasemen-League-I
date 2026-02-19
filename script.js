@@ -13,7 +13,7 @@ const animalDatabase = {
     "Dicky": { sp: "Dicky sang Raja Kingkong", atk: 98, def: 98, spd: 65, desc: "Benteng pertahanan terakhir." }
 };
 
-// --- MUSIK ENGINE ---
+// --- LOGIKA MUSIK ---
 const audio = document.getElementById('uclMusic');
 let isPlaying = false;
 const musicBtn = document.createElement('div');
@@ -26,7 +26,7 @@ musicBtn.addEventListener('click', () => {
         audio.play().then(() => {
             musicBtn.innerHTML = '🔊';
             isPlaying = true;
-        }).catch(err => alert("Klik layar dulu bro baru bisa play!"));
+        }).catch(() => alert("Klik layar mana saja dulu bro!"));
     } else {
         audio.pause();
         musicBtn.innerHTML = '🔇';
@@ -90,13 +90,13 @@ function renderTable(players) {
         if (selisih > 0) trendText = `<span style="color:#22c55e">▲ ${selisih}</span>`;
         else if (selisih < 0) trendText = `<span style="color:#ef4444">▼ ${Math.abs(selisih)}</span>`;
 
-        // Atur Class Baris
+        // Atur Kelas Warna Rank
         if (rankSekarang === 1) tr.classList.add("rank-1");
         else if (rankSekarang === 2) tr.classList.add("rank-2");
         else if (rankSekarang === 3) tr.classList.add("rank-3");
         
-        // ZONA DEGRADASI (Otomatis 1 terbawah)
-        if (rankSekarang > players.length - 1) {
+        // ZONA DEGRADASI - HANYA 1 ORANG PALING BAWAH
+        if (rankSekarang === players.length && players.length > 1) {
             tr.classList.add("degradasi");
         }
 
@@ -124,7 +124,7 @@ function openModal(name) {
         <div class="stat-item"><span>ATK</span><div class="progress-bg"><div class="progress-fill atk" style="width:${data.atk}%"></div></div><span>${data.atk}</span></div>
         <div class="stat-item"><span>DEF</span><div class="progress-bg"><div class="progress-fill def" style="width:${data.def}%"></div></div><span>${data.def}</span></div>
         <div class="stat-item"><span>SPD</span><div class="progress-bg"><div class="progress-fill spd" style="width:${data.spd}%"></div></div><span>${data.spd}</span></div>
-        <p style="font-size:12px; color:#ccc; margin-top:15px; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; line-height:1.4">"${data.desc}"</p>
+        <p style="font-size:12px; color:#ccc; margin-top:15px; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">"${data.desc}"</p>
     `;
     document.getElementById('animalModal').style.display = 'block';
 }
@@ -134,4 +134,3 @@ window.onclick = function(e) { if(e.target.className === 'modal-overlay') closeM
 
 fetchData();
 setInterval(fetchData, 30000);
-
