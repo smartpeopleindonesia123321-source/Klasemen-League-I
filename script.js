@@ -6,7 +6,7 @@ const animalDatabase = {
     "Regi": { sp: "Regi sang Siberian Husky", desc: "Memiliki loyalitas tanpa batas dan keberanian yang melegenda. Ia adalah pelindung sejati yang tak akan mundur dalam situasi genting, selalu siap mempertaruhkan segalanya demi kemenangan tim." },
     "Rizal": { sp: "Rizal sang Serigala Kutub", desc: "Pemburu taktis yang sangat cerdas dan setia pada kelompok. Ia mengintai dalam senyap, bergerak secepat kilat di tengah badai, dan menyerang titik lemah lawan dengan akurasi yang mematikan." },
     "Asep": { sp: "Asep sang Banteng Spanyol", desc: "Simbol kekuatan tak terbendung yang penuh amarah. Dengan tanduk yang kokoh dan insting menyerang yang tajam, ia akan menyeruduk siapa pun yang berani menghalangi jalurnya di arena." },
-    "Aries": { sp: "Aries sang Singa Siberia", desc: "Predator penguasa wilayah dingin yang tangguh. Aumannya adalah peringatan bagi musuh, dan keberaniannya dalam memimpin perburuan menjadikannya raja yang paling disegani di medan laga." },
+    "Aries": { sp: "Aries sang Singa Siberia", desc: "Predator penguasa wilayah dingin yang tangguh. Aumannya adalah peringatan bagi musuh, dan keberaniannya dalam memimpin perburuan menjadikannya raja yang paling disobani di medan laga." },
     "Ikmal": { sp: "Ikmal sang Rusa Kutub", desc: "Spesies pengembara yang memiliki ketahanan fisik luar biasa. Kelincahannya saat melintasi medan sulit membuatnya sangat sulit ditangkap, selalu selangkah lebih maju dari kejaran lawan." },
     "Yanti": { sp: "Yanti sang Kelinci Afrika", desc: "Kecil namun memiliki kecepatan dan daya ledak yang mengejutkan. Ia adalah ahli dalam hal meloloskan diri dan menyelinap, memanfaatkan kelincahannya untuk mengecoh musuh yang lebih besar." },
     "Maya": { sp: "Maya sang Panda Tiongkok", desc: "Terlihat tenang dan bersahabat, namun memiliki rahang yang sangat kuat dan tenaga yang tersembunyi. Ia adalah sosok yang sabar namun mematikan saat dipaksa untuk bertarung demi wilayahnya." },
@@ -45,11 +45,11 @@ function closeModal() {
     document.getElementById('animalModal').style.display = 'none';
 }
 
-function closeModalOutside(event) {
+window.onclick = function(event) {
     if (event.target.id === 'animalModal') closeModal();
-}
+};
 
-// --- DATA FETCHING ---
+// --- DATA FETCHING DENGAN LOCAL STORAGE LOGIC ---
 async function fetchData() {
     try {
         const response = await fetch(`${sheetUrl}&nocache=${new Date().getTime()}`);
@@ -69,7 +69,25 @@ async function fetchData() {
                 });
             }
         }
+
+        // Urutkan berdasarkan Poin, lalu Goal
         players.sort((a, b) => b.point - a.point || b.goals - a.goals);
+
+        // --- LOGIKA POSISI DINAMIS (LOCAL STORAGE) ---
+        const lastPositions = JSON.parse(localStorage.getItem('league_ranks') || '{}');
+        const currentPositions = {};
+
+        players.forEach((p, index) => {
+            const rankSekarang = index + 1;
+            // Ambil rank lama dari browser, jika tidak ada asumsikan sama dengan sekarang
+            p.rankLama = lastPositions[p.nama] || rankSekarang;
+            // Simpan rank sekarang untuk perbandingan berikutnya
+            currentPositions[p.nama] = rankSekarang;
+        });
+
+        // Simpan posisi terbaru ke LocalStorage
+        localStorage.setItem('league_ranks', JSON.stringify(currentPositions));
+
         renderTable(players);
         document.getElementById('status').innerText = "LIVE • TERKONEKSI";
     } catch (err) {
@@ -83,7 +101,16 @@ function renderTable(players) {
 
     players.forEach((p, i) => {
         const tr = document.createElement("tr");
+        const rankSekarang = i + 1;
         
+        // Tentukan Tren (Naik/Turun)
+        let trendHtml = `<span style="color:#64748b">-</span>`;
+        if (rankSekarang < p.rankLama) {
+            trendHtml = `<span style="color:#22c55e">▲ ${p.rankLama - rankSekarang}</span>`;
+        } else if (rankSekarang > p.rankLama) {
+            trendHtml = `<span style="color:#ef4444">▼ ${rankSekarang - p.rankLama}</span>`;
+        }
+
         // CSS Rankings
         if (i === 0) tr.classList.add("rank-1");
         else if (i === 1) tr.classList.add("rank-2");
@@ -95,7 +122,7 @@ function renderTable(players) {
         }
 
         tr.innerHTML = `
-            <td>${i + 1}</td>
+            <td>${rankSekarang}</td>
             <td style="text-align:left">
                 <div class="team-wrapper">
                     <img src="${p.logo}" class="team-logo" onclick="openModal('${p.nama}')" onerror="this.src='https://via.placeholder.com/40'">
@@ -105,7 +132,7 @@ function renderTable(players) {
             <td><strong>${p.point}</strong></td>
             <td>${p.goals}</td>
             <td style="color:#00f2ff; font-size:10px;">━━━━</td>
-            <td>-</td>
+            <td style="font-weight:bold; font-size:13px;">${trendHtml}</td>
         `;
         tbody.appendChild(tr);
     });
@@ -113,6 +140,3 @@ function renderTable(players) {
 
 fetchData();
 setInterval(fetchData, 30000);
-
-
-
