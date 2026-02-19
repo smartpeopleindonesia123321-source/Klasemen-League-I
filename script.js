@@ -1,16 +1,16 @@
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=0&single=true&output=csv';
 
 const animalDatabase = {
-    "Dandi": { sp: "Dandi sang Beruang Grizzly", atk: 95, def: 90, spd: 70, desc: "Spesies beruang puncak yang dikenal sebagai penguasa daratan. Kekuatan murninya tak tertandingi, sanggup melumpuhkan lawan dengan satu hantaman." },
-    "Erni": { sp: "Erni sang Kucing Angora", atk: 65, def: 55, spd: 92, desc: "Di balik penampilannya yang anggun, tersimpan insting pemburu yang sangat tajam. Gerakannya sangat halus namun penuh perhitungan." },
-    "Regi": { sp: "Regi sang Siberian Husky", atk: 80, def: 85, spd: 88, desc: "Memiliki loyalitas tanpa batas dan keberanian yang melegenda. Ia adalah pelindung sejati yang tak akan mundur dalam situasi genting." },
-    "Rizal": { sp: "Rizal sang Serigala Kutub", atk: 88, def: 75, spd: 95, desc: "Pemburu taktis yang sangat cerdas dan setia pada kelompok. Ia mengintai dalam senyap, bergerak secepat kilat di tengah badai." },
-    "Asep": { sp: "Asep sang Banteng Spanyol", atk: 92, def: 88, spd: 75, desc: "Simbol kekuatan tak terbendung yang penuh amarah. Dengan tanduk yang kokoh dan insting menyerang yang tajam." },
-    "Aries": { sp: "Aries sang Singa Siberia", atk: 96, def: 82, spd: 85, desc: "Predator penguasa wilayah dingin yang tangguh. Aumannya adalah peringatan bagi musuh dan raja yang paling disegani." },
-    "Ikmal": { sp: "Ikmal sang Rusa Kutub", atk: 70, def: 75, spd: 94, desc: "Spesies pengembara yang memiliki ketahanan fisik luar biasa. Kelincahannya membuatnya sangat sulit ditangkap lawan." },
-    "Yanti": { sp: "Yanti sang Kelinci Afrika", atk: 60, def: 50, spd: 98, desc: "Kecil namun memiliki kecepatan dan daya ledak mengejutkan. Ahli dalam meloloskan diri dan menyelinap." },
-    "Maya": { sp: "Maya sang Panda Tiongkok", atk: 85, def: 95, spd: 60, desc: "Terlihat tenang dan bersahabat, namun memiliki rahang yang sangat kuat dan tenaga yang tersembunyi." },
-    "Dicky": { sp: "Dicky sang Raja Kingkong", atk: 98, def: 98, spd: 65, desc: "Kekuatan raksasa dari hutan rimba yang sangat dominan. Benteng pertahanan terakhir yang sulit untuk ditembus." }
+    "Dandi": { sp: "Dandi sang Beruang Grizzly", atk: 95, def: 90, spd: 70, desc: "Spesies beruang puncak yang dikenal sebagai penguasa daratan." },
+    "Erni": { sp: "Erni sang Kucing Angora", atk: 65, def: 55, spd: 92, desc: "Di balik penampilannya yang anggun, tersimpan insting pemburu yang tajam." },
+    "Regi": { sp: "Regi sang Siberian Husky", atk: 80, def: 85, spd: 88, desc: "Memiliki loyalitas tanpa batas dan keberanian yang melegenda." },
+    "Rizal": { sp: "Rizal sang Serigala Kutub", atk: 88, def: 75, spd: 95, desc: "Pemburu taktis yang sangat cerdas dan setia pada kelompok." },
+    "Asep": { sp: "Asep sang Banteng Spanyol", atk: 92, def: 88, spd: 75, desc: "Simbol kekuatan tak terbendung yang penuh amarah." },
+    "Aries": { sp: "Aries sang Singa Siberia", atk: 96, def: 82, spd: 85, desc: "Predator penguasa wilayah dingin yang tangguh." },
+    "Ikmal": { sp: "Ikmal sang Rusa Kutub", atk: 70, def: 75, spd: 94, desc: "Spesies pengembara yang memiliki ketahanan fisik luar biasa." },
+    "Yanti": { sp: "Yanti sang Kelinci Afrika", atk: 60, def: 50, spd: 98, desc: "Kecil namun memiliki kecepatan dan daya ledak mengejutkan." },
+    "Maya": { sp: "Maya sang Panda Tiongkok", atk: 85, def: 95, spd: 60, desc: "Terlihat tenang namun memiliki rahang yang sangat kuat." },
+    "Dicky": { sp: "Dicky sang Raja Kingkong", atk: 98, def: 98, spd: 65, desc: "Kekuatan raksasa dari hutan rimba yang sangat dominan." }
 };
 
 // --- SISTEM MUSIK ---
@@ -23,7 +23,7 @@ document.body.appendChild(musicBtn);
 let playing = false;
 musicBtn.onclick = () => {
     if (!playing) {
-        audio.play().catch(e => console.log("Klik interaksi diperlukan"));
+        audio.play().catch(e => console.log("Interaksi user diperlukan"));
         musicBtn.innerHTML = '🔊';
     } else {
         audio.pause();
@@ -32,11 +32,11 @@ musicBtn.onclick = () => {
     playing = !playing;
 };
 
-// --- SISTEM MODAL (CARD VIEW) ---
+// --- MODAL ---
 function openModal(name) {
     const modal = document.getElementById('animalModal');
     const modalBody = document.getElementById('modalBody');
-    const data = animalDatabase[name] || { sp: "Misterius", atk: 50, def: 50, spd: 50, desc: "Data belum tercatat." };
+    const data = animalDatabase[name] || { sp: "Misterius", atk: 50, def: 50, spd: 50, desc: "Data belum ada." };
     
     modalBody.innerHTML = `
         <div class="fifa-card">
@@ -68,11 +68,7 @@ function closeModal() {
     document.getElementById('animalModal').style.display = 'none';
 }
 
-function closeModalOutside(event) {
-    if (event.target.id === 'animalModal') closeModal();
-}
-
-// --- DATA FETCHING ---
+// --- FETCH DATA ---
 async function fetchData() {
     try {
         const response = await fetch(`${sheetUrl}&nocache=${new Date().getTime()}`);
@@ -97,24 +93,25 @@ async function fetchData() {
 
         const lastPositions = JSON.parse(localStorage.getItem('league_ranks') || '{}');
         const currentPositions = {};
-
         players.forEach((p, index) => {
             const rankSekarang = index + 1;
             p.rankLama = lastPositions[p.nama] || rankSekarang;
             currentPositions[p.nama] = rankSekarang;
         });
-
         localStorage.setItem('league_ranks', JSON.stringify(currentPositions));
+
         renderTable(players);
         document.getElementById('status').innerText = "LIVE • TERKONEKSI";
     } catch (err) {
-        document.getElementById('status').innerText = "KONEKSI TERPUTUS";
+        console.error("Fetch error:", err);
+        document.getElementById('status').innerText = "ERROR KONEKSI DATA";
     }
 }
 
 function renderTable(players) {
-    const tbody = document.querySelector("#mainTable tbody");
-    tbody.innerHTML = "";
+    const table = document.querySelector("#mainTable tbody");
+    if (!table) return; // Pengaman jika table tidak ditemukan
+    table.innerHTML = "";
 
     players.forEach((p, i) => {
         const tr = document.createElement("tr");
@@ -142,12 +139,13 @@ function renderTable(players) {
             </td>
             <td><strong>${p.point}</strong></td>
             <td>${p.goals}</td>
-            <td style="color:#00f2ff; font-size:10px;">━━━━</td>
             <td style="font-weight:bold; font-size:13px;">${trendHtml}</td>
+            <td style="color:#00f2ff; font-size:10px;">━━━━</td>
         `;
-        tbody.appendChild(tr);
+        table.appendChild(tr);
     });
 }
 
+// Jalankan fungsi
 fetchData();
 setInterval(fetchData, 30000);
