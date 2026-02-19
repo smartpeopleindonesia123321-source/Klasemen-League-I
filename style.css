@@ -8,125 +8,72 @@
 
 body {
     margin: 0; padding: 0;
-    font-family: 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), 
-                url("https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1920&q=80");
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.95)), url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1920&q=80');
     background-size: cover; background-attachment: fixed;
     color: white; min-height: 100vh;
 }
 
-.container { width: 100%; max-width: 800px; margin: 0 auto; padding: 10px; box-sizing: border-box; }
+.container { width: 100%; max-width: 800px; margin: 0 auto; padding: 10px; }
+h1 { text-align: center; text-transform: uppercase; letter-spacing: 2px; margin: 20px 0; font-size: 24px; }
+#status { text-align: center; font-size: 11px; color: var(--accent); margin-bottom: 10px; }
 
-h1 { font-size: clamp(20px, 6vw, 32px); text-align: center; text-transform: uppercase; letter-spacing: 2px; margin: 15px 0; }
+.table-container { background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
+.info-banner { background: rgba(255,255,255,0.1); padding: 12px; text-align: center; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-#status { text-align: center; padding: 5px; font-size: 11px; color: var(--accent); margin-bottom: 5px; height: 15px; }
+table { width: 100%; border-collapse: collapse; }
+th { padding: 15px 5px; background: rgba(30, 64, 175, 0.8); color: var(--accent); font-size: 11px; text-transform: uppercase; }
+td { padding: 12px 5px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-.table-container {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-    border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1);
-    overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+.team-wrapper { display: flex; align-items: center; gap: 12px; padding-left: 10px; }
+.team-logo { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; transition: 0.3s; border: 2px solid rgba(255,255,255,0.2); }
+.team-logo:hover { transform: scale(1.2); border-color: var(--accent); }
+.team-name { font-weight: 500; font-size: 16px; }
+
+/* Rank Styling */
+.rank-1 td:first-child { background: var(--gold); color: black; font-weight: bold; }
+.rank-2 td:first-child { background: var(--silver); color: white; font-weight: bold; }
+.rank-3 td:first-child { background: var(--bronze); color: white; font-weight: bold; }
+
+/* MODAL */
+.modal-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(10px); z-index: 1000000;
+}
+.modal-content {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: #1e293b; padding: 30px; border-radius: 20px; border: 2px solid var(--accent);
+    width: 85%; max-width: 350px; text-align: center; box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
 }
 
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.close-btn { position: absolute; top: 10px; right: 20px; font-size: 30px; cursor: pointer; color: #fff; }
+.ok-btn { margin-top: 20px; padding: 10px 30px; background: var(--accent); border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: #000; }
 
-th { 
-    padding: 12px 5px; text-transform: uppercase; font-size: 11px; 
-    color: var(--accent); background: rgba(30, 64, 175, 0.8); 
+/* Styling Baris Degradasi */
+.degradasi td:first-child {
+    background: linear-gradient(135deg, #ff4b2b 0%, #ff416c 100%) !important;
+    color: white !important;
+    font-weight: bold;
+}
+.degradasi {
+    background: rgba(255, 75, 43, 0.1) !important;
 }
 
-td { padding: 8px 5px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-.team-wrapper { 
-    display: flex; 
-    align-items: center; 
-    gap: 12px;
-    padding-left: 10px;
-}
-
-.team-logo { 
-    width: 40px; 
-    height: 40px; 
-    object-fit: cover; 
-    border-radius: 50%; 
-    flex-shrink: 0; 
-    border: 1px solid rgba(255,255,255,0.1);
-}
-
-.team-name { 
-    font-weight: 500;
-    font-size: 18px;
-    color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: left;
-}
-
-.rank-1 td:first-child { background: var(--gold); color: #000; font-weight: bold; }
-.rank-2 td:first-child { background: var(--silver); color: #fff; font-weight: bold; }
-.rank-3 td:first-child { background: var(--bronze); color: #fff; font-weight: bold; }
-
-.up { color: #00ff88; font-size: 10px; font-weight: bold; }
-.down { color: #ff4d4d; font-size: 10px; font-weight: bold; }
-.stay { color: #666; font-size: 10px; }
-
-.sparkline-canvas { width: 60px !important; height: 20px !important; }
-
-tr { transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
-
-.toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
-.toast {
-    background: rgba(30, 64, 175, 0.95);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    margin-top: 10px;
-    border-left: 4px solid var(--accent);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    animation: slideIn 0.5s ease forwards, fadeOut 0.5s ease forwards 4s;
-}
-
-@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes fadeOut { to { opacity: 0; transform: translateY(-20px); } }
-
-.rank-1 { position: relative; box-shadow: inset 0 0 20px rgba(246, 211, 101, 0.2); }
-.rank-1 .team-name { text-shadow: 0 0 10px rgba(246, 211, 101, 0.8); font-weight: bold; }
-
-/* --- PERBAIKAN ZONA DEGRADASI --- */
-/* Gunakan selector yang lebih kuat agar background merah muncul */
-#mainTable tbody tr.degradasi {
-    background: rgba(220, 38, 38, 0.3) !important; /* Merah lebih tegas */
-    border-left: 4px solid #ef4444; /* Kasih garis merah di samping kiri baris */
-}
-
-#mainTable tbody tr.degradasi td:first-child {
-    background: #dc2626 !important; /* Posisi (angka) jadi merah pekat */
-    color: #fff !important;
-}
-
-#mainTable tbody tr.degradasi .team-name {
-    color: #fca5a5 !important; /* Nama jadi merah muda terang */
-}
-
-#music-container {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 10px;
-  border-radius: 50%;
-  cursor: pointer;
-  z-index: 1000;
-  border: 2px solid #edb211; /* Warna emas ala UCL */
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.3s;
-}
-
-#music-container:hover {
-  transform: scale(1.1);
+/* Tombol Musik Melayang */
+.music-control {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #edb211;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 9999;
+    font-size: 24px;
+    box-shadow: 0 0 15px rgba(237, 178, 17, 0.4);
 }
