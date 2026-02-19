@@ -4,16 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FOOTBALL LEAGUE-I | Pro Mobile</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
     <h1>FOOTBALL LEAGUE-I</h1>
-    <div id="status">SINKRONISASI DATA...</div>
+    <div id="status">MENGHUBUNGKAN KE SERVER...</div>
 
     <div class="table-container">
+        <div class="info-banner">
+            💡 <strong>Tips:</strong> Klik ikon binatang untuk info spesies!
+        </div>
         <table id="mainTable">
             <thead>
                 <tr>
@@ -30,16 +32,18 @@
     </div>
 </div>
 
-<script src="script.js"></script>
-<audio id="bgMusic" loop>
-  <source src="ucl-theme.mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
+<div id="animalModal" class="modal-overlay" onclick="closeModalOutside(event)">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <div id="modalBody"></div>
+        <button class="ok-btn" onclick="closeModal()">OKE</button>
+    </div>
+</div>
+
+<audio id="uclMusic" loop>
+    <source src="ucl-theme.mp3" type="audio/mpeg">
 </audio>
 
-<div id="music-container" onclick="toggleMusic()">
-  <span id="music-icon">🔇</span> </div>
+<script src="script.js"></script>
 </body>
 </html>
-
-
-
