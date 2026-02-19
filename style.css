@@ -1,79 +1,56 @@
-:root {
-    --primary: #1e40af;
-    --accent: #00f2ff;
-    --gold: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-    --silver: linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%);
-    --bronze: linear-gradient(135deg, #d97706 0%, #78350f 100%);
+/* --- FIFA CARD CSS --- */
+.fifa-card { 
+    text-align: left; 
 }
-
-body {
-    margin: 0; padding: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.95)), url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1920&q=80');
-    background-size: cover; background-attachment: fixed;
-    color: white; min-height: 100vh;
+.card-title { 
+    color: var(--accent); 
+    font-size: 18px;
+    margin-bottom: 20px; 
+    text-transform: uppercase; 
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 10px;
 }
-
-.container { width: 100%; max-width: 800px; margin: 0 auto; padding: 10px; }
-h1 { text-align: center; text-transform: uppercase; letter-spacing: 2px; margin: 20px 0; font-size: 24px; }
-#status { text-align: center; font-size: 11px; color: var(--accent); margin-bottom: 10px; }
-
-.table-container { background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
-.info-banner { background: rgba(255,255,255,0.1); padding: 12px; text-align: center; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-table { width: 100%; border-collapse: collapse; }
-th { padding: 15px 5px; background: rgba(30, 64, 175, 0.8); color: var(--accent); font-size: 11px; text-transform: uppercase; }
-td { padding: 12px 5px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-.team-wrapper { display: flex; align-items: center; gap: 12px; padding-left: 10px; }
-.team-logo { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; transition: 0.3s; border: 2px solid rgba(255,255,255,0.2); }
-.team-logo:hover { transform: scale(1.2); border-color: var(--accent); }
-.team-name { font-weight: 500; font-size: 16px; }
-
-/* Rank Styling */
-.rank-1 td:first-child { background: var(--gold); color: black; font-weight: bold; }
-.rank-2 td:first-child { background: var(--silver); color: white; font-weight: bold; }
-.rank-3 td:first-child { background: var(--bronze); color: white; font-weight: bold; }
-
-/* MODAL */
-.modal-overlay {
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(10px); z-index: 1000000;
+.stats-container { 
+    margin-bottom: 20px; 
 }
-.modal-content {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: #1e293b; padding: 30px; border-radius: 20px; border: 2px solid var(--accent);
-    width: 85%; max-width: 350px; text-align: center; box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
+.stat-item { 
+    display: flex; 
+    align-items: center; 
+    margin-bottom: 15px; 
+    font-weight: bold; 
+    font-size: 12px;
 }
-
-.close-btn { position: absolute; top: 10px; right: 20px; font-size: 30px; cursor: pointer; color: #fff; }
-.ok-btn { margin-top: 20px; padding: 10px 30px; background: var(--accent); border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: #000; }
-
-/* Styling Baris Degradasi */
-.degradasi td:first-child {
-    background: linear-gradient(135deg, #ff4b2b 0%, #ff416c 100%) !important;
-    color: white !important;
-    font-weight: bold;
+.stat-item span:first-child { 
+    width: 35px; 
+    color: #fff;
 }
-.degradasi {
-    background: rgba(255, 75, 43, 0.1) !important;
+.progress-bg { 
+    flex-grow: 1; 
+    height: 8px; 
+    background: rgba(255,255,255,0.1); 
+    border-radius: 4px; 
+    margin: 0 12px; 
+    overflow: hidden;
 }
+.progress-fill { 
+    height: 100%; 
+    border-radius: 4px; 
+    transition: width 1.5s cubic-bezier(0.1, 0.42, 0.41, 1); 
+}
+.atk { background: linear-gradient(90deg, #ff4b2b, #ff416c); }
+.def { background: linear-gradient(90deg, #1fddff, #0072ff); }
+.spd { background: linear-gradient(90deg, #00f260, #0575e6); }
 
-/* Tombol Musik Melayang */
-.music-control {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    background: rgba(0, 0, 0, 0.8);
-    border: 2px solid #edb211;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 9999;
-    font-size: 24px;
-    box-shadow: 0 0 15px rgba(237, 178, 17, 0.4);
+.stat-val { 
+    width: 25px; 
+    text-align: right; 
+    color: var(--accent); 
+}
+.card-desc { 
+    font-size: 13px; 
+    color: #cbd5e1; 
+    line-height: 1.6; 
+    background: rgba(0,0,0,0.2);
+    padding: 10px;
+    border-radius: 10px;
 }
