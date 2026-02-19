@@ -95,8 +95,8 @@ function renderTable(players) {
         else if (rankSekarang === 2) tr.classList.add("rank-2");
         else if (rankSekarang === 3) tr.classList.add("rank-3");
         
-        // ZONA DEGRADASI (Otomatis 3 terbawah)
-        if (rankSekarang > players.length - 3) {
+        // ZONA DEGRADASI (Otomatis 1 terbawah)
+        if (rankSekarang > players.length - 1) {
             tr.classList.add("degradasi");
         }
 
@@ -134,3 +134,4 @@ window.onclick = function(e) { if(e.target.className === 'modal-overlay') closeM
 
 fetchData();
 setInterval(fetchData, 30000);
+
