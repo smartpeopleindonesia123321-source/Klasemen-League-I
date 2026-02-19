@@ -21,38 +21,37 @@ h1 { text-align: center; letter-spacing: 2px; text-shadow: 0 0 15px var(--accent
 .info-banner { background: rgba(255,255,255,0.1); padding: 12px; text-align: center; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
 table { width: 100%; border-collapse: collapse; }
-th { padding: 15px 5px; background: rgba(30, 64, 175, 0.9); color: var(--accent); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+th { padding: 15px 5px; background: rgba(30, 64, 175, 0.9); color: var(--accent); font-size: 11px; text-transform: uppercase; }
 td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 15px; }
 
-/* HOVER ICON PEMAIN - DIPERKUAT */
+/* HOVER LOGO - DIPERBAIKI */
 .team-wrapper { display: flex; align-items: center; gap: 12px; padding-left: 15px; }
 .team-logo { 
     width: 45px; height: 45px; border-radius: 50%; cursor: pointer; 
     border: 2px solid #fff; background: #fff; object-fit: cover;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    display: block;
+    transition: all 0.3s ease; /* Animasi membesar */
 }
 .team-logo:hover { 
-    transform: scale(1.4) rotate(5deg); 
-    border-color: var(--accent); 
-    box-shadow: 0 0 20px var(--accent);
-    z-index: 99;
+    transform: scale(1.4); /* Membesar 1.4x */
+    border-color: var(--accent);
+    box-shadow: 0 0 15px var(--accent);
+    z-index: 10;
 }
 
-/* RANKING STYLING */
+/* WARNA RANKING */
 .rank-1 td:first-child { background: var(--gold) !important; color: #000 !important; font-weight: 800; }
-.rank-2 td:first-child { background: var(--silver) !important; color: #fff; }
-.rank-3 td:first-child { background: var(--bronze) !important; color: #fff; }
+.rank-2 td:first-child { background: var(--silver) !important; }
+.rank-3 td:first-child { background: var(--bronze) !important; }
 
-/* ZONA DEGRADASI - MERAH DEGRADASI */
+/* ZONA DEGRADASI - HANYA 1 ORANG TERBAWAH */
 .degradasi td:first-child { 
     background: var(--danger) !important; 
     color: white !important; 
     font-weight: 800;
 }
-.degradasi { background: rgba(255, 75, 43, 0.15) !important; }
+.degradasi { background: rgba(255, 75, 43, 0.1) !important; }
 
-/* MODAL & STATS */
+/* MODAL FIFA CARD */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; backdrop-filter: blur(5px); }
 .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 25px; border-radius: 20px; border: 2px solid var(--accent); width: 290px; }
 .stat-item { display: flex; align-items: center; margin-bottom: 12px; font-weight: bold; font-size: 12px; }
@@ -62,7 +61,6 @@ td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(255,25
 .def { background: linear-gradient(90deg, #1fddff, #0072ff); }
 .spd { background: linear-gradient(90deg, #00f260, #0575e6); }
 
-/* TOMBOL MUSIK - POSISI FIXED */
 .music-control { 
     position: fixed; bottom: 25px; right: 25px; width: 50px; height: 50px; 
     background: #000; border: 2px solid var(--accent); border-radius: 50%; 
