@@ -1,277 +1,118 @@
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=0&single=true&output=csv';
 
-// ==========================================
-// 1. SETUP MUSIC UCL (FADE-IN & FADE-OUT)
-// ==========================================
-const audio = document.createElement('audio');
-audio.id = 'uclMusic';
-audio.loop = true;
-audio.src = 'ucl-theme.mp3'; // <--- PASTIKAN FILE MP3 ADA DI FOLDER PROJECT
-audio.volume = 0; 
-document.body.appendChild(audio);
+const animalDatabase = {
+    "Dandi": { sp: "Dandi sang Beruang Grizzly", desc: "Spesies beruang puncak yang dikenal sebagai penguasa daratan. Kekuatan murninya tak tertandingi, sanggup melumpuhkan lawan dengan satu hantaman dan melahap mangsanya secara brutal tanpa sisa" },
+    "Erni": { sp: "Erni sang Kucing Angora", desc: "Di balik penampilannya yang anggun, tersimpan insting pemburu yang sangat tajam. Gerakannya sangat halus namun penuh perhitungan, mampu melakukan serangan kejutan yang tidak terduga." },
+    "Regi": { sp: "Regi sang Siberian Husky", desc: "Memiliki loyalitas tanpa batas dan keberanian yang melegenda. Ia adalah pelindung sejati yang tak akan mundur dalam situasi genting, selalu siap mempertaruhkan segalanya demi kemenangan tim." },
+    "Rizal": { sp: "Rizal sang Serigala Kutub", desc: "Pemburu taktis yang sangat cerdas dan setia pada kelompok. Ia mengintai dalam senyap, bergerak secepat kilat di tengah badai, dan menyerang titik lemah lawan dengan akurasi yang mematikan." },
+    "Asep": { sp: "Asep sang Banteng Spanyol", desc: "Simbol kekuatan tak terbendung yang penuh amarah. Dengan tanduk yang kokoh dan insting menyerang yang tajam, ia akan menyeruduk siapa pun yang berani menghalangi jalurnya di arena." },
+    "Aries": { sp: "Aries sang Singa Siberia", desc: "Predator penguasa wilayah dingin yang tangguh. Aumannya adalah peringatan bagi musuh, dan keberaniannya dalam memimpin perburuan menjadikannya raja yang paling disegani di medan laga." },
+    "Ikmal": { sp: "Ikmal sang Rusa Kutub", desc: "Spesies pengembara yang memiliki ketahanan fisik luar biasa. Kelincahannya saat melintasi medan sulit membuatnya sangat sulit ditangkap, selalu selangkah lebih maju dari kejaran lawan." },
+    "Yanti": { sp: "Yanti sang Kelinci Afrika", desc: "Kecil namun memiliki kecepatan dan daya ledak yang mengejutkan. Ia adalah ahli dalam hal meloloskan diri dan menyelinap, memanfaatkan kelincahannya untuk mengecoh musuh yang lebih besar." },
+    "Maya": { sp: "Maya sang Panda Tiongkok", desc: "Terlihat tenang dan bersahabat, namun memiliki rahang yang sangat kuat dan tenaga yang tersembunyi. Ia adalah sosok yang sabar namun mematikan saat dipaksa untuk bertarung demi wilayahnya." },
+    "Dicky": { sp: "Dicky sang Raja Kingkong", desc: "Kekuatan raksasa dari hutan rimba yang sangat dominan. Memiliki determinasi tinggi dan dominasi fisik yang luar biasa, ia adalah benteng pertahanan terakhir yang sulit untuk ditembus." }
+};
 
+// --- SISTEM MUSIK ---
+const audio = document.getElementById('uclMusic');
 const musicBtn = document.createElement('div');
-musicBtn.id = 'music-control';
-musicBtn.innerHTML = '🔇'; 
-musicBtn.style.cssText = `
-    position: fixed; bottom: 20px; right: 20px; 
-    background: rgba(0,0,0,0.8); color: #edb211; 
-    width: 50px; height: 50px; border-radius: 50%; 
-    display: flex; align-items: center; justify-content: center; 
-    cursor: pointer; z-index: 9999; border: 2px solid #edb211;
-    font-size: 24px; transition: 0.3s; box-shadow: 0 0 15px rgba(237, 178, 17, 0.3);
-`;
+musicBtn.className = 'music-control';
+musicBtn.innerHTML = '🔇';
 document.body.appendChild(musicBtn);
 
-let isMusicPlaying = false;
-const maxVolume = 0.7; // Volume maksimal
-
-function fadeIn(audioElement, duration) {
-    let vol = 0;
-    const interval = 50;
-    const step = maxVolume / (duration / interval);
-    const fadeContainer = setInterval(() => {
-        if (vol < maxVolume) {
-            vol += step;
-            audioElement.volume = Math.min(vol, maxVolume);
-        } else {
-            clearInterval(fadeContainer);
-        }
-    }, interval);
-}
-
-function fadeOut(audioElement, duration) {
-    let vol = audioElement.volume;
-    const interval = 50;
-    const step = vol / (duration / interval);
-    const fadeContainer = setInterval(() => {
-        if (vol > 0) {
-            vol -= step;
-            audioElement.volume = Math.max(vol, 0);
-        } else {
-            audioElement.pause();
-            clearInterval(fadeContainer);
-        }
-    }, interval);
-}
-
-function toggleMusic() {
-    if (isMusicPlaying) {
-        fadeOut(audio, 1000);
-        musicBtn.innerHTML = '🔇';
+let playing = false;
+musicBtn.onclick = () => {
+    if (!playing) {
+        audio.play().catch(e => console.log("Klik interaksi diperlukan"));
+        musicBtn.innerHTML = '🔊';
     } else {
-        audio.play();
-        fadeIn(audio, 1500);
-        musicBtn.innerHTML = '🔊';
+        audio.pause();
+        musicBtn.innerHTML = '🔇';
     }
-    isMusicPlaying = !isMusicPlaying;
+    playing = !playing;
+};
+
+// --- SISTEM MODAL ---
+function openModal(name) {
+    const modal = document.getElementById('animalModal');
+    const modalBody = document.getElementById('modalBody');
+    const data = animalDatabase[name] || { sp: "Spesies Misterius", desc: "Data belum tercatat di database liga." };
+    modalBody.innerHTML = `<h2 style="color:#00f2ff; margin-top:0;">${data.sp}</h2><p style="color:#cbd5e1; line-height:1.5;">"${data.desc}"</p>`;
+    modal.style.display = 'block';
 }
 
-musicBtn.addEventListener('click', (e) => {
-    e.stopPropagation(); // Biar gak trigger event click body
-    toggleMusic();
-});
-
-// Autoplay pertama kali saat user berinteraksi dengan web
-document.addEventListener('click', () => {
-    if (!isMusicPlaying) {
-        audio.play();
-        fadeIn(audio, 3000); // Fade in 3 detik biar dramatis
-        isMusicPlaying = true;
-        musicBtn.innerHTML = '🔊';
-    }
-}, { once: true });
-
-
-// ==========================================
-// 2. SETUP TOAST NOTIFICATION
-// ==========================================
-const toastContainer = document.createElement('div');
-toastContainer.className = 'toast-container';
-document.body.appendChild(toastContainer);
-
-function showToast(message) {
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.innerText = message;
-    toastContainer.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 500);
-    }, 4500);
+function closeModal() {
+    document.getElementById('animalModal').style.display = 'none';
 }
 
+function closeModalOutside(event) {
+    if (event.target.id === 'animalModal') closeModal();
+}
 
-// ==========================================
-// 3. FUNGSI UTAMA FETCH DATA
-// ==========================================
+// --- DATA FETCHING ---
 async function fetchData() {
     try {
-        const statusEl = document.getElementById('status');
-        if(statusEl) statusEl.innerText = "MEMPERBARUI DATA...";
-        
-        // Catat posisi sebelum update untuk animasi
-        const rowsBefore = Array.from(document.querySelectorAll("#mainTable tbody tr"));
-        const firstPositions = {};
-        rowsBefore.forEach(row => {
-            const teamName = row.querySelector('.team-name')?.innerText;
-            if (teamName) firstPositions[teamName] = row.getBoundingClientRect().top;
-        });
+        const response = await fetch(`${sheetUrl}&nocache=${new Date().getTime()}`);
+        const csvText = await response.text();
+        const lines = csvText.split(/\r?\n/);
+        const players = [];
 
-        const response = await fetch(`${sheetUrl}&cache=${new Date().getTime()}`);
-        const rawData = await response.text();
-        
-        const rows = rawData.split('\n').slice(1);
-        let players = rows.map(row => {
-            const cols = row.split(',');
-            return {
-                nama: cols[0]?.replace(/"/g, '').trim(),
-                point: parseInt(cols[1]) || 0,
-                goals: parseInt(cols[2]) || 0,
-                logo: cols[3]?.replace(/"/g, '').trim() || ''
-            };
-        }).filter(p => p.nama);
-
-        // Sortir: Poin -> Selisih Gol
-        players.sort((a, b) => b.point - a.point || b.goals - a.goals);
-        
-        updateHistoryAndRender(players);
-
-        // Animasi perpindahan baris & Notifikasi
-        const rowsAfter = Array.from(document.querySelectorAll("#mainTable tbody tr"));
-        rowsAfter.forEach(row => {
-            const teamName = row.querySelector('.team-name').innerText;
-            const lastPos = row.getBoundingClientRect().top;
-            const firstPos = firstPositions[teamName];
-
-            if (firstPos && firstPos !== lastPos) {
-                const deltaY = firstPos - lastPos;
-                
-                if (deltaY > 0) {
-                    const rankNow = row.querySelector('td:first-child').innerText;
-                    if (rankNow === "1") {
-                        showToast(`🔥 BOOM! ${teamName} SEKARANG DI PUNCAK!`);
-                    } else {
-                        showToast(`🚀 ${teamName} berhasil naik peringkat!`);
-                    }
-                }
-
-                row.animate([
-                    { transform: `translateY(${deltaY}px)` },
-                    { transform: 'translateY(0)' }
-                ], {
-                    duration: 1000,
-                    easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+        for (let i = 1; i < lines.length; i++) {
+            if (!lines[i]) continue;
+            const cols = lines[i].split(',').map(c => c.replace(/^"|"$/g, '').trim());
+            if (cols[0]) {
+                players.push({
+                    nama: cols[0],
+                    point: parseInt(cols[1]) || 0,
+                    goals: parseInt(cols[2]) || 0,
+                    logo: cols[3] || ''
                 });
             }
-        });
-
-        if(statusEl) statusEl.innerText = "LIVE • TERUPDATE";
+        }
+        players.sort((a, b) => b.point - a.point || b.goals - a.goals);
+        renderTable(players);
+        document.getElementById('status').innerText = "LIVE • TERKONEKSI";
     } catch (err) {
-        if(document.getElementById('status')) document.getElementById('status').innerText = "KONEKSI BERMASALAH";
-        console.error(err);
+        document.getElementById('status').innerText = "KONEKSI TERPUTUS";
     }
 }
 
-
-// ==========================================
-// 4. LOGIKA RENDER TABEL & HISTORY
-// ==========================================
-function updateHistoryAndRender(players) {
-    const lastRankMap = JSON.parse(localStorage.getItem('savedRank')) || {};
-    const history = JSON.parse(localStorage.getItem('rankHistory')) || {};
-    const currentRankMap = {};
+function renderTable(players) {
     const tbody = document.querySelector("#mainTable tbody");
-    
-    players.forEach((p, i) => {
-        const rankNow = i + 1;
-        currentRankMap[p.nama] = rankNow;
-        if (!history[p.nama]) history[p.nama] = [];
-        history[p.nama].push(rankNow);
-        if (history[p.nama].length > 8) history[p.nama].shift();
-    });
-
     tbody.innerHTML = "";
 
     players.forEach((p, i) => {
-        const rankNow = i + 1;
-        const isLast = (rankNow === players.length);
-        let changeHtml = '<span class="stay">−</span>';
-        let diff = 0;
-
-        if (lastRankMap[p.nama]) {
-            diff = lastRankMap[p.nama] - rankNow;
-            if (diff > 0) changeHtml = `<span class="up">▲${diff}</span>`;
-            else if (diff < 0) changeHtml = `<span class="down">▼${Math.abs(diff)}</span>`;
+        const tr = document.createElement("tr");
+        
+        // CSS Rankings
+        if (i === 0) tr.classList.add("rank-1");
+        else if (i === 1) tr.classList.add("rank-2");
+        else if (i === 2) tr.classList.add("rank-3");
+        
+        // Baris Terakhir = Degradasi
+        if (i === players.length - 1 && players.length > 1) {
+            tr.classList.add("degradasi");
         }
 
-        const tr = document.createElement("tr");
-        if (rankNow === 1) tr.className = "rank-1";
-        else if (rankNow === 2) tr.className = "rank-2";
-        else if (rankNow === 3) tr.className = "rank-3";
-        if (isLast) tr.classList.add("degradasi");
-
         tr.innerHTML = `
-            <td>${rankNow}</td>
-            <td style="text-align: left;">
+            <td>${i + 1}</td>
+            <td style="text-align:left">
                 <div class="team-wrapper">
-                    <img src="${p.logo || 'https://cdn-icons-png.flaticon.com/512/33/33736.png'}" class="team-logo">
+                    <img src="${p.logo}" class="team-logo" onclick="openModal('${p.nama}')" onerror="this.src='https://via.placeholder.com/40'">
                     <span class="team-name">${p.nama}</span>
                 </div>
             </td>
             <td><strong>${p.point}</strong></td>
             <td>${p.goals}</td>
-            <td><canvas id="spark-${i}" class="sparkline-canvas" width="80" height="30"></canvas></td>
-            <td>${changeHtml}</td>
+            <td style="color:#00f2ff; font-size:10px;">━━━━</td>
+            <td>-</td>
         `;
         tbody.appendChild(tr);
-
-        renderSparkline(`spark-${i}`, history[p.nama], diff);
-    });
-
-    localStorage.setItem('savedRank', JSON.stringify(currentRankMap));
-    localStorage.setItem('rankHistory', JSON.stringify(history));
-}
-
-
-// ==========================================
-// 5. RENDER GRAFIK SPARKLINE
-// ==========================================
-function renderSparkline(canvasId, dataPoints, diff) {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    
-    let lineColor = '#00f2ff'; 
-    if (diff > 0) lineColor = '#00ff88'; 
-    else if (diff < 0) lineColor = '#ff4d4d'; 
-
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: dataPoints.map((_, i) => i),
-            datasets: [{
-                data: dataPoints,
-                borderColor: lineColor,
-                borderWidth: 2,
-                fill: false,
-                tension: 0.4,
-                pointRadius: 0
-            }]
-        },
-        options: {
-            responsive: false,
-            animation: false,
-            plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            scales: { 
-                x: { display: false }, 
-                y: { display: false, reverse: true } 
-            }
-        }
     });
 }
 
-// Eksekusi
 fetchData();
 setInterval(fetchData, 30000);
+
+
+
