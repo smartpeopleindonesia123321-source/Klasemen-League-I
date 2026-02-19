@@ -1,16 +1,16 @@
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=0&single=true&output=csv';
 
 const animalDatabase = {
-    "Dandi": { sp: "Dandi sang Beruang Grizzly", desc: "Spesies beruang puncak yang dikenal sebagai penguasa daratan. Kekuatan murninya tak tertandingi, sanggup melumpuhkan lawan dengan satu hantaman dan melahap mangsanya secara brutal tanpa sisa" },
-    "Erni": { sp: "Erni sang Kucing Angora", desc: "Di balik penampilannya yang anggun, tersimpan insting pemburu yang sangat tajam. Gerakannya sangat halus namun penuh perhitungan, mampu melakukan serangan kejutan yang tidak terduga." },
-    "Regi": { sp: "Regi sang Siberian Husky", desc: "Memiliki loyalitas tanpa batas dan keberanian yang melegenda. Ia adalah pelindung sejati yang tak akan mundur dalam situasi genting, selalu siap mempertaruhkan segalanya demi kemenangan tim." },
-    "Rizal": { sp: "Rizal sang Serigala Kutub", desc: "Pemburu taktis yang sangat cerdas dan setia pada kelompok. Ia mengintai dalam senyap, bergerak secepat kilat di tengah badai, dan menyerang titik lemah lawan dengan akurasi yang mematikan." },
-    "Asep": { sp: "Asep sang Banteng Spanyol", desc: "Simbol kekuatan tak terbendung yang penuh amarah. Dengan tanduk yang kokoh dan insting menyerang yang tajam, ia akan menyeruduk siapa pun yang berani menghalangi jalurnya di arena." },
-    "Aries": { sp: "Aries sang Singa Siberia", desc: "Predator penguasa wilayah dingin yang tangguh. Aumannya adalah peringatan bagi musuh, dan keberaniannya dalam memimpin perburuan menjadikannya raja yang paling disobani di medan laga." },
-    "Ikmal": { sp: "Ikmal sang Rusa Kutub", desc: "Spesies pengembara yang memiliki ketahanan fisik luar biasa. Kelincahannya saat melintasi medan sulit membuatnya sangat sulit ditangkap, selalu selangkah lebih maju dari kejaran lawan." },
-    "Yanti": { sp: "Yanti sang Kelinci Afrika", desc: "Kecil namun memiliki kecepatan dan daya ledak yang mengejutkan. Ia adalah ahli dalam hal meloloskan diri dan menyelinap, memanfaatkan kelincahannya untuk mengecoh musuh yang lebih besar." },
-    "Maya": { sp: "Maya sang Panda Tiongkok", desc: "Terlihat tenang dan bersahabat, namun memiliki rahang yang sangat kuat dan tenaga yang tersembunyi. Ia adalah sosok yang sabar namun mematikan saat dipaksa untuk bertarung demi wilayahnya." },
-    "Dicky": { sp: "Dicky sang Raja Kingkong", desc: "Kekuatan raksasa dari hutan rimba yang sangat dominan. Memiliki determinasi tinggi dan dominasi fisik yang luar biasa, ia adalah benteng pertahanan terakhir yang sulit untuk ditembus." }
+    "Dandi": { sp: "Dandi sang Beruang Grizzly", atk: 95, def: 90, spd: 70, desc: "Spesies beruang puncak yang dikenal sebagai penguasa daratan. Kekuatan murninya tak tertandingi, sanggup melumpuhkan lawan dengan satu hantaman." },
+    "Erni": { sp: "Erni sang Kucing Angora", atk: 65, def: 55, spd: 92, desc: "Di balik penampilannya yang anggun, tersimpan insting pemburu yang sangat tajam. Gerakannya sangat halus namun penuh perhitungan." },
+    "Regi": { sp: "Regi sang Siberian Husky", atk: 80, def: 85, spd: 88, desc: "Memiliki loyalitas tanpa batas dan keberanian yang melegenda. Ia adalah pelindung sejati yang tak akan mundur dalam situasi genting." },
+    "Rizal": { sp: "Rizal sang Serigala Kutub", atk: 88, def: 75, spd: 95, desc: "Pemburu taktis yang sangat cerdas dan setia pada kelompok. Ia mengintai dalam senyap, bergerak secepat kilat di tengah badai." },
+    "Asep": { sp: "Asep sang Banteng Spanyol", atk: 92, def: 88, spd: 75, desc: "Simbol kekuatan tak terbendung yang penuh amarah. Dengan tanduk yang kokoh dan insting menyerang yang tajam." },
+    "Aries": { sp: "Aries sang Singa Siberia", atk: 96, def: 82, spd: 85, desc: "Predator penguasa wilayah dingin yang tangguh. Aumannya adalah peringatan bagi musuh dan raja yang paling disegani." },
+    "Ikmal": { sp: "Ikmal sang Rusa Kutub", atk: 70, def: 75, spd: 94, desc: "Spesies pengembara yang memiliki ketahanan fisik luar biasa. Kelincahannya membuatnya sangat sulit ditangkap lawan." },
+    "Yanti": { sp: "Yanti sang Kelinci Afrika", atk: 60, def: 50, spd: 98, desc: "Kecil namun memiliki kecepatan dan daya ledak mengejutkan. Ahli dalam meloloskan diri dan menyelinap." },
+    "Maya": { sp: "Maya sang Panda Tiongkok", atk: 85, def: 95, spd: 60, desc: "Terlihat tenang dan bersahabat, namun memiliki rahang yang sangat kuat dan tenaga yang tersembunyi." },
+    "Dicky": { sp: "Dicky sang Raja Kingkong", atk: 98, def: 98, spd: 65, desc: "Kekuatan raksasa dari hutan rimba yang sangat dominan. Benteng pertahanan terakhir yang sulit untuk ditembus." }
 };
 
 // --- SISTEM MUSIK ---
@@ -32,12 +32,35 @@ musicBtn.onclick = () => {
     playing = !playing;
 };
 
-// --- SISTEM MODAL ---
+// --- SISTEM MODAL (CARD VIEW) ---
 function openModal(name) {
     const modal = document.getElementById('animalModal');
     const modalBody = document.getElementById('modalBody');
-    const data = animalDatabase[name] || { sp: "Spesies Misterius", desc: "Data belum tercatat di database liga." };
-    modalBody.innerHTML = `<h2 style="color:#00f2ff; margin-top:0;">${data.sp}</h2><p style="color:#cbd5e1; line-height:1.5;">"${data.desc}"</p>`;
+    const data = animalDatabase[name] || { sp: "Misterius", atk: 50, def: 50, spd: 50, desc: "Data belum tercatat." };
+    
+    modalBody.innerHTML = `
+        <div class="fifa-card">
+            <h2 class="card-title">${data.sp}</h2>
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span>ATK</span>
+                    <div class="progress-bg"><div class="progress-fill atk" style="width: ${data.atk}%"></div></div>
+                    <span class="stat-val">${data.atk}</span>
+                </div>
+                <div class="stat-item">
+                    <span>DEF</span>
+                    <div class="progress-bg"><div class="progress-fill def" style="width: ${data.def}%"></div></div>
+                    <span class="stat-val">${data.def}</span>
+                </div>
+                <div class="stat-item">
+                    <span>SPD</span>
+                    <div class="progress-bg"><div class="progress-fill spd" style="width: ${data.spd}%"></div></div>
+                    <span class="stat-val">${data.spd}</span>
+                </div>
+            </div>
+            <p class="card-desc">"${data.desc}"</p>
+        </div>
+    `;
     modal.style.display = 'block';
 }
 
@@ -49,7 +72,7 @@ window.onclick = function(event) {
     if (event.target.id === 'animalModal') closeModal();
 };
 
-// --- DATA FETCHING DENGAN LOCAL STORAGE LOGIC ---
+// --- DATA FETCHING ---
 async function fetchData() {
     try {
         const response = await fetch(`${sheetUrl}&nocache=${new Date().getTime()}`);
@@ -70,22 +93,18 @@ async function fetchData() {
             }
         }
 
-        // Urutkan berdasarkan Poin, lalu Goal
         players.sort((a, b) => b.point - a.point || b.goals - a.goals);
 
-        // --- LOGIKA POSISI DINAMIS (LOCAL STORAGE) ---
+        // LOGIKA POSISI DINAMIS (LOCAL STORAGE)
         const lastPositions = JSON.parse(localStorage.getItem('league_ranks') || '{}');
         const currentPositions = {};
 
         players.forEach((p, index) => {
             const rankSekarang = index + 1;
-            // Ambil rank lama dari browser, jika tidak ada asumsikan sama dengan sekarang
             p.rankLama = lastPositions[p.nama] || rankSekarang;
-            // Simpan rank sekarang untuk perbandingan berikutnya
             currentPositions[p.nama] = rankSekarang;
         });
 
-        // Simpan posisi terbaru ke LocalStorage
         localStorage.setItem('league_ranks', JSON.stringify(currentPositions));
 
         renderTable(players);
@@ -103,7 +122,6 @@ function renderTable(players) {
         const tr = document.createElement("tr");
         const rankSekarang = i + 1;
         
-        // Tentukan Tren (Naik/Turun)
         let trendHtml = `<span style="color:#64748b">-</span>`;
         if (rankSekarang < p.rankLama) {
             trendHtml = `<span style="color:#22c55e">▲ ${p.rankLama - rankSekarang}</span>`;
@@ -111,15 +129,10 @@ function renderTable(players) {
             trendHtml = `<span style="color:#ef4444">▼ ${rankSekarang - p.rankLama}</span>`;
         }
 
-        // CSS Rankings
         if (i === 0) tr.classList.add("rank-1");
         else if (i === 1) tr.classList.add("rank-2");
         else if (i === 2) tr.classList.add("rank-3");
-        
-        // Baris Terakhir = Degradasi
-        if (i === players.length - 1 && players.length > 1) {
-            tr.classList.add("degradasi");
-        }
+        if (i === players.length - 1 && players.length > 1) tr.classList.add("degradasi");
 
         tr.innerHTML = `
             <td>${rankSekarang}</td>
