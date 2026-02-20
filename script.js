@@ -31,11 +31,15 @@ musicBtn.addEventListener('click', () => {
             musicBtn.innerHTML = '🔊'; // Icon suara nyala
             isPlaying = true;
         }).catch(() => alert("Klik layar mana saja dulu bro!"));
-    } else {
+} else {
         audio.pause();
-        musicBtn.innerHTML = '󱝏'; // Gunakan simbol mute (atau '✕' kecil)
-        // Alternatif paling aman jika icon di atas gak muncul:
-        // musicBtn.innerHTML = '<span style="font-size:14px">OFF</span>'; 
+        // Pakai SVG biar ada icon speaker + tanda silang (X) yang rapi
+        musicBtn.innerHTML = `
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
+                <line x1="23" y1="9" x2="17" y2="15"></line>
+                <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>`;
         isPlaying = false;
     }
 });
@@ -161,4 +165,5 @@ window.onclick = function(e) { if(e.target.className === 'modal-overlay') closeM
 fetchData();
 // Auto refresh setiap 30 detik
 setInterval(fetchData, 30000);
+
 
