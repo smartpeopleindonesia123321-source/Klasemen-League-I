@@ -5,56 +5,71 @@
     --silver: linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%);
     --bronze: linear-gradient(135deg, #d97706 0%, #78350f 100%);
     --danger: linear-gradient(135deg, #ff4b2b 0%, #ff416c 100%);
+    /* Font Racing & Modern */
+    --font-sporty: 'Kanit', sans-serif;
 }
 
 body {
-    margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif;
+    margin: 0; padding: 0; 
+    /* Font utama pakai Kanit biar satu tema */
+    font-family: var(--font-sporty); 
     background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.95)), url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200');
     background-size: cover; background-attachment: fixed; color: white; min-height: 100vh;
 }
 
 .container { width: 100%; max-width: 850px; margin: 0 auto; padding: 10px; }
-h1 { text-align: center; letter-spacing: 2px; text-shadow: 0 0 15px var(--accent); margin-top: 30px; }
-#status { text-align: center; font-size: 11px; color: var(--accent); margin-bottom: 10px; font-weight: bold; }
+h1 { text-align: center; letter-spacing: 2px; text-shadow: 0 0 15px var(--accent); margin-top: 30px; text-transform: uppercase; font-style: italic; }
+#status { text-align: center; font-size: 11px; color: var(--accent); margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
 
 .table-container { background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 .info-banner { background: rgba(255,255,255,0.1); padding: 12px; text-align: center; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
 table { width: 100%; border-collapse: collapse; }
-th { padding: 15px 5px; background: rgba(30, 64, 175, 0.9); color: var(--accent); font-size: 11px; text-transform: uppercase; }
-td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 15px; }
+th { padding: 15px 5px; background: rgba(30, 64, 175, 0.9); color: var(--accent); font-size: 13px; text-transform: uppercase; font-style: italic; }
+td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 16px; }
 
-/* HOVER LOGO - DIPERBAIKI */
+/* NAMA ORANG - MODAL SPORTY & RACING */
+.team-name {
+    font-family: var(--font-sporty);
+    font-weight: 800;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255,255,255,0.2);
+}
+
 .team-wrapper { display: flex; align-items: center; gap: 12px; padding-left: 15px; }
 .team-logo { 
     width: 45px; height: 45px; border-radius: 50%; cursor: pointer; 
     border: 2px solid #fff; background: #fff; object-fit: cover;
-    transition: all 0.3s ease; /* Animasi membesar */
+    transition: all 0.3s ease;
 }
 .team-logo:hover { 
-    transform: scale(1.4); /* Membesar 1.4x */
+    transform: scale(1.4); 
     border-color: var(--accent);
     box-shadow: 0 0 15px var(--accent);
     z-index: 10;
 }
 
 /* WARNA RANKING */
-.rank-1 td:first-child { background: var(--gold) !important; color: #000 !important; font-weight: 800; }
-.rank-2 td:first-child { background: var(--silver) !important; }
-.rank-3 td:first-child { background: var(--bronze) !important; }
+.rank-1 td:first-child { background: var(--gold) !important; color: #000 !important; font-weight: 900; font-style: italic; }
+.rank-2 td:first-child { background: var(--silver) !important; color: #fff; font-style: italic; }
+.rank-3 td:first-child { background: var(--bronze) !important; color: #fff; font-style: italic; }
 
-/* ZONA DEGRADASI - HANYA 1 ORANG TERBAWAH */
+/* ZONA DEGRADASI */
 .degradasi td:first-child { 
     background: var(--danger) !important; 
     color: white !important; 
-    font-weight: 800;
+    font-weight: 900;
+    font-style: italic;
 }
 .degradasi { background: rgba(255, 75, 43, 0.1) !important; }
 
 /* MODAL FIFA CARD */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; backdrop-filter: blur(5px); }
 .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 25px; border-radius: 20px; border: 2px solid var(--accent); width: 290px; }
-.stat-item { display: flex; align-items: center; margin-bottom: 12px; font-weight: bold; font-size: 12px; }
+.stat-item { display: flex; align-items: center; margin-bottom: 12px; font-weight: 900; font-style: italic; font-size: 13px; text-transform: uppercase; }
 .progress-bg { flex-grow: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin: 0 10px; overflow: hidden; }
 .progress-fill { height: 100%; transition: width 1.5s ease-out; }
 .atk { background: linear-gradient(90deg, #ff4b2b, #ff416c); }
@@ -64,5 +79,4 @@ td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(255,25
 .music-control { 
     position: fixed; bottom: 25px; right: 25px; width: 50px; height: 50px; 
     background: #000; border: 2px solid var(--accent); border-radius: 50%; 
-
-
+}
