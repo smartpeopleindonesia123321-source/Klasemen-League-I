@@ -8,43 +8,45 @@
     <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@1,800;1,900&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</div>
 
-<div class="container">
-    <h1>FOOTBALL LEAGUE-I</h1>
-    <div id="status">MENGHUBUNGKAN...</div>
+    <div class="container">
+        <h1>FOOTBALL LEAGUE-I</h1>
+        <div id="status">MENGHUBUNGKAN...</div>
 
-    <div class="table-container">
-        <div class="info-banner">
-            💡 <strong>Tips:</strong> Klik foto tim untuk detail ID Card!
+        <div class="table-container">
+            <div class="info-banner">
+                💡 <strong>Tips:</strong> Klik foto tim untuk detail ID Card!
+            </div>
+            <table id="mainTable">
+                <thead>
+                    <tr>
+                        <th width="8%">POS</th>
+                        <th style="text-align: left; padding-left: 15px;">CONTENDER</th>
+                        <th width="10%">PTS</th>
+                        <th width="10%">AGG</th>
+                        <th width="15%">TREND</th>
+                        <th width="12%">+/-</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
-        <table id="mainTable">
-            <thead>
-                <tr>
-                    <th width="8%">POS</th>
-                    <th style="text-align: left; padding-left: 15px;">CONTENDER</th>
-                    <th width="10%">PTS</th>
-                    <th width="10%">AGG</th>
-                    <th width="15%">TREND</th>
-                    <th width="12%">+/-</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
     </div>
-</div>
 
-<div id="animalModal" class="modal-overlay">
-    <div class="modal-content">
-        <div id="modalBody"></div>
-        <button class="ok-btn" onclick="closeModal()">OKE</button>
+    <div id="animalModal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="modalBody"></div>
+            <button class="ok-btn" onclick="closeModal()">OKE</button>
+        </div>
     </div>
-</div>
 
-<audio id="uclMusic" loop preload="auto">
-    <source src="ucl-theme.mp3" type="audio/mpeg">
-</audio>
+    <audio id="uclMusic" loop preload="auto">
+        <source src="ucl-theme.mp3" type="audio/mpeg">
+    </audio>
 
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
+
 
