@@ -28,12 +28,14 @@ document.body.appendChild(musicBtn);
 musicBtn.addEventListener('click', () => {
     if (!isPlaying) {
         audio.play().then(() => {
-            musicBtn.innerHTML = '🔊';
+            musicBtn.innerHTML = '🔊'; // Icon suara nyala
             isPlaying = true;
         }).catch(() => alert("Klik layar mana saja dulu bro!"));
     } else {
         audio.pause();
-        musicBtn.innerHTML = '🔇';
+        musicBtn.innerHTML = '󱝏'; // Gunakan simbol mute (atau '✕' kecil)
+        // Alternatif paling aman jika icon di atas gak muncul:
+        // musicBtn.innerHTML = '<span style="font-size:14px">OFF</span>'; 
         isPlaying = false;
     }
 });
@@ -159,3 +161,4 @@ window.onclick = function(e) { if(e.target.className === 'modal-overlay') closeM
 fetchData();
 // Auto refresh setiap 30 detik
 setInterval(fetchData, 30000);
+
