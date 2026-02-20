@@ -1,16 +1,16 @@
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=0&single=true&output=csv';
 
 const animalDatabase = {
-    "Dandi": { sp: "Dandi sang Beruang Grizzly", atk: 95, def: 90, spd: 70, desc: 'Kekuatan murni yang tak tertandingi : Sebagai predator puncak dari pegunungan utara, Dandi mewakili kekuatan fisik mentah yang mampu merobek pertahanan apa pun dengan sekali ayunan cakar. Tubuhnya yang masif dilapisi lemak tebal dan otot padat, menjadikannya tank alami yang sangat sulit ditumbangkan meski gerakannya tidak terlalu lincah. Strateginya sederhana namun mematikan. menerima serangan lawan tanpa bergeming, lalu membalas dengan hantaman destruktif yang mengakhiri pertarungan seketika.' },
-    "Erni": { sp: "Erni sang Kucing Angora", atk: 65, def: 55, spd: 92, desc: 'Gerakan halus namun penuh perhitungan : Jangan tertipu oleh bulu putihnya yang elegan dan lembut, karena Erni adalah perwujudan dari kecepatan dan presisi yang mematikan di medan tempur. Ia bergerak layaknya bayangan yang meluncur di atas lantai marmer, menggunakan kelincahan tubuhnya untuk menghindari serangan lawan dengan jarak hanya beberapa milimeter. Setiap cakarnya tidak dirancang untuk menghancurkan, melainkan untuk menyerang titik vital lawan dengan akurasi bedah di saat musuh sedang lengah.' },
-    "Regi": { sp: "Regi sang Siberian Husky", atk: 80, def: 85, spd: 88, desc: 'Loyalitas tanpa batas dan keberanian : Dibentuk oleh kerasnya badai salju abadi, Regi memiliki daya tahan jantung dan stamina yang hampir mustahil untuk dipatahkan. Ia adalah petarung yang mengandalkan disiplin dan kerja keras, di mana keseimbangan antara serangan yang solid dan pertahanan yang kokoh membuatnya menjadi lawan yang sangat stabil. Kesetiaannya pada insting tempur memungkinkannya untuk terus berdiri tegak bahkan ketika musuh mulai kelelahan, menjadikannya pilar kekuatan dalam tim.' },
-    "Rizal": { sp: "Rizal sang Serigala Kutub", atk: 88, def: 75, spd: 95, desc: 'Pemburu taktis yang sangat cerdas : Rizal adalah manifestasi dari kecerdasan taktis yang dipadukan dengan kecepatan kilat di atas hamparan es. Ia tidak pernah menyerang secara membabi buta, melainkan mengamati pola gerakan lawan sebelum meluncurkan serangan cepat yang terencana dengan matang. Sebagai pemburu alami, ia mampu memanfaatkan celah terkecil dalam pertahanan lawan, berpindah dari satu titik ke titik lain dengan sangat efisien hingga musuh merasa terkepung oleh satu ekor serigala saja.' },
-    "Asep": { sp: "Asep sang Banteng Spanyol", atk: 92, def: 88, spd: 75, desc: 'Simbol kekuatan tak terbendung : Begitu Asep mulai memacu langkahnya, tidak ada dinding atau barisan pertahanan yang mampu menghentikan momentum destruktifnya. Ia adalah simbol energi kinetik yang tak terbendung, mengandalkan berat tubuh dan tanduknya yang keras untuk membajak apa pun yang menghalangi jalannya. Meskipun ia kurang dalam hal manuver tikungan, kekuatan dorongannya yang eksplosif membuat lawan biasanya memilih untuk menghindar daripada mencoba menahan terjangan langsungnya.' },
-    "Aries": { sp: "Aries sang Singa Siberia", atk: 96, def: 82, spd: 85, desc: 'Aumannya adalah peringatan musuh : Menggabungkan keanggunan seorang raja dengan keganasan predator es, Aries mendominasi medan perang lewat aura intimidasi dan kekuatan serangan yang luar biasa. Ia memiliki struktur otot yang lebih besar dari singa biasa, memungkinkannya untuk menerjang dengan kecepatan tinggi sambil tetap mempertahankan daya hancur yang mampu mematahkan tulang. Setiap gerakannya mencerminkan otoritas, menjadikannya pusat perhatian yang menakutkan bagi siapa pun yang berani menatap matanya.' },
-    "Ikmal": { sp: "Ikmal sang Rusa Kutub", atk: 70, def: 75, spd: 94, desc: 'Kelincahan yang sulit ditangkap : Ikmal adalah master dalam seni navigasi di medan yang sulit, menggunakan kaki-kakinya yang ramping untuk melakukan akselerasi instan yang membingungkan mata. Ia tidak mengandalkan benturan fisik sebagai senjata utama, melainkan menggunakan kecepatannya untuk melakukan serangan hit-and-run yang membuat lawan frustrasi. Kelincahannya memungkinkannya untuk menari di antara serangan musuh, mengubah medan perang menjadi panggung pertunjukan di mana ia tidak pernah bisa disentuh.' },
-    "Yanti": { sp: "Yanti sang Kelinci Afrika", atk: 60, def: 50, spd: 98, desc: 'Daya ledak kecepatan mengejutkan : Sebagai individu tercepat dalam daftar ini, Yanti adalah keajaiban biomekanik yang mampu berpindah posisi dalam sekejap mata sebelum saraf lawan sempat bereaksi. Meskipun pertahanannya sangat rapuh, ia mengimbanginya dengan kemampuan menghindar yang absolut dan daya ledak kaki belakang yang luar biasa. Strateginya adalah mengandalkan kecepatan murni untuk menyelesaikan konflik sebelum lawan menyadari bahwa pertarungan telah dimulai.' },
-    "Maya": { sp: "Maya sang Panda Tiongkok", atk: 85, def: 95, spd: 60, desc: 'Rahang kuat di balik ketenangan : Di balik perawakannya yang tenang dan menggemaskan, Maya adalah benteng berjalan dengan pertahanan yang hampir mustahil ditembus oleh serangan konvensional. Ia memiliki kepadatan tulang dan lapisan pelindung alami yang luar biasa, memungkinkannya untuk mengabaikan serangan lawan sambil menunggu momen yang tepat. Saat ia memutuskan untuk menyerang, kekuatan rahang dan cengkeramannya mampu memberikan tekanan penghancur yang kontras dengan pembawaannya yang santai.' },
-    "Dicky": { sp: "Dicky sang Raja Kingkong", atk: 98, def: 98, spd: 65, desc: 'Benteng pertahanan terakhir : Berdiri sebagai puncak hierarki kekuatan, Dicky adalah raksasa yang memiliki keseimbangan sempurna antara serangan penghancur dan pertahanan yang absolut. Ia adalah Boss terakhir yang mampu menahan gempuran dari berbagai arah sekaligus tanpa bergeser satu inci pun dari posisinya. Dengan kecerdasan primata tingkat tinggi dan kekuatan fisik yang melampaui batas spesies lain, kehadirannya di medan laga berarti akhir bagi setiap ambisi musuh yang mencoba menantangnya.' }
+    "Dandi": { sp: "Dandi sang Beruang Grizzly", atk: 95, def: 90, spd: 70, desc: 'Kekuatan murni yang tak tertandingi : Sebagai predator puncak dari pegunungan utara, Dandi mewakili kekuatan fisik mentah yang mampu merobek pertahanan apa pun dengan sekali ayunan cakar. Tubuhnya yang masif dilapisi lemak tebal dan otot padat, menjadikannya tank alami yang sangat sulit ditumbangkan.' },
+    "Erni": { sp: "Erni sang Kucing Angora", atk: 65, def: 55, spd: 92, desc: 'Gerakan halus namun penuh perhitungan : Jangan tertipu oleh bulu putihnya yang elegan dan lembut, karena Erni adalah perwujudan dari kecepatan dan presisi yang mematikan di medan tempur. Ia bergerak layaknya bayangan yang meluncur di atas lantai marmer.' },
+    "Regi": { sp: "Regi sang Siberian Husky", atk: 80, def: 85, spd: 88, desc: 'Loyalitas tanpa batas dan keberanian : Dibentuk oleh kerasnya badai salju abadi, Regi memiliki daya tahan jantung dan stamina yang hampir mustahil untuk dipatahkan. Ia adalah petarung yang mengandalkan disiplin dan kerja keras.' },
+    "Rizal": { sp: "Rizal sang Serigala Kutub", atk: 88, def: 75, spd: 95, desc: 'Pemburu taktis yang sangat cerdas : Rizal adalah manifestasi dari kecerdasan taktis yang dipadukan dengan kecepatan kilat di atas hamparan es. Ia mampu memanfaatkan celah terkecil dalam pertahanan lawan.' },
+    "Asep": { sp: "Asep sang Banteng Spanyol", atk: 92, def: 88, spd: 75, desc: 'Simbol kekuatan tak terbendung : Begitu Asep mulai memacu langkahnya, tidak ada dinding atau barisan pertahanan yang mampu menghentikan momentum destruktifnya. Ia adalah simbol energi kinetik yang tak terbendung.' },
+    "Aries": { sp: "Aries sang Singa Siberia", atk: 96, def: 82, spd: 85, desc: 'Aumannya adalah peringatan musuh : Menggabungkan keanggunan seorang raja dengan keganasan predator es, Aries mendominasi medan perang lewat aura intimidasi dan kekuatan serangan yang luar biasa.' },
+    "Ikmal": { sp: "Ikmal sang Rusa Kutub", atk: 70, def: 75, spd: 94, desc: 'Kelincahan yang sulit ditangkap : Ikmal adalah master dalam seni navigasi di medan yang sulit, menggunakan kaki-kakinya yang ramping untuk melakukan akselerasi instan yang membingungkan mata.' },
+    "Yanti": { sp: "Yanti sang Kelinci Afrika", atk: 60, def: 50, spd: 98, desc: 'Daya ledak kecepatan mengejutkan : Sebagai individu tercepat dalam daftar ini, Yanti adalah keajaiban biomekanik yang mampu berpindah posisi dalam sekejap mata sebelum saraf lawan sempat bereaksi.' },
+    "Maya": { sp: "Maya sang Panda Tiongkok", atk: 85, def: 95, spd: 60, desc: 'Rahang kuat di balik ketenangan : Di balik perawakannya yang tenang dan menggemaskan, Maya adalah benteng berjalan dengan pertahanan yang hampir mustahil ditembus oleh serangan konvensional.' },
+    "Dicky": { sp: "Dicky sang Raja Kingkong", atk: 98, def: 98, spd: 65, desc: 'Benteng pertahanan terakhir : Berdiri sebagai puncak hierarki kekuatan, Dicky adalah raksasa yang memiliki keseimbangan sempurna antara serangan penghancur dan pertahanan yang absolut.' }
 };
 
 // --- LOGIKA MUSIK ---
@@ -18,6 +18,10 @@ const audio = document.getElementById('uclMusic');
 let isPlaying = false;
 const musicBtn = document.createElement('div');
 musicBtn.className = 'music-control';
+musicBtn.style.display = 'flex';
+musicBtn.style.alignItems = 'center';
+musicBtn.style.justifyContent = 'center';
+musicBtn.style.cursor = 'pointer';
 musicBtn.innerHTML = '🔇';
 document.body.appendChild(musicBtn);
 
@@ -34,6 +38,7 @@ musicBtn.addEventListener('click', () => {
     }
 });
 
+// --- FETCH DATA ---
 async function fetchData() {
     try {
         const response = await fetch(`${sheetUrl}&nocache=${new Date().getTime()}`);
@@ -46,8 +51,10 @@ async function fetchData() {
             const cols = lines[i].split(',').map(c => c.replace(/^"|"$/g, '').trim());
             if (cols[0]) {
                 players.push({
-                    nama: cols[0], point: parseInt(cols[1]) || 0,
-                    goals: parseInt(cols[2]) || 0, logo: cols[3] || ''
+                    nama: cols[0], 
+                    point: parseInt(cols[1]) || 0,
+                    goals: parseInt(cols[2]) || 0, 
+                    logo: cols[3] || ''
                 });
             }
         }
@@ -70,6 +77,7 @@ async function fetchData() {
     }
 }
 
+// --- RENDER TABEL ---
 function renderTable(players) {
     const table = document.querySelector("#mainTable tbody");
     if (!table) return;
@@ -90,12 +98,10 @@ function renderTable(players) {
         if (selisih > 0) trendText = `<span style="color:#22c55e">▲ ${selisih}</span>`;
         else if (selisih < 0) trendText = `<span style="color:#ef4444">▼ ${Math.abs(selisih)}</span>`;
 
-        // Atur Kelas Warna Rank
         if (rankSekarang === 1) tr.classList.add("rank-1");
         else if (rankSekarang === 2) tr.classList.add("rank-2");
         else if (rankSekarang === 3) tr.classList.add("rank-3");
         
-        // ZONA DEGRADASI - HANYA 1 ORANG PALING BAWAH
         if (rankSekarang === players.length && players.length > 1) {
             tr.classList.add("degradasi");
         }
@@ -117,14 +123,31 @@ function renderTable(players) {
     });
 }
 
+// --- MODAL STATUS ---
 function openModal(name) {
     const data = animalDatabase[name] || { sp: "Misterius", atk: 50, def: 50, spd: 50, desc: "-" };
     document.getElementById('modalBody').innerHTML = `
-        <h2 style="font-size:18px; color:var(--accent); text-transform:uppercase; margin-bottom:15px">${data.sp}</h2>
-        <div class="stat-item"><span>ATK</span><div class="progress-bg"><div class="progress-fill atk" style="width:${data.atk}%"></div></div><span>${data.atk}</span></div>
-        <div class="stat-item"><span>DEF</span><div class="progress-bg"><div class="progress-fill def" style="width:${data.def}%"></div></div><span>${data.def}</span></div>
-        <div class="stat-item"><span>SPD</span><div class="progress-bg"><div class="progress-fill spd" style="width:${data.spd}%"></div></div><span>${data.spd}</span></div>
-        <p style="font-size:12px; color:#ccc; margin-top:15px; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">"${data.desc}"</p>
+        <h2 class="team-name" style="font-size:18px; color:var(--accent); margin-bottom:15px; text-transform:uppercase;">
+            ${data.sp}
+        </h2>
+        <div class="stat-item">
+            <span>ATK</span>
+            <div class="progress-bg"><div class="progress-fill atk" style="width:${data.atk}%"></div></div>
+            <span>${data.atk}</span>
+        </div>
+        <div class="stat-item">
+            <span>DEF</span>
+            <div class="progress-bg"><div class="progress-fill def" style="width:${data.def}%"></div></div>
+            <span>${data.def}</span>
+        </div>
+        <div class="stat-item">
+            <span>SPD</span>
+            <div class="progress-bg"><div class="progress-fill spd" style="width:${data.spd}%"></div></div>
+            <span>${data.spd}</span>
+        </div>
+        <p style="font-family: 'Segoe UI', sans-serif; font-size:12px; font-style: normal; color:#ccc; margin-top:15px; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; line-height: 1.6;">
+            "${data.desc}"
+        </p>
     `;
     document.getElementById('animalModal').style.display = 'block';
 }
@@ -132,10 +155,7 @@ function openModal(name) {
 function closeModal() { document.getElementById('animalModal').style.display = 'none'; }
 window.onclick = function(e) { if(e.target.className === 'modal-overlay') closeModal(); }
 
+// Jalankan Fetch Pertama
 fetchData();
+// Auto refresh setiap 30 detik
 setInterval(fetchData, 30000);
-
-
-
-
-
