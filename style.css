@@ -77,6 +77,27 @@ td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(255,25
 .spd { background: linear-gradient(90deg, #00f260, #0575e6); }
 
 .music-control { 
-    position: fixed; bottom: 25px; right: 25px; width: 50px; height: 50px; 
-    background: #000; border: 2px solid var(--accent); border-radius: 50%; 
+    position: fixed; 
+    bottom: 25px; 
+    right: 25px; 
+    width: 50px; 
+    height: 50px; 
+    background: rgba(0, 0, 0, 0.8); /* Hitam transparan biar elegan */
+    border: 2px solid var(--accent); 
+    border-radius: 50%; 
+    display: flex;         /* Supaya icon di tengah */
+    align-items: center;    /* Center vertikal */
+    justify-content: center; /* Center horizontal */
+    font-size: 20px;       /* Ukuran icon speaker */
+    cursor: pointer;
+    z-index: 9999;         /* Biar gak ketutup tabel */
+    box-shadow: 0 0 15px var(--accent);
+    transition: all 0.3s ease;
 }
+
+.music-control:hover {
+    transform: scale(1.1);
+    background: var(--accent);
+    color: #000;
+}
+
