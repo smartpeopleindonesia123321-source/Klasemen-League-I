@@ -99,9 +99,12 @@ td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(255,25
     transition: all 0.3s ease;
 }
 
-.music-control:hover {
-    transform: scale(1.1);
-    background: var(--accent);
-    color: #000;
+.music-control {
+    /* ... kode lo yang lain ... */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent); /* Biar icon-nya warna biru neon sesuai tema lo */
 }
+
 
