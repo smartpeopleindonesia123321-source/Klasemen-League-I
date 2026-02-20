@@ -110,5 +110,31 @@ function closeModal() { document.getElementById('animalModal').style.display = '
 fetchData();
 setInterval(fetchData, 30000);
 
+function toggleTheme() {
+    const body = document.body;
+    const btn = document.getElementById('themeBtn');
+    
+    // Ini perintah buat ganti-ganti class light-mode di body
+    body.classList.toggle('light-mode');
+    
+    if (body.classList.contains('light-mode')) {
+        btn.innerHTML = '☀️'; // Ganti jadi matahari kalau terang
+        localStorage.setItem('theme', 'light'); // Simpan pilihan biar gak ilang pas refresh
+    } else {
+        btn.innerHTML = '🌙'; // Balik jadi bulan kalau gelap
+        localStorage.setItem('theme', 'dark');
+    }
+}
+
+// Jalankan ini setiap kali halaman dibuka/di-refresh
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+        const btn = document.getElementById('themeBtn');
+        if(btn) btn.innerHTML = '☀️';
+    }
+});
+
 
 
