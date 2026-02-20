@@ -83,19 +83,32 @@ function renderTable(players) {
 
 function openModal(name, logo) {
     const d = animalDatabase[name] || { sp: name, atk: 50, def: 50, spd: 50, desc: "-" };
+    
+    // 1. Set innerHTML dengan width: 0% dulu biar ada starting point animasinya
     document.getElementById('modalBody').innerHTML = `
         <img src="${logo}" class="modal-photo">
         <h2 class="team-name" style="color:var(--accent); margin-bottom:20px;">${d.sp}</h2>
-        <div class="stat-item"><span>ATK</span><div class="progress-bg"><div class="progress-fill atk" style="width:${d.atk}%"></div></div><span>${d.atk}</span></div>
-        <div class="stat-item"><span>DEF</span><div class="progress-bg"><div class="progress-fill def" style="width:${d.def}%"></div></div><span>${d.def}</span></div>
-        <div class="stat-item"><span>SPD</span><div class="progress-bg"><div class="progress-fill spd" style="width:${d.spd}%"></div></div><span>${d.spd}</span></div>
+        <div class="stat-item"><span>ATK</span><div class="progress-bg"><div class="progress-fill atk" style="width:0%"></div></div><span>${d.atk}</span></div>
+        <div class="stat-item"><span>DEF</span><div class="progress-bg"><div class="progress-fill def" style="width:0%"></div></div><span>${d.def}</span></div>
+        <div class="stat-item"><span>SPD</span><div class="progress-bg"><div class="progress-fill spd" style="width:0%"></div></div><span>${d.spd}</span></div>
         <p style="font-size:12px; color:#ccc; margin-top:15px; line-height:1.5; font-family:sans-serif;">"${d.desc}"</p>
     `;
+    
+    // 2. Tampilkan modal
     document.getElementById('animalModal').style.display = 'block';
+
+    // 3. TRIGGER ANIMASI: Pakai setTimeout kasih jeda dikit biar CSS transisinya jalan
+    setTimeout(() => {
+        const fills = document.querySelectorAll('.progress-fill');
+        fills[0].style.width = d.atk + '%';
+        fills[1].style.width = d.def + '%';
+        fills[2].style.width = d.spd + '%';
+    }, 100); 
 }
 
 function closeModal() { document.getElementById('animalModal').style.display = 'none'; }
 fetchData();
 setInterval(fetchData, 30000);
+
 
 
