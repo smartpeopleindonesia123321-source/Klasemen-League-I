@@ -10,7 +10,7 @@ const animalDatabase = {
     "Ikmal": { sp: "Ikmal sang Rusa Kutub", atk: 70, def: 75, spd: 94, desc: "Ikmal adalah master dalam seni navigasi di medan yang sulit, menggunakan kaki-kakinya yang ramping untuk melakukan akselerasi instan yang membingungkan mata. Ia tidak mengandalkan benturan fisik sebagai senjata utama, melainkan menggunakan kecepatannya untuk melakukan serangan hit-and-run yang membuat lawan frustrasi. Kelincahannya memungkinkannya untuk menari di antara serangan musuh, mengubah medan perang menjadi panggung pertunjukan di mana ia tidak pernah bisa disentuh." },
     "Yanti": { sp: "Yanti sang Kelinci Afrika", atk: 60, def: 50, spd: 98, desc: "Sebagai individu tercepat dalam daftar ini, Yanti adalah keajaiban biomekanik yang mampu berpindah posisi dalam sekejap mata sebelum saraf lawan sempat bereaksi. Meskipun pertahanannya sangat rapuh, ia mengimbanginya dengan kemampuan menghindar yang absolut dan daya ledak kaki belakang yang luar biasa. Strateginya adalah mengandalkan kecepatan murni untuk menyelesaikan konflik sebelum lawan menyadari bahwa pertarungan telah dimulai." },
     "Maya": { sp: "Maya sang Panda Tiongkok", atk: 85, def: 95, spd: 60, desc: "Di balik perawakannya yang tenang dan menggemaskan, Maya adalah benteng berjalan dengan pertahanan yang hampir mustahil ditembus oleh serangan konvensional. Ia memiliki kepadatan tulang dan lapisan pelindung alami yang luar biasa, memungkinkannya untuk mengabaikan serangan lawan sambil menunggu momen yang tepat. Saat ia memutuskan untuk menyerang, kekuatan rahang dan cengkeramannya mampu memberikan tekanan penghancur yang kontras dengan pembawaannya yang santai." },
-    "Dicky": { sp: "Dicky sang Raja Kingkong", atk: 98, def: 98, spd: 65, desc: "Berdiri sebagai puncak hierarki kekuatan, Dicky adalah raksasa yang memiliki keseimbangan sempurna antara serangan penghancur dan pertahanan yang absolut. Ia adalah "Boss terakhir" yang mampu menahan gempuran dari berbagai arah sekaligus tanpa bergeser satu inci pun dari posisinya. Dengan kecerdasan primata tingkat tinggi dan kekuatan fisik yang melampaui batas spesies lain, kehadirannya di medan laga berarti akhir bagi setiap ambisi musuh yang mencoba menantangnya." }
+    "Dicky": { sp: "Dicky sang Raja Kingkong", atk: 98, def: 98, spd: 65, desc: "Berdiri sebagai puncak hierarki kekuatan, Dicky adalah raksasa yang memiliki keseimbangan sempurna antara serangan penghancur dan pertahanan yang absolut. Ia adalah Boss terakhir yang mampu menahan gempuran dari berbagai arah sekaligus tanpa bergeser satu inci pun dari posisinya. Dengan kecerdasan primata tingkat tinggi dan kekuatan fisik yang melampaui batas spesies lain, kehadirannya di medan laga berarti akhir bagi setiap ambisi musuh yang mencoba menantangnya." }
 };
 
 // --- LOGIKA MUSIK ---
@@ -134,4 +134,5 @@ window.onclick = function(e) { if(e.target.className === 'modal-overlay') closeM
 
 fetchData();
 setInterval(fetchData, 30000);
+
 
