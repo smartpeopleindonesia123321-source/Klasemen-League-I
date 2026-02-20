@@ -1,4 +1,10 @@
 :root {
+    /* Tambahkan 4 baris ini di dalam :root lo */
+    --bg-main: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.95)), url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200');
+    --container-bg: rgba(255,255,255,0.05);
+    --text-primary: white;
+    --modal-bg: #111;
+
     --primary: #1e40af;
     --accent: #00f2ff;
     --gold: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
@@ -8,19 +14,39 @@
     --font-sporty: 'Kanit', sans-serif;
 }
 
+/* Tambahkan rule ini tepat DI BAWAH :root */
+body.light-mode {
+    --bg-main: linear-gradient(rgba(255,255,255,0.9), rgba(240,240,240,0.9)), url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200');
+    --container-bg: rgba(0,0,0,0.05);
+    --text-primary: #111;
+    --modal-bg: #fff;
+}
+
 body {
     margin: 0; padding: 0; 
     font-family: var(--font-sporty); 
-    background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.95)), url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200');
-    background-size: cover; background-attachment: fixed; color: white; min-height: 100vh;
+    background: var(--bg-main); /* BERUBAH */
+    color: var(--text-primary); /* BERUBAH */
+    background-size: cover; 
+    background-attachment: fixed; 
+    min-height: 100vh;
+    transition: background 0.5s ease, color 0.5s ease; /* BIAR HALUS */
 }
 
 .container { width: 100%; max-width: 850px; margin: 0 auto; padding: 10px; }
 h1 { text-align: center; text-shadow: 0 0 15px var(--accent); text-transform: uppercase; font-style: italic; font-weight: 900; }
 #status { text-align: center; font-size: 11px; color: var(--accent); margin-bottom: 10px; font-weight: bold; }
 
+
 /* TABLE STYLE */
-.table-container { background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
+.table-container { 
+    background: var(--container-bg); /* BERUBAH */
+    backdrop-filter: blur(15px); 
+    border-radius: 15px; 
+    border: 1px solid rgba(255,255,255,0.1); 
+    overflow: hidden; 
+    transition: background 0.5s ease; /* BIAR HALUS */
+}
 table { width: 100%; border-collapse: collapse; }
 th { padding: 15px 5px; background: rgba(30, 64, 175, 0.9); color: var(--accent); font-style: italic; text-transform: uppercase; }
 td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 16px; }
@@ -47,7 +73,17 @@ td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(255,25
 
 /* MODAL ID CARD */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; backdrop-filter: blur(8px); }
-.modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 30px; border-radius: 20px; border: 2px solid var(--accent); width: 320px; text-align: center; }
+.modal-content { 
+    position: absolute; top: 50%; left: 50%; 
+    transform: translate(-50%, -50%); 
+    background: var(--modal-bg); /* BERUBAH */
+    padding: 30px; 
+    border-radius: 20px; 
+    border: 2px solid var(--accent); 
+    width: 320px; 
+    text-align: center;
+    transition: background 0.5s ease, color 0.5s ease; /* BIAR HALUS */
+}
 
 /* FOTO DI MODAL */
 .modal-photo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--accent); box-shadow: 0 0 20px var(--accent); margin-bottom: 15px; object-fit: cover; background: white; }
@@ -66,3 +102,11 @@ td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(255,25
 /* MUSIC BUTTON */
 .music-control { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: #000; border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 10px var(--accent); z-index: 999; color: var(--accent); }
 
+.theme-toggle {
+    position: fixed; top: 20px; right: 85px;
+    width: 45px; height: 45px; border-radius: 50%;
+    background: var(--modal-bg); border: 2px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 9999; box-shadow: 0 0 10px var(--accent);
+    transition: all 0.3s ease;
+}
