@@ -304,6 +304,8 @@ function shareToWA() {
     text += "--------------------------------------\n";
     text += "📑 *INFO MARKET VALUE CALCULATION:*\n";
     text += "Base (Rp 5M) + (1 Pts = 100jt) + (1 Goal = 10jt) in Rupiah\n";
+    // --- BARIS BARU DI BAWAH INI ---
+    text += "⭐ *Best player of the week = Persentase kemenangan tertinggi di minggu ini*\n";
     text += "--------------------------------------\n\n";
     text += "🏆 *KLASEMEN TERBARU* 🏆\nPOS | CONTENDER | PTS | AGG\n--------------------------------------\n";
 
@@ -319,3 +321,4 @@ function shareToWA() {
     text += "\n📍 *Cek Detail ID Card & Market Value:* \n" + window.location.href;
     window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), '_blank');
 }
+
