@@ -206,3 +206,35 @@ body.light-mode .potw-highlight { background: #1e40af; color: #ffffff !important
     body.light-mode #mainTable td:nth-child(1),
     body.light-mode #mainTable td:nth-child(2) { background: #fff !important; }
 }
+
+/* --- FIX VISIBILITAS LIGHT MODE (TAMBAHKAN DI PALING BAWAH) --- */
+
+/* Pastikan semua teks di tabel jadi hitam saat Light Mode */
+body.light-mode td {
+    color: #111 !important;
+}
+
+/* Khusus untuk baris peringkat yang punya background gelap agar teksnya kontras */
+body.light-mode .rank-2 .team-name,
+body.light-mode .rank-3 .team-name,
+body.light-mode .degradasi .team-name,
+body.light-mode .rank-2 td,
+body.light-mode .rank-3 td,
+body.light-mode .degradasi td {
+    color: #000 !important; /* Paksa jadi Hitam Pekat */
+    text-shadow: none;      /* Hapus shadow agar lebih bersih */
+}
+
+/* Pastikan kolom sticky (Nomor & Nama) tetap putih bersih di Light Mode */
+body.light-mode #mainTable td:nth-child(1),
+body.light-mode #mainTable td:nth-child(2),
+body.light-mode #mainTable th:nth-child(1),
+body.light-mode #mainTable th:nth-child(2) {
+    background-color: #ffffff !important;
+    color: #000 !important;
+}
+
+/* Tambahan: Supaya Rank 1 tetap keren tapi terbaca */
+body.light-mode .rank-1 .team-name {
+    color: #854d0e !important; /* Warna emas tua agar kontras dengan putih */
+}
