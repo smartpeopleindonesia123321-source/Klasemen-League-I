@@ -284,7 +284,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function shareToWA() {
     const rows = document.querySelectorAll("#mainTable tbody tr");
-    let text = "🏆 *FOOTBALL LEAGUE-I - KLASEMEN TERBARU* 🏆\n\n";
+    const tickerText = document.getElementById('newsTicker').innerText; // Ambil berita dari ticker
+
+    let text = "🗞️ *FOOTBALL LEAGUE-I NEWS UPDATE* 🗞️\n";
+    text += "_" + tickerText.replace(/---/g, "\n") + "_\n\n"; // Masukin berita ticker dengan format miring
+    
+    text += "🏆 *KLASEMEN TERBARU* 🏆\n";
     text += "POS | CONTENDER | PTS | AGG | POTW\n";
     text += "--------------------------------------\n";
 
@@ -296,6 +301,7 @@ function shareToWA() {
             const pts = cells[2].innerText;
             const agg = cells[3].innerText;
             const potwCell = cells[6].innerText;
+            
             let potwStatus = "";
             if (potwCell.toLowerCase().includes("best player")) {
                 potwStatus = " ⭐ *[POTW]*"; 
@@ -304,10 +310,12 @@ function shareToWA() {
         }
     });
 
-    text += "\n📍 Cek klasemen lengkap di sini:\n" + window.location.href;
+    text += "\n📍 *Cek klasemen lengkap & Market Value di sini:* \n" + window.location.href;
+    
     const waUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
     window.open(waUrl, '_blank');
 }
+
 
 
 
