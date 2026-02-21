@@ -1,7 +1,7 @@
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=0&single=true&output=csv';
 
 const animalDatabase = {
-    "Dandi": { sp: "Dandi sang Beruang Grizzly", atk: 95, def: 90, spd: 70, desc: 'Kekuatan murni yang tak tertandingi : Sebagai predator puncak dari pegunungan utara, Dandi mewakili kekuatan fisik mentah yang mampu merobek pertahanan apa pun dengan sekali ayunan cakar. Tubuhnya yang masif dilapisi lemak tebal dan otot padat, menjadikannya tank alami yang sangat sulit ditumbangkan.' },
+    "Dandi": { sp: "Dandi sang Beruang Grizzly", atk: 95, def: 90, spd: 70, desc: 'Kekuatan murni yang tak terbendung : Sebagai predator puncak dari pegunungan utara, Dandi mewakili kekuatan fisik mentah yang mampu merobek pertahanan apa pun dengan sekali ayunan cakar. Tubuhnya yang masif dilapisi lemak tebal dan otot padat, menjadikannya tank alami yang sangat sulit ditumbangkan.' },
     "Erni": { sp: "Erni sang Kucing Angora", atk: 65, def: 55, spd: 92, desc: 'Gerakan halus namun penuh perhitungan : Jangan tertipu oleh bulu putihnya yang elegan dan lembut, karena Erni adalah perwujudan dari kecepatan dan presisi yang mematikan di medan tempur. Ia bergerak layaknya bayangan yang meluncur di atas lantai marmer.' },
     "Regi": { sp: "Regi sang Siberian Husky", atk: 80, def: 85, spd: 88, desc: 'Loyalitas tanpa batas dan keberanian : Dibentuk oleh kerasnya badai salju abadi, Regi memiliki daya tahan jantung dan stamina yang hampir mustahil untuk dipatahkan. Ia adalah petarung yang mengandalkan disiplin dan kerja keras.' },
     "Rizal": { sp: "Rizal sang Serigala Kutub", atk: 88, def: 75, spd: 95, desc: 'Pemburu taktis yang sangat cerdas : Rizal adalah manifestasi dari kecerdasan taktis yang dipadukan dengan kecepatan kilat di atas hamparan es. Ia mampu memanfaatkan celah terkecil dalam pertahanan lawan.' },
@@ -72,8 +72,16 @@ async function fetchData() {
             };
         }).filter(p => p.nama);
 
-        // 1. Sorting Klasemen Utama (Point & Goals)
+        // 1. Sorting Klasemen Utama
         players.sort((a, b) => b.point - a.point || b.goals - a.goals);
+
+        // --- TAMBAHAN: UPDATE TICKER NEWS OTOMATIS ---
+        const tickerEl = document.getElementById('newsTicker');
+        if (tickerEl && players.length > 0) {
+            const leader = players[0].nama;
+            const topScorerData = [...players].sort((a, b) => b.goals - a.goals)[0];
+            tickerEl.innerText = `📢 NEWS UPDATE: ${leader.toUpperCase()} MEMIMPIN KLASEMEN! --- 🔥 TOP SCORER: ${topScorerData.nama.toUpperCase()} DENGAN ${topScorerData.goals} GOALS --- ⚽ SELAMAT BERTANDING DAN JAGA SPORTIVITAS! ---`;
+        }
 
         // 2. LOGIKA TREND (Memory Storage)
         const lastPositions = JSON.parse(localStorage.getItem('lastPos')) || {};
@@ -87,15 +95,14 @@ async function fetchData() {
             };
         });
 
-        // Simpan posisi terbaru untuk refresh berikutnya
         const newPositions = {};
         players.forEach((p, i) => { newPositions[p.nama] = i + 1; });
         localStorage.setItem('lastPos', JSON.stringify(newPositions));
 
-        // 3. Render Tabel Utama (Lengkap dengan Trend)
+        // 3. Render Tabel Utama
         renderTable(players);
 
-        // 4. Render Top Scorer Podium (Berdasarkan Goals)
+        // 4. Render Top Scorer Podium
         const topScorers = [...players].sort((a, b) => b.goals - a.goals).slice(0, 3);
         renderTopScorer(topScorers);
 
@@ -112,9 +119,8 @@ function renderTable(players) {
     players.forEach((p, i) => {
         const tr = document.createElement("tr");
         const currentRank = i + 1;
-        const diff = p.prevPos - currentRank; // Perhitungan +/-
+        const diff = p.prevPos - currentRank;
 
-        // Logika Trend Icon (Garis Naik/Turun/Flat)
         let trendIcon = `<svg width="40" height="20"><line x1="0" y1="10" x2="40" y2="10" stroke="#444" stroke-width="2"/></svg>`;
         let diffText = "-";
         let diffClass = "";
@@ -203,13 +209,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function shareToWA() {
-    // Ambil semua baris di body tabel
     const rows = document.querySelectorAll("#mainTable tbody tr");
     let text = "🏆 *FOOTBALL LEAGUE-I - KLASEMEN TERBARU* 🏆\n\n";
     text += "POS | CONTENDER | PTS | AGG | POTW\n";
     text += "--------------------------------------\n";
 
-    // Looping data top 10
     rows.forEach((row, index) => {
         if (index < 10) { 
             const cells = row.querySelectorAll("td");
@@ -217,29 +221,16 @@ function shareToWA() {
             const name = row.querySelector(".team-name").innerText;
             const pts = cells[2].innerText;
             const agg = cells[3].innerText;
-            
-            // CEK POTW: Kita lihat di kolom terakhir (index 6)
-            // Kalau ada tulisan "Best Player", kita kasih icon bintang atau tanda
             const potwCell = cells[6].innerText;
             let potwStatus = "";
             if (potwCell.toLowerCase().includes("best player")) {
                 potwStatus = " ⭐ *[POTW]*"; 
             }
-            
-            // Format baris dengan tambahan POTW jika ada
             text += `${pos}. *${name}* - ${pts} Pts (${agg})${potwStatus}\n`;
         }
     });
 
-    text += "\n📍 Cek klasemen lengkap di sini:\n";
-    text += window.location.href;
-
-    // Encode teks ke format URL WhatsApp
+    text += "\n📍 Cek klasemen lengkap di sini:\n" + window.location.href;
     const waUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
-    
-    // Buka WhatsApp di tab baru
     window.open(waUrl, '_blank');
 }
-
-
-
