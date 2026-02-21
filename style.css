@@ -172,5 +172,18 @@ body.light-mode .potw-highlight {
     box-shadow: none;
 }
 
+@media screen and (max-width: 480px) {
+    /* Kasih sedikit padding di kanan tabel biar kolom POTW gak nempel tembok */
+    #mainTable td:last-child, 
+    #mainTable th:last-child {
+        padding-right: 20px;
+    }
+    
+    /* Nama tim jangan terlalu lebar di HP */
+    .team-name {
+        max-width: 90px;
+        font-size: 12px;
+    }
+}
 
 
