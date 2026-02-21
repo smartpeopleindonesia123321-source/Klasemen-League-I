@@ -137,3 +137,23 @@ td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(255,25
     background: #128C7E;
     box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
 }
+
+.potw-highlight {
+    background: #00f2ff;
+    color: #000 !important;
+    font-weight: 900;
+    font-style: italic;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    text-transform: uppercase;
+    display: inline-block;
+    box-shadow: 0 0 10px #00f2ff;
+}
+
+body.light-mode .potw-highlight {
+    background: #1e40af;
+    color: #ffffff !important;
+    box-shadow: none;
+}
+
