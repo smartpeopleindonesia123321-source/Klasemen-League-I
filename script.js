@@ -187,30 +187,41 @@ function renderTopScorer(topPlayers) {
 }
 
 function openModal(name, logo) {
+    // 1. Ambil semua baris di tabel
     const tableRows = Array.from(document.querySelectorAll("#mainTable tbody tr"));
-    const playerRow = tableRows.find(row => row.querySelector(".team-name").innerText === name);
     
-    // Ambil data Poin dan Gol
-    const points = playerRow ? parseInt(playerRow.querySelectorAll("td")[2].innerText) : 0;
-    const goals = playerRow ? parseInt(playerRow.querySelectorAll("td")[3].innerText) : 0;
+    // 2. Cari baris pemain dengan mencocokkan nama (pake trim() biar akurat)
+    const playerRow = tableRows.find(row => {
+        const rowName = row.querySelector(".team-name").innerText.trim().toUpperCase();
+        return rowName === name.trim().toUpperCase();
+    });
     
-    // RUMUS DALAM RUPIAH:
-    // Base 5 Miliar + (Poin * 100jt) + (Gol * 10jt)
+    let points = 0;
+    let goals = 0;
+
+    // 3. Kalau ketemu, ambil angkanya. Kalau nggak, muncul log di console buat cek
+    if (playerRow) {
+        const cells = playerRow.querySelectorAll("td");
+        points = parseInt(cells[2].innerText) || 0; // Kolom PTS
+        goals = parseInt(cells[3].innerText) || 0;  // Kolom AGG
+    } else {
+        console.warn("Pemain tidak ditemukan di tabel untuk kalkulasi harga:", name);
+    }
+    
+    // 4. HITUNGAN RUPIAH (Sesuai request lo: 1 Pts = 100jt, 1 Goal = 10jt)
     const baseValue = 5000000000; 
     const pointValue = points * 100000000;
     const goalValue = goals * 10000000;
-    
     const totalValue = baseValue + pointValue + goalValue;
 
-    // Format ke Rupiah (IDR)
-    const formatter = new Intl.NumberFormat('id-ID', {
+    // 5. Format Rupiah
+    const marketValue = new Intl.NumberFormat('id-ID', {
         style: 'currency',
         currency: 'IDR',
         minimumFractionDigits: 0
-    });
+    }).format(totalValue);
 
-    const marketValue = formatter.format(totalValue);
-
+    // Sisanya sama, tinggal render modalnya
     const d = animalDatabase[name] || { sp: name, atk: 50, def: 50, spd: 50, desc: "-" };
     
     document.getElementById('modalBody').innerHTML = `
@@ -282,5 +293,6 @@ function shareToWA() {
     const waUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
     window.open(waUrl, '_blank');
 }
+
 
 
