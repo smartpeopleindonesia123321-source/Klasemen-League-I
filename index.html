@@ -44,11 +44,15 @@
     <h3 class="section-title">🔥 TOP SCORER</h3> <div id="topScorerPodium" class="podium-wrapper">
         </div>
 </div>
-    <div style="text-align: center; margin-bottom: 15px;">
-            <button onclick="shareToWA()" class="share-btn">
-            <span>Bagikan Klasemen</span>
-            </button>
-    </div>
+    <div style="text-align: center; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+    <button onclick="shareToWA()" class="share-btn" style="margin: 0;">
+        <span>Bagikan Klasemen</span>
+    </button>
+    
+    <button onclick="window.location.href='piagam.html'" class="share-btn" style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #000; margin: 0;">
+        <span>🏆 Lihat Piagam Juara</span>
+    </button>
+</div>
     
     <div id="animalModal" class="modal-overlay">
         <div class="modal-content">
@@ -64,6 +68,7 @@
     <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
