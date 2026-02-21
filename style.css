@@ -143,12 +143,13 @@ td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(255,25
     color: #000 !important;
     font-weight: 900;
     font-style: italic;
-    padding: 4px 10px;
+    padding: 4px 8px; /* Sedikit dikurangi paddingnya */
     border-radius: 6px;
-    font-size: 11px;
+    font-size: 10px; /* Ukuran font dikecilkan sedikit agar muat satu baris */
     text-transform: uppercase;
     display: inline-block;
     box-shadow: 0 0 10px #00f2ff;
+    white-space: nowrap; /* Biar tulisannya gak kepotong ke bawah */
 }
 
 body.light-mode .potw-highlight {
@@ -156,4 +157,5 @@ body.light-mode .potw-highlight {
     color: #ffffff !important;
     box-shadow: none;
 }
+
 
