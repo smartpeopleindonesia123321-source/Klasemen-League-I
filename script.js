@@ -75,12 +75,17 @@ async function fetchData() {
         // 1. Sorting Klasemen Utama
         players.sort((a, b) => b.point - a.point || b.goals - a.goals);
 
-        // --- TAMBAHAN: UPDATE TICKER NEWS OTOMATIS ---
+        // --- TAMBAHAN: UPDATE TICKER NEWS OTOMATIS (TERMASUK POTW) ---
         const tickerEl = document.getElementById('newsTicker');
         if (tickerEl && players.length > 0) {
             const leader = players[0].nama;
             const topScorerData = [...players].sort((a, b) => b.goals - a.goals)[0];
-            tickerEl.innerText = `📢 NEWS UPDATE: ${leader.toUpperCase()} MEMIMPIN KLASEMEN! --- 🔥 TOP SCORER: ${topScorerData.nama.toUpperCase()} DENGAN ${topScorerData.goals} GOALS --- ⚽ SELAMAT BERTANDING DAN JAGA SPORTIVITAS! ---`;
+            
+            // Cari siapa Best Player-nya
+            const bestPlayerObj = players.find(p => p.potw.toLowerCase().includes("best player"));
+            const bestPlayerName = bestPlayerObj ? bestPlayerObj.nama.toUpperCase() : "BELUM DITENTUKAN";
+
+            tickerEl.innerText = `📢 NEWS UPDATE: ${leader.toUpperCase()} MEMIMPIN KLASEMEN! --- ⭐ BEST PLAYER OF THE WEEK: ${bestPlayerName} --- 🔥 TOP SCORER: ${topScorerData.nama.toUpperCase()} (${topScorerData.goals} GOALS) --- ⚽ SELAMAT BERTANDING! ---`;
         }
 
         // 2. LOGIKA TREND (Memory Storage)
