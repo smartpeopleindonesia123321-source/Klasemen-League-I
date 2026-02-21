@@ -56,6 +56,7 @@ function stopWithFadeOut() {
 }
 
 // --- DATA FETCH ---
+// --- DATA FETCH ---
 async function fetchData() {
     try {
         const res = await fetch(`${sheetUrl}&nocache=${new Date().getTime()}`);
@@ -72,10 +73,10 @@ async function fetchData() {
             };
         }).filter(p => p.nama);
 
-        // 1. Sorting Klasemen Utama (Berdasarkan Poin & Gol)
+        // 1. Sorting Klasemen Utama
         players.sort((a, b) => b.point - a.point || b.goals - a.goals);
 
-        // --- TAMBAHAN: UPDATE TICKER NEWS DENGAN 3 MARKET VALUE TERMAHAL ---
+        // --- PERBAIKAN: UPDATE TICKER NEWS (MULTI-NAME POTW) ---
         const tickerEl = document.getElementById('newsTicker');
         if (tickerEl && players.length > 0) {
             const leader = players[0].nama;
@@ -95,34 +96,31 @@ async function fetchData() {
                 })
                 .join(" | ");
 
-            // Cari siapa Best Player-nya
-            const bestPlayerObj = players.find(p => p.potw.toLowerCase().includes("best player"));
-            const bestPlayerName = bestPlayerObj ? bestPlayerObj.nama.toUpperCase() : "BELUM DITENTUKAN";
+            // --- INI PERBAIKANNYA: AMBIL SEMUA YANG ADA TULISAN BEST PLAYER ---
+            const allPotw = players
+                .filter(p => p.potw.toLowerCase().includes("best player"))
+                .map(p => p.nama.toUpperCase());
+            
+            const bestPlayerText = allPotw.length > 0 ? allPotw.join(", ") : "BELUM DITENTUKAN";
 
-            // Update teks Ticker
-            tickerEl.innerText = `📢 NEWS UPDATE: ${leader.toUpperCase()} MEMIMPIN KLASEMEN! --- 💰 MARKET VALUE HIGHLIGHTS: ${topMarketValues} --- ⭐ BEST PLAYER: ${bestPlayerName} --- 🔥 TOP SCORER: ${topScorerData.nama.toUpperCase()} (${topScorerData.goals} GOALS) ---`;
+            // Update teks Ticker dengan format baru
+            tickerEl.innerText = `📢 NEWS UPDATE: ${leader.toUpperCase()} MEMIMPIN KLASEMEN! --- 💰 TOP MARKET VALUE: ${topMarketValues} --- ⭐ BEST PLAYER OF THE WEEK: ${bestPlayerText} --- 🔥 TOP SCORER: ${topScorerData.nama.toUpperCase()} (${topScorerData.goals} GOALS) ---`;
         }
 
-        // 2. LOGIKA TREND (Memory Storage)
+        // 2. LOGIKA TREND
         const lastPositions = JSON.parse(localStorage.getItem('lastPos')) || {};
-        
         players = players.map((player, index) => {
             const currentRank = index + 1;
             const previousRank = lastPositions[player.nama] || currentRank; 
-            return {
-                ...player,
-                prevPos: previousRank
-            };
+            return { ...player, prevPos: previousRank };
         });
 
         const newPositions = {};
         players.forEach((p, i) => { newPositions[p.nama] = i + 1; });
         localStorage.setItem('lastPos', JSON.stringify(newPositions));
 
-        // 3. Render Tabel Utama
+        // 3 & 4. Render Tabel & Top Scorer
         renderTable(players);
-
-        // 4. Render Top Scorer Podium
         const topScorers = [...players].sort((a, b) => b.goals - a.goals).slice(0, 3);
         renderTopScorer(topScorers);
 
@@ -361,6 +359,7 @@ function shareToWA() {
     const waUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
     window.open(waUrl, '_blank');
 }
+
 
 
 
