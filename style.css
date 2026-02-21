@@ -321,3 +321,6 @@ body.light-mode .rank-1 .team-name {
 .pos-2 { order: 1; opacity: 0.9; } /* Kiri */
 .pos-3 { order: 3; opacity: 0.8; } /* Kanan */
 
+.pos-up { color: #00ff88; }
+.pos-down { color: #ff4444; }
+
