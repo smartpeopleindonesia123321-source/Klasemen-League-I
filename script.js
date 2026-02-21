@@ -284,37 +284,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function shareToWA() {
     const rows = document.querySelectorAll("#mainTable tbody tr");
-    const tickerText = document.getElementById('newsTicker').innerText; // Ambil berita dari ticker
+    const tickerText = document.getElementById('newsTicker').innerText; // Ambil berita berjalan
 
     let text = "🗞️ *FOOTBALL LEAGUE-I NEWS UPDATE* 🗞️\n";
-    text += "_" + tickerText.replace(/---/g, "\n") + "_\n\n"; // Masukin berita ticker dengan format miring
+    // Bersihkan tanda --- jadi baris baru biar rapi di WA
+    text += "_" + tickerText.replace(/---/g, "\n") + "_\n\n"; 
     
     text += "🏆 *KLASEMEN TERBARU* 🏆\n";
-    text += "POS | CONTENDER | PTS | AGG | POTW\n";
+    text += "POS | CONTENDER | PTS | AGG\n";
     text += "--------------------------------------\n";
 
-    rows.forEach((row, index) => {
-        if (index < 10) { 
-            const cells = row.querySelectorAll("td");
+    rows.forEach((row) => {
+        const cells = row.querySelectorAll("td");
+        if (cells.length > 0) {
             const pos = cells[0].innerText;
-            const name = row.querySelector(".team-name").innerText;
+            const name = row.querySelector(".team-name").innerText.toUpperCase();
             const pts = cells[2].innerText;
             const agg = cells[3].innerText;
-            const potwCell = cells[6].innerText;
             
-            let potwStatus = "";
-            if (potwCell.toLowerCase().includes("best player")) {
-                potwStatus = " ⭐ *[POTW]*"; 
+            // CEK STATUS POTW: ambil dari kolom ke-6 (indeks 6)
+            const potwStatus = cells[6].innerText.trim();
+            let potwIcon = "";
+            
+            // Jika ada teks 'Best Player', kasih icon bintang & bold
+            if (potwStatus.toLowerCase().includes("best player")) {
+                potwIcon = " ⭐ *[POTW]*"; 
             }
-            text += `${pos}. *${name}* - ${pts} Pts (${agg})${potwStatus}\n`;
+            
+            text += `${pos}. *${name}* - ${pts} Pts (${agg})${potwIcon}\n`;
         }
     });
 
-    text += "\n📍 *Cek klasemen lengkap & Market Value di sini:* \n" + window.location.href;
+    text += "\n📍 *Cek Detail ID Card & Market Value:* \n" + window.location.href;
     
     const waUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
     window.open(waUrl, '_blank');
 }
+
 
 
 
