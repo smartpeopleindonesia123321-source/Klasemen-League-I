@@ -42,23 +42,48 @@ async function fetchData() {
     try {
         const res = await fetch(`${sheetUrl}&nocache=${new Date().getTime()}`);
         const csv = await res.text();
+        
+        // Looping data CSV
         const players = csv.split('\n').slice(1).map(line => {
-            const [nama, pt, gd, logo] = line.split(',').map(c => c.trim().replace(/"/g, ''));
-            return { nama, point: parseInt(pt) || 0, goals: parseInt(gd) || 0, logo };
+            // Kita ambil kolom: A(0)=Nama, B(1)=Point, C(2)=Goals, D(3)=Logo, E(4)=POTW
+            const row = line.split(',').map(c => c.trim().replace(/"/g, ''));
+            
+            return { 
+                nama: row[0], 
+                point: parseInt(row[1]) || 0, 
+                goals: parseInt(row[2]) || 0, 
+                logo: row[3],
+                potw: row[4] || "" // Mengambil kolom E
+            };
         }).filter(p => p.nama);
 
+        // Urutkan berdasarkan point terbanyak
         players.sort((a, b) => b.point - a.point || b.goals - a.goals);
         renderTable(players);
         document.getElementById('status').innerText = "LIVE • TERKONEKSI";
-    } catch (e) { document.getElementById('status').innerText = "OFFLINE"; }
+    } catch (e) { 
+        console.error(e);
+        document.getElementById('status').innerText = "OFFLINE"; 
+    }
 }
 
 function renderTable(players) {
     const body = document.querySelector("#mainTable tbody");
     body.innerHTML = "";
+
     players.forEach((p, i) => {
         const tr = document.createElement("tr");
         const rank = i + 1;
+
+        // Logika Highlight POTW (Kolom E)
+        let potwContent = "";
+        if (p.potw.toLowerCase() === "best player") {
+            potwContent = `<span class="potw-highlight">Best Player</span>`;
+        } else {
+            potwContent = `<span style="opacity:0.3">-</span>`;
+        }
+
+        // Klasifikasi warna baris (Rank 1, 2, 3)
         if(rank === 1) tr.className = "rank-1";
         else if(rank === 2) tr.className = "rank-2";
         else if(rank === 3) tr.className = "rank-3";
@@ -76,6 +101,7 @@ function renderTable(players) {
             <td>${p.goals}</td>
             <td><svg width="40" height="20"><line x1="0" y1="10" x2="40" y2="10" stroke="#444" stroke-width="2"/></svg></td>
             <td>-</td>
+            <td>${potwContent}</td>
         `;
         body.appendChild(tr);
     });
@@ -166,6 +192,7 @@ function shareToWA() {
     // Buka WhatsApp di tab baru
     window.open(waUrl, '_blank');
 }
+
 
 
 
