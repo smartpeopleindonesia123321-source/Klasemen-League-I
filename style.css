@@ -110,3 +110,30 @@ td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(255,25
     cursor: pointer; z-index: 9999; box-shadow: 0 0 10px var(--accent);
     transition: all 0.3s ease;
 }
+
+/* --- BUTTON SHARE WA --- */
+.share-btn {
+    background: #25D366; 
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-family: var(--font-sporty);
+    font-weight: 800;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 10px auto 20px auto; /* Biar ke tengah otomatis */
+    width: fit-content;
+}
+
+.share-btn:hover {
+    transform: scale(1.05);
+    background: #128C7E;
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
+}
