@@ -1,10 +1,8 @@
 :root {
-    /* Tambahkan 4 baris ini di dalam :root lo */
     --bg-main: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.95)), url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200');
     --container-bg: rgba(255,255,255,0.05);
     --text-primary: white;
     --modal-bg: #111;
-
     --primary: #1e40af;
     --accent: #00f2ff;
     --gold: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
@@ -12,108 +10,159 @@
     --bronze: linear-gradient(135deg, #d97706 0%, #78350f 100%);
     --danger: linear-gradient(135deg, #ff4b2b 0%, #ff416c 100%);
     --font-sporty: 'Kanit', sans-serif;
+    --bg-sticky: #0a0a0a; /* Warna solid untuk kolom yang nempel */
 }
 
-/* Tambahkan rule ini tepat DI BAWAH :root */
 body.light-mode {
     --bg-main: linear-gradient(rgba(255,255,255,0.9), rgba(240,240,240,0.9)), url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200');
     --container-bg: rgba(0,0,0,0.05);
     --text-primary: #111;
     --modal-bg: #fff;
+    --bg-sticky: #ffffff;
 }
 
 body {
     margin: 0; padding: 0; 
     font-family: var(--font-sporty); 
-    background: var(--bg-main); /* BERUBAH */
-    color: var(--text-primary); /* BERUBAH */
+    background: var(--bg-main);
+    color: var(--text-primary);
     background-size: cover; 
     background-attachment: fixed; 
     min-height: 100vh;
-    transition: background 0.5s ease, color 0.5s ease; /* BIAR HALUS */
+    transition: background 0.5s ease, color 0.5s ease;
 }
 
 .container { width: 100%; max-width: 850px; margin: 0 auto; padding: 10px; }
-h1 { text-align: center; text-shadow: 0 0 15px var(--accent); text-transform: uppercase; font-style: italic; font-weight: 900; }
+
+h1 { 
+    text-align: center; 
+    text-shadow: 0 0 15px var(--accent); 
+    text-transform: uppercase; 
+    font-style: italic; 
+    font-weight: 900; 
+    margin-top: 20px;
+}
+
 #status { text-align: center; font-size: 11px; color: var(--accent); margin-bottom: 10px; font-weight: bold; }
 
+/* --- TABLE SYSTEM --- */
 .table-container {
     width: 100%;
-    overflow-x: auto; /* Kunci fitur scroll samping */
+    overflow-x: auto;
     overflow-y: hidden;
-    -webkit-overflow-scrolling: touch; /* Biar scroll di iPhone/Android licin */
+    -webkit-overflow-scrolling: touch;
     border-radius: 12px;
     margin-top: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 #mainTable {
     width: 100%;
-    min-width: 650px; /* PENTING: Paksa lebar tabel agar kolom POTW gak tersembunyi/tertekuk */
+    min-width: 650px; /* Biar kolom POTW gak kepotong di HP */
     border-collapse: collapse;
 }
 
-/* Tambahkan indikator scroll tipis biar user tau bisa digeser */
-.table-container::-webkit-scrollbar {
-    height: 4px;
-}
-.table-container::-webkit-scrollbar-thumb {
-    background: var(--accent);
-    border-radius: 10px;
+.table-container::-webkit-scrollbar { height: 4px; }
+.table-container::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+th { 
+    padding: 15px 5px; 
+    background: #1e40af !important; 
+    color: var(--accent); 
+    font-style: italic; 
+    text-transform: uppercase;
+    position: sticky;
+    top: 0;
+    z-index: 30; /* Paling atas */
 }
 
-table { width: 100%; border-collapse: collapse; }
-th { padding: 15px 5px; background: rgba(30, 64, 175, 0.9); color: var(--accent); font-style: italic; text-transform: uppercase; }
-td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 16px; }
+td { 
+    padding: 14px 5px; 
+    text-align: center; 
+    border-bottom: 1px solid rgba(255,255,255,0.05); 
+    font-size: 16px; 
+}
 
-/* ROW HIGHLIGHTS */
+/* --- FITUR STICKY COLUMN --- */
+#mainTable th:nth-child(1),
+#mainTable td:nth-child(1) {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background: var(--bg-sticky);
+}
+
+#mainTable th:nth-child(2),
+#mainTable td:nth-child(2) {
+    position: sticky;
+    left: 45px; /* Sesuaikan lebar kolom POS */
+    z-index: 10;
+    background: var(--bg-sticky);
+    border-right: 2px solid var(--accent);
+}
+
+/* --- ROW HIGHLIGHTS & STICKY FIX --- */
 .rank-1 { background: linear-gradient(90deg, rgba(246, 211, 101, 0.2) 0%, transparent 100%) !important; }
+.rank-1 td:nth-child(1), .rank-1 td:nth-child(2) { background: #1e1b0a !important; } 
 .rank-1 td:first-child { background: var(--gold) !important; color: #000 !important; font-weight: 900; }
 .rank-1 .team-name { color: #f6d365; }
 
 .rank-2 { background: linear-gradient(90deg, rgba(189, 195, 199, 0.15) 0%, transparent 100%) !important; }
+.rank-2 td:nth-child(1), .rank-2 td:nth-child(2) { background: #141414 !important; }
 .rank-2 td:first-child { background: var(--silver) !important; color: #fff; }
 
 .rank-3 { background: linear-gradient(90deg, rgba(217, 119, 6, 0.15) 0%, transparent 100%) !important; }
+.rank-3 td:nth-child(1), .rank-3 td:nth-child(2) { background: #1e140a !important; }
 .rank-3 td:first-child { background: var(--bronze) !important; color: #fff; }
 
 .degradasi { background: rgba(255, 75, 43, 0.15) !important; }
+.degradasi td:nth-child(1), .degradasi td:nth-child(2) { background: #220a0a !important; }
 .degradasi td:first-child { background: var(--danger) !important; }
 
-/* TEAM STYLING */
+/* --- TEAM STYLING --- */
 .team-wrapper { display: flex; align-items: center; gap: 12px; padding-left: 15px; }
 .team-logo { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; transition: 0.3s; object-fit: cover; background: #fff; }
 .team-logo:hover { transform: scale(1.3); box-shadow: 0 0 15px var(--accent); }
-.team-name { font-weight: 800; font-style: italic; text-transform: uppercase; }
+.team-name { font-weight: 800; font-style: italic; text-transform: uppercase; white-space: nowrap; }
 
-/* MODAL ID CARD */
+/* --- POTW HIGHLIGHT --- */
+.potw-highlight {
+    background: #00f2ff;
+    color: #000 !important;
+    font-weight: 900;
+    font-style: italic;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    text-transform: uppercase;
+    display: inline-block;
+    box-shadow: 0 0 10px #00f2ff;
+    white-space: nowrap;
+}
+
+body.light-mode .potw-highlight { background: #1e40af; color: #ffffff !important; box-shadow: none; }
+
+/* --- MODAL ID CARD --- */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; backdrop-filter: blur(8px); }
 .modal-content { 
     position: absolute; top: 50%; left: 50%; 
     transform: translate(-50%, -50%); 
-    background: var(--modal-bg); /* BERUBAH */
+    background: var(--modal-bg); 
     padding: 30px; 
     border-radius: 20px; 
     border: 2px solid var(--accent); 
     width: 320px; 
     text-align: center;
-    transition: background 0.5s ease, color 0.5s ease; /* BIAR HALUS */
+    transition: all 0.5s ease;
 }
-
-/* FOTO DI MODAL */
 .modal-photo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--accent); box-shadow: 0 0 20px var(--accent); margin-bottom: 15px; object-fit: cover; background: white; }
-
 .stat-item { display: flex; align-items: center; margin-bottom: 10px; font-weight: 900; font-style: italic; font-size: 12px; }
 .progress-bg { flex-grow: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin: 0 10px; overflow: hidden; }
-.progress-fill {
-    height: 100%;
-    width: 0; /* Mulai dari nol supaya animasi jalan saat modal buka */
-    transition: width 1.2s cubic-bezier(0.17, 0.67, 0.83, 0.67); /* Animasi smooth */
-}
+.progress-fill { height: 100%; width: 0; transition: width 1.2s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
 .atk { background: #ff4b2b; } .def { background: #00f2ff; } .spd { background: #00f260; }
-
 .ok-btn { margin-top: 20px; padding: 10px 30px; background: var(--accent); border: none; font-weight: 900; cursor: pointer; border-radius: 5px; }
 
-/* MUSIC BUTTON */
+/* --- INTERFACE BUTTONS --- */
 .music-control { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: #000; border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 10px var(--accent); z-index: 999; color: var(--accent); }
 
 .theme-toggle {
@@ -125,7 +174,6 @@ td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(255,25
     transition: all 0.3s ease;
 }
 
-/* --- BUTTON SHARE WA --- */
 .share-btn {
     background: #25D366; 
     color: white;
@@ -142,48 +190,19 @@ td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(255,25
     align-items: center;
     justify-content: center;
     gap: 8px;
-    margin: 10px auto 20px auto; /* Biar ke tengah otomatis */
+    margin: 10px auto 20px auto;
     width: fit-content;
 }
+.share-btn:hover { transform: scale(1.05); background: #128C7E; }
 
-.share-btn:hover {
-    transform: scale(1.05);
-    background: #128C7E;
-    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
-}
-
-.potw-highlight {
-    background: #00f2ff;
-    color: #000 !important;
-    font-weight: 900;
-    font-style: italic;
-    padding: 4px 8px; /* Sedikit dikurangi paddingnya */
-    border-radius: 6px;
-    font-size: 10px; /* Ukuran font dikecilkan sedikit agar muat satu baris */
-    text-transform: uppercase;
-    display: inline-block;
-    box-shadow: 0 0 10px #00f2ff;
-    white-space: nowrap; /* Biar tulisannya gak kepotong ke bawah */
-}
-
-body.light-mode .potw-highlight {
-    background: #1e40af;
-    color: #ffffff !important;
-    box-shadow: none;
-}
-
+/* --- RESPONSIVE MOBILE --- */
 @media screen and (max-width: 480px) {
-    /* Kasih sedikit padding di kanan tabel biar kolom POTW gak nempel tembok */
     #mainTable td:last-child, 
-    #mainTable th:last-child {
-        padding-right: 20px;
-    }
+    #mainTable th:last-child { padding-right: 20px; }
     
-    /* Nama tim jangan terlalu lebar di HP */
-    .team-name {
-        max-width: 90px;
-        font-size: 12px;
-    }
+    .team-name { max-width: 90px; font-size: 12px; }
+
+    /* Fix background sticky untuk light mode di HP */
+    body.light-mode #mainTable td:nth-child(1),
+    body.light-mode #mainTable td:nth-child(2) { background: #fff !important; }
 }
-
-
