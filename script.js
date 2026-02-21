@@ -109,11 +109,22 @@ function renderTopScorer(topPlayers) {
     const podium = document.getElementById("topScorerPodium");
     if(!podium) return;
     podium.innerHTML = "";
+    
     topPlayers.forEach((p, i) => {
         const card = document.createElement("div");
         card.className = `scorer-card pos-${i + 1}`;
-        const badge = i === 0 ? "👑" : (i === 1 ? "🥈" : "🥉");
-        card.innerHTML = `<div style="font-size:16px">${badge}</div><img src="${p.logo}" class="scorer-photo"><span class="scorer-name">${p.nama}</span><span class="scorer-label">TOTAL AGG</span><span class="scorer-agg">${p.goals}</span>`;
+        
+        // Menentukan label peringkat (1, 2, 3)
+        const rankLabel = i + 1;
+
+        card.innerHTML = `
+            <div style="font-size:12px; font-weight:900; color:var(--accent); margin-bottom:5px;">#${rankLabel}</div>
+            <img src="${p.logo}" class="scorer-photo">
+            <span class="scorer-name">${p.nama}</span>
+            <div style="line-height: 1.2; margin-top:5px;">
+                <span class="scorer-agg" style="font-size:14px; font-weight:900; color:#fff;">${p.goals} Goals</span>
+            </div>
+        `;
         podium.appendChild(card);
     });
 }
@@ -161,3 +172,4 @@ function shareToWA() {
     text += "\n📍 Cek klasemen lengkap di sini:\n" + window.location.href;
     window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), '_blank');
 }
+
