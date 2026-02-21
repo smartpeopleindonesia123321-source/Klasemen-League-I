@@ -61,7 +61,7 @@ async function fetchData() {
         const res = await fetch(`${sheetUrl}&nocache=${new Date().getTime()}`);
         const csv = await res.text();
         
-        const players = csv.split('\n').slice(1).map(line => {
+        let players = csv.split('\n').slice(1).map(line => {
             const row = line.split(',').map(c => c.trim().replace(/"/g, ''));
             return { 
                 nama: row[0], 
@@ -72,11 +72,30 @@ async function fetchData() {
             };
         }).filter(p => p.nama);
 
-        // Urutkan Klasemen Utama (Point)
+        // 1. Sorting Klasemen Utama (Point & Goals)
         players.sort((a, b) => b.point - a.point || b.goals - a.goals);
+
+        // 2. LOGIKA TREND (Memory Storage)
+        const lastPositions = JSON.parse(localStorage.getItem('lastPos')) || {};
+        
+        players = players.map((player, index) => {
+            const currentRank = index + 1;
+            const previousRank = lastPositions[player.nama] || currentRank; 
+            return {
+                ...player,
+                prevPos: previousRank
+            };
+        });
+
+        // Simpan posisi terbaru untuk refresh berikutnya
+        const newPositions = {};
+        players.forEach((p, i) => { newPositions[p.nama] = i + 1; });
+        localStorage.setItem('lastPos', JSON.stringify(newPositions));
+
+        // 3. Render Tabel Utama (Lengkap dengan Trend)
         renderTable(players);
 
-        // --- NEW: LOGIKA TOP SCORER (BERDASARKAN AGG/GOALS) ---
+        // 4. Render Top Scorer Podium (Berdasarkan Goals)
         const topScorers = [...players].sort((a, b) => b.goals - a.goals).slice(0, 3);
         renderTopScorer(topScorers);
 
@@ -92,19 +111,49 @@ function renderTable(players) {
     body.innerHTML = "";
     players.forEach((p, i) => {
         const tr = document.createElement("tr");
-        const rank = i + 1;
-        let potwContent = p.potw.toLowerCase() === "best player" ? `<span class="potw-highlight">Best Player Of The Week</span>` : `<span style="opacity:0.3">-</span>`;
-        if(rank === 1) tr.className = "rank-1";
-        else if(rank === 2) tr.className = "rank-2";
-        else if(rank === 3) tr.className = "rank-3";
-        else if(rank === players.length) tr.className = "degradasi";
+        const currentRank = i + 1;
+        const diff = p.prevPos - currentRank; // Perhitungan +/-
 
-        tr.innerHTML = `<td>${rank}</td><td style="text-align:left"><div class="team-wrapper"><img src="${p.logo}" class="team-logo" onclick="openModal('${p.nama}', '${p.logo}')"><span class="team-name">${p.nama}</span></div></td><td><strong>${p.point}</strong></td><td>${p.goals}</td><td>-</td><td>-</td><td>${potwContent}</td>`;
+        // Logika Trend Icon (Garis Naik/Turun/Flat)
+        let trendIcon = `<svg width="40" height="20"><line x1="0" y1="10" x2="40" y2="10" stroke="#444" stroke-width="2"/></svg>`;
+        let diffText = "-";
+        let diffClass = "";
+
+        if (diff > 0) {
+            trendIcon = `<svg width="40" height="20"><line x1="5" y1="15" x2="35" y2="5" stroke="#00ff88" stroke-width="3" stroke-linecap="round"/></svg>`;
+            diffText = `+${diff}`;
+            diffClass = "pos-up";
+        } else if (diff < 0) {
+            trendIcon = `<svg width="40" height="20"><line x1="5" y1="5" x2="35" y2="15" stroke="#ff4444" stroke-width="3" stroke-linecap="round"/></svg>`;
+            diffText = diff;
+            diffClass = "pos-down";
+        }
+
+        let potwContent = p.potw.toLowerCase() === "best player" ? `<span class="potw-highlight">Best Player</span>` : `<span style="opacity:0.3">-</span>`;
+        
+        if(currentRank === 1) tr.className = "rank-1";
+        else if(currentRank === 2) tr.className = "rank-2";
+        else if(currentRank === 3) tr.className = "rank-3";
+        else if(currentRank === players.length) tr.className = "degradasi";
+
+        tr.innerHTML = `
+            <td>${currentRank}</td>
+            <td style="text-align:left">
+                <div class="team-wrapper">
+                    <img src="${p.logo}" class="team-logo" onclick="openModal('${p.nama}', '${p.logo}')">
+                    <span class="team-name">${p.nama}</span>
+                </div>
+            </td>
+            <td><strong>${p.point}</strong></td>
+            <td>${p.goals}</td>
+            <td>${trendIcon}</td>
+            <td class="${diffClass}"><strong>${diffText}</strong></td>
+            <td>${potwContent}</td>
+        `;
         body.appendChild(tr);
     });
 }
 
-// --- NEW: FUNGSI RENDER PODIUM TOP SCORER ---
 function renderTopScorer(topPlayers) {
     const podium = document.getElementById("topScorerPodium");
     if(!podium) return;
@@ -114,14 +163,11 @@ function renderTopScorer(topPlayers) {
         const card = document.createElement("div");
         card.className = `scorer-card pos-${i + 1}`;
         
-        // Menentukan label peringkat (1, 2, 3)
-        const rankLabel = i + 1;
-
         card.innerHTML = `
-            <div style="font-size:12px; font-weight:900; color:var(--accent); margin-bottom:5px;">#${rankLabel}</div>
+            <div style="font-size:12px; font-weight:900; color:var(--accent); margin-bottom:5px;">#${i + 1}</div>
             <img src="${p.logo}" class="scorer-photo">
             <span class="scorer-name">${p.nama}</span>
-            <div style="line-height: 1.2; margin-top:5px;">
+            <div style="margin-top:5px;">
                 <span class="scorer-agg" style="font-size:14px; font-weight:900; color:#fff;">${p.goals} Goals</span>
             </div>
         `;
@@ -172,4 +218,3 @@ function shareToWA() {
     text += "\n📍 Cek klasemen lengkap di sini:\n" + window.location.href;
     window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), '_blank');
 }
-
