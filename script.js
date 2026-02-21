@@ -287,15 +287,45 @@ function shareToWA() {
     const tickerEl = document.getElementById('newsTicker');
     let tickerText = tickerEl ? tickerEl.innerText : "";
 
-    // Ganti kata 'BEST PLAYER' di ticker text (jika ada) jadi 'BEST PLAYER OF THE WEEK' agar seragam
-    tickerText = tickerText.replace(/BEST PLAYER:/g, "BEST PLAYER OF THE WEEK:");
+    // 1. SCAN SEMUA PEMAIN UNTUK MENCARI BEST PLAYER (BISA BANYAK NAMA)
+    const allPlayers = Array.from(rows).map(row => {
+        const cells = row.querySelectorAll("td");
+        return {
+            name: row.querySelector(".team-name").innerText.toUpperCase(),
+            potw: cells[6] ? cells[6].innerText.trim() : ""
+        };
+    });
 
+    const potwPlayers = allPlayers
+        .filter(p => p.potw.toLowerCase().includes("best player"))
+        .map(p => p.name);
+
+    // Format tampilan daftar nama POTW
+    let potwListText = "BELUM DITENTUKAN";
+    if (potwPlayers.length > 0) {
+        if (potwPlayers.length > 5) {
+            // Jika lebih dari 5 orang, buat daftar ke bawah pakai strip
+            potwListText = "\n- " + potwPlayers.join("\n- ");
+        } else {
+            // Jika sedikit, gabungin pakai koma saja
+            potwListText = potwPlayers.join(", ");
+        }
+    }
+
+    // 2. BERSIHKAN & UPDATE TICKER TEXT UNTUK WA
+    let updatedTicker = tickerText.replace(/---/g, "\n");
+    
+    // Ganti Label "BEST PLAYER" lama menjadi "BEST PLAYER OF THE WEEK" + Daftar Nama
+    if (updatedTicker.includes("BEST PLAYER:")) {
+        updatedTicker = updatedTicker.replace(/BEST PLAYER:.*?(?=\n|$)/, `BEST PLAYER OF THE WEEK: ${potwListText}`);
+    } else if (updatedTicker.includes("BEST PLAYER OF THE WEEK:")) {
+        updatedTicker = updatedTicker.replace(/BEST PLAYER OF THE WEEK:.*?(?=\n|$)/, `BEST PLAYER OF THE WEEK: ${potwListText}`);
+    }
+
+    // 3. RAKIT PESAN WHATSAPP
     let text = "🗞️ *FOOTBALL LEAGUE-I NEWS UPDATE* 🗞️\n";
+    text += "_" + updatedTicker + "_\n";
     
-    // 1. Bagian Berita & Market Value (Udah otomatis ganti jadi Best Player of the Week)
-    text += "_" + tickerText.replace(/---/g, "\n") + "_\n";
-    
-    // 2. Info Rumus Market Value
     text += "--------------------------------------\n";
     text += "📑 *INFO MARKET VALUE CALCULATION:*\n";
     text += "Base (Rp 5M) + (1 Pts = 100jt) + (1 Goal = 10jt) in Rupiah\n";
@@ -305,7 +335,7 @@ function shareToWA() {
     text += "POS | CONTENDER | PTS | AGG\n";
     text += "--------------------------------------\n";
 
-    // 3. Looping data tabel
+    // 4. LOOPING DATA TABEL UNTUK DAFTAR KLASEMEN
     rows.forEach((row) => {
         const cells = row.querySelectorAll("td");
         if (cells.length > 0) {
@@ -314,12 +344,10 @@ function shareToWA() {
             const pts = cells[2].innerText;
             const agg = cells[3].innerText;
             
-            // Cek POTW (Kolom ke-7 / Indeks 6)
             const potwStatus = cells[6] ? cells[6].innerText.trim() : "";
             let potwIcon = "";
             
             if (potwStatus.toLowerCase().includes("best player")) {
-                // Di daftar klasemen bawah juga kita pertegas teksnya
                 potwIcon = " ⭐ *[BEST PLAYER OF THE WEEK]*"; 
             }
             
@@ -329,9 +357,11 @@ function shareToWA() {
 
     text += "\n📍 *Cek Detail ID Card & Market Value:* \n" + window.location.href;
     
+    // 5. EKSEKUSI KIRIM
     const waUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
     window.open(waUrl, '_blank');
 }
+
 
 
 
