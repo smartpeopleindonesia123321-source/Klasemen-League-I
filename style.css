@@ -189,8 +189,9 @@ body.light-mode .potw-highlight { background: #1e40af; color: #ffffff !important
     transition: all 0.3s ease;
 }
 
+/* --- BUTTON SHARE WA (WARNA BIRU MATCH HEADER) --- */
 .share-btn {
-    background: #25D366; 
+    background: #1e40af; /* Warna Biru Header Tabel */
     color: white;
     border: none;
     padding: 12px 20px;
@@ -200,7 +201,8 @@ body.light-mode .potw-highlight { background: #1e40af; color: #ffffff !important
     cursor: pointer;
     text-transform: uppercase;
     transition: 0.3s;
-    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+    /* Shadow biru transparan agar lebih nyatu */
+    box-shadow: 0 4px 15px rgba(30, 64, 175, 0.3); 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -208,7 +210,12 @@ body.light-mode .potw-highlight { background: #1e40af; color: #ffffff !important
     margin: 10px auto 20px auto;
     width: fit-content;
 }
-.share-btn:hover { transform: scale(1.05); background: #128C7E; }
+
+.share-btn:hover {
+    transform: scale(1.05);
+    background: #1a368e; /* Warna biru sedikit lebih gelap saat di-hover */
+    box-shadow: 0 6px 20px rgba(30, 64, 175, 0.5);
+}
 
 /* --- RESPONSIVE MOBILE --- */
 @media screen and (max-width: 480px) {
@@ -253,4 +260,5 @@ body.light-mode #mainTable th:nth-child(2) {
 body.light-mode .rank-1 .team-name {
     color: #854d0e !important; /* Warna emas tua agar kontras dengan putih */
 }
+
 
