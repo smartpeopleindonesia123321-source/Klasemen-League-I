@@ -287,15 +287,18 @@ function shareToWA() {
     const tickerEl = document.getElementById('newsTicker');
     let tickerText = tickerEl ? tickerEl.innerText : "";
 
+    // Ganti kata 'BEST PLAYER' di ticker text (jika ada) jadi 'BEST PLAYER OF THE WEEK' agar seragam
+    tickerText = tickerText.replace(/BEST PLAYER:/g, "BEST PLAYER OF THE WEEK:");
+
     let text = "🗞️ *FOOTBALL LEAGUE-I NEWS UPDATE* 🗞️\n";
     
-    // 1. Bagian Berita & Market Value
+    // 1. Bagian Berita & Market Value (Udah otomatis ganti jadi Best Player of the Week)
     text += "_" + tickerText.replace(/---/g, "\n") + "_\n";
     
-    // 2. TAMBAHAN PENJELASAN RUMUS (Hanya di WA)
+    // 2. Info Rumus Market Value
     text += "--------------------------------------\n";
     text += "📑 *INFO MARKET VALUE CALCULATION:*\n";
-    text += "Base (Rp 5M) + (1 Pts = 100jt) + (1 Goal = 10jt)\n";
+    text += "Base (Rp 5M) + (1 Pts = 100jt) + (1 Goal = 10jt) in Rupiah\n";
     text += "--------------------------------------\n\n";
     
     text += "🏆 *KLASEMEN TERBARU* 🏆\n";
@@ -316,7 +319,8 @@ function shareToWA() {
             let potwIcon = "";
             
             if (potwStatus.toLowerCase().includes("best player")) {
-                potwIcon = " ⭐ *[POTW]*"; 
+                // Di daftar klasemen bawah juga kita pertegas teksnya
+                potwIcon = " ⭐ *[BEST PLAYER OF THE WEEK]*"; 
             }
             
             text += `${pos}. *${name}* - ${pts} Pts (${agg})${potwIcon}\n`;
@@ -328,6 +332,7 @@ function shareToWA() {
     const waUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
     window.open(waUrl, '_blank');
 }
+
 
 
 
