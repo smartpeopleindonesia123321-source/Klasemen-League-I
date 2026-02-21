@@ -409,4 +409,18 @@ body.light-mode .rank-1 .team-name {
     border-color: #cbd5e1;
 }
 
+.market-value {
+    margin: 10px 0;
+    padding: 5px;
+    background: rgba(0, 242, 255, 0.1);
+    border-radius: 8px;
+    border: 1px dashed var(--accent);
+}
+.value-amount {
+    display: block;
+    font-size: 20px;
+    color: #ffd700; /* Warna Emas */
+    font-weight: 900;
+}
+
 
