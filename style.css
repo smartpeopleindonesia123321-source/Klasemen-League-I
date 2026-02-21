@@ -351,16 +351,22 @@ body.light-mode .rank-1 .team-name {
     position: relative;
 }
 
+/* Style dasar (Dark Mode) */
 .ticker-text {
     display: inline-block;
     padding-left: 100%;
     font-family: 'Kanit', sans-serif;
     font-size: 13px;
     font-weight: bold;
-    color: var(--accent);
+    color: var(--accent); /* Warna default neon */
     text-transform: uppercase;
-    line-height: 35px; /* Tinggi baris */
-    animation: ticker-move 20s linear infinite; /* Kecepatan jalan */
+    line-height: 35px;
+    animation: ticker-move 20s linear infinite;
+}
+
+/* PERUBAHAN DI SINI: Warna hitam pas Light Mode */
+.light-mode .ticker-text {
+    color: #000000; /* Teks jadi hitam pekat agar jelas */
 }
 
 @keyframes ticker-move {
@@ -373,3 +379,4 @@ body.light-mode .rank-1 .team-name {
     background: #f1f5f9;
     border-color: #cbd5e1;
 }
+
