@@ -203,20 +203,43 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function shareToWA() {
+    // Ambil semua baris di body tabel
     const rows = document.querySelectorAll("#mainTable tbody tr");
-    let text = "🏆 *FOOTBALL LEAGUE-I - KLASEMEN TERBARU* 🏆\n\nPOS | CONTENDER | PTS | AGG\n------------------------------\n";
+    let text = "🏆 *FOOTBALL LEAGUE-I - KLASEMEN TERBARU* 🏆\n\n";
+    text += "POS | CONTENDER | PTS | AGG | POTW\n";
+    text += "--------------------------------------\n";
+
+    // Looping data top 10
     rows.forEach((row, index) => {
-        if (index < 10) {
+        if (index < 10) { 
             const cells = row.querySelectorAll("td");
             const pos = cells[0].innerText;
             const name = row.querySelector(".team-name").innerText;
             const pts = cells[2].innerText;
             const agg = cells[3].innerText;
-            text += `${pos}. *${name}* - ${pts} Pts (${agg})\n`;
+            
+            // CEK POTW: Kita lihat di kolom terakhir (index 6)
+            // Kalau ada tulisan "Best Player", kita kasih icon bintang atau tanda
+            const potwCell = cells[6].innerText;
+            let potwStatus = "";
+            if (potwCell.toLowerCase().includes("best player")) {
+                potwStatus = " ⭐ *[POTW]*"; 
+            }
+            
+            // Format baris dengan tambahan POTW jika ada
+            text += `${pos}. *${name}* - ${pts} Pts (${agg})${potwStatus}\n`;
         }
     });
-    text += "\n📍 Cek klasemen lengkap di sini:\n" + window.location.href;
-    window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), '_blank');
+
+    text += "\n📍 Cek klasemen lengkap di sini:\n";
+    text += window.location.href;
+
+    // Encode teks ke format URL WhatsApp
+    const waUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
+    
+    // Buka WhatsApp di tab baru
+    window.open(waUrl, '_blank');
 }
+
 
 
