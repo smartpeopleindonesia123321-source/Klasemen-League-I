@@ -37,16 +37,30 @@ body {
 h1 { text-align: center; text-shadow: 0 0 15px var(--accent); text-transform: uppercase; font-style: italic; font-weight: 900; }
 #status { text-align: center; font-size: 11px; color: var(--accent); margin-bottom: 10px; font-weight: bold; }
 
-
-/* TABLE STYLE */
-.table-container { 
-    background: var(--container-bg); /* BERUBAH */
-    backdrop-filter: blur(15px); 
-    border-radius: 15px; 
-    border: 1px solid rgba(255,255,255,0.1); 
-    overflow: hidden; 
-    transition: background 0.5s ease; /* BIAR HALUS */
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* Kunci fitur scroll samping */
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch; /* Biar scroll di iPhone/Android licin */
+    border-radius: 12px;
+    margin-top: 10px;
 }
+
+#mainTable {
+    width: 100%;
+    min-width: 650px; /* PENTING: Paksa lebar tabel agar kolom POTW gak tersembunyi/tertekuk */
+    border-collapse: collapse;
+}
+
+/* Tambahkan indikator scroll tipis biar user tau bisa digeser */
+.table-container::-webkit-scrollbar {
+    height: 4px;
+}
+.table-container::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 10px;
+}
+
 table { width: 100%; border-collapse: collapse; }
 th { padding: 15px 5px; background: rgba(30, 64, 175, 0.9); color: var(--accent); font-style: italic; text-transform: uppercase; }
 td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 16px; }
@@ -157,5 +171,6 @@ body.light-mode .potw-highlight {
     color: #ffffff !important;
     box-shadow: none;
 }
+
 
 
