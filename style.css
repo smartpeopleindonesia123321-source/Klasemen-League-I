@@ -340,15 +340,44 @@ body.light-mode .rank-1 .team-name {
 }
 
 /* --- STYLE TICKER NEWS --- */
+/* --- STYLE TICKER NEWS --- */
 .ticker-container {
     width: 100%;
-    background: rgba(0, 242, 255, 0.1); /* Biru neon transparan */
+    background: rgba(0, 242, 255, 0.1); /* Biru neon transparan (Dark Mode) */
     border-top: 1px solid rgba(0, 242, 255, 0.3);
     border-bottom: 1px solid rgba(0, 242, 255, 0.3);
     margin: 15px 0;
     overflow: hidden;
     white-space: nowrap;
     position: relative;
+}
+
+/* KHUSUS LIGHT MODE: Background dibuat agak abu terang biar teks hitamnya kontras */
+.light-mode .ticker-container {
+    background: #f1f5f9; 
+    border-color: #cbd5e1;
+}
+
+.ticker-text {
+    display: inline-block;
+    padding-left: 100%;
+    font-family: 'Kanit', sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--accent); /* Warna biru neon (Dark Mode) */
+    text-transform: uppercase;
+    line-height: 35px;
+    animation: ticker-move 20s linear infinite;
+}
+
+/* KHUSUS LIGHT MODE: Teks jadi Hitam */
+.light-mode .ticker-text {
+    color: #000000;
+}
+
+@keyframes ticker-move {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
 }
 
 /* Style dasar (Dark Mode) */
@@ -379,4 +408,5 @@ body.light-mode .rank-1 .team-name {
     background: #f1f5f9;
     border-color: #cbd5e1;
 }
+
 
