@@ -168,7 +168,7 @@ function renderTopScorer(topPlayers) {
             <img src="${p.logo}" class="scorer-photo">
             <span class="scorer-name">${p.nama}</span>
             <div style="margin-top:5px;">
-                <span class="scorer-agg" style="font-size:14px; font-weight:900; color:#fff;">${p.goals} Goals</span>
+                <span class="scorer-agg" style="font-size:14px; font-weight:900; color:var(--text);">${p.goals} Goals</span>
             </div>
         `;
         podium.appendChild(card);
@@ -218,3 +218,4 @@ function shareToWA() {
     text += "\n📍 Cek klasemen lengkap di sini:\n" + window.location.href;
     window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), '_blank');
 }
+
