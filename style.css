@@ -324,3 +324,17 @@ body.light-mode .rank-1 .team-name {
 .pos-up { color: #00ff88; }
 .pos-down { color: #ff4444; }
 
+/* Pastikan warna teks variabel lo sudah benar di light mode */
+.light-mode {
+    --text: #1e293b; /* Warna biru gelap/abu tua untuk teks */
+}
+
+/* Biar kartu top scorer punya sedikit bayangan pas mode terang agar terbaca */
+.light-mode .scorer-card {
+    background: rgba(0, 0, 0, 0.05); /* Background tipis gelap */
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.light-mode .scorer-name {
+    color: #1e40af; /* Warna nama tim dibuat lebih tegas di mode terang */
+}
