@@ -10,6 +10,7 @@
             --dark: #0a0a0a; --white: #ffffff;
         }
         body { background: #222; font-family: 'Kanit', sans-serif; display: flex; flex-direction: column; align-items: center; gap: 50px; padding: 50px 0; }
+        
         .certificate {
             width: 800px; height: 560px; background: var(--white);
             position: relative; border: 20px solid var(--dark);
@@ -17,34 +18,55 @@
             box-shadow: 0 0 50px rgba(0,0,0,0.5); overflow: hidden; color: var(--dark);
             margin-bottom: 50px;
         }
+
+        /* Border & Ornament */
         .inner-border { position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border: 2px solid var(--dark); pointer-events: none; }
         .corner { position: absolute; width: 100px; height: 100px; border: 8px solid var(--gold); }
         .top-left { top: 0; left: 0; border-right: none; border-bottom: none; }
         .top-right { top: 0; right: 0; border-left: none; border-bottom: none; }
         .bottom-left { bottom: 0; left: 0; border-right: none; border-top: none; }
         .bottom-right { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+        /* Typography */
         .header { margin-top: 60px; text-transform: uppercase; letter-spacing: 5px; font-weight: 400; font-size: 14px; }
-        .award-title { font-family: 'Playfair Display', serif; font-size: 45px; margin: 10px 0; color: var(--gold); text-transform: uppercase; text-align: center;}
+        .award-title { font-family: 'Playfair Display', serif; font-size: 45px; margin: 10px 0; color: var(--gold); text-transform: uppercase; text-align: center; width: 80%; line-height: 1.1; }
         .presented-to { margin-top: 20px; font-size: 16px; font-style: italic; }
-        .winner-name { font-size: 40px; font-weight: 900; text-decoration: underline; margin: 5px 0; text-transform: uppercase; color: #111; }
+        .winner-name { font-size: 40px; font-weight: 900; text-decoration: underline; margin: 5px 0; text-transform: uppercase; color: #111; text-align: center; }
         .league-name { font-weight: bold; color: #1e40af; margin-top: 10px; font-size: 20px; }
         .description { width: 80%; text-align: center; font-size: 14px; margin-top: 20px; line-height: 1.6; }
+
+        /* Footer */
         .footer { margin-top: 40px; display: flex; justify-content: space-around; width: 100%; }
         .sig-box { text-align: center; width: 200px; }
         .sig-line { border-top: 2px solid var(--dark); margin-top: 50px; padding-top: 5px; font-weight: bold; }
         
-        /* Variasi Warna */
-        .cert-juara2 .award-title { color: var(--silver); } .cert-juara2 .corner { border-color: var(--silver); }
-        .cert-juara3 .award-title { color: var(--bronze); } .cert-juara3 .corner { border-color: var(--bronze); }
-        .cert-topscorer .award-title { color: #cc0000; } .cert-topscorer .corner { border-color: #cc0000; }
-        .cert-poty .award-title { color: #1e40af; } .cert-poty .corner { border-color: #1e40af; }
+        /* Variasi Warna Berdasarkan Class */
+        .cert-juara2 .award-title { color: var(--silver); } 
+        .cert-juara2 .corner { border-color: var(--silver); }
+        .cert-juara3 .award-title { color: var(--bronze); } 
+        .cert-juara3 .corner { border-color: var(--bronze); }
+        .cert-topscorer .award-title { color: #cc0000; } 
+        .cert-topscorer .corner { border-color: #cc0000; }
+        .cert-poty .award-title { color: #1e40af; } 
+        .cert-poty .corner { border-color: #1e40af; }
 
-        @media print { body { background: none; padding: 0; } .certificate { box-shadow: none; page-break-after: always; } button { display: none; } }
+        .btn-print {
+            position: fixed; top: 20px; left: 20px; padding: 10px 20px;
+            background: #00f2ff; border: none; font-weight: bold; cursor: pointer;
+            border-radius: 5px; z-index: 100;
+        }
+
+        @media print { 
+            body { background: none; padding: 0; gap: 0; } 
+            .certificate { box-shadow: none; page-break-after: always; margin: 0; } 
+            .btn-print { display: none; } 
+        }
     </style>
 </head>
 <body>
 
-    <div id="loading" style="color: white;">MENGUMPULKAN DATA PEMENANG...</div>
+    <button class="btn-print" onclick="window.print()">CETAK / SAVE PDF</button>
+    <div id="loading" style="color: white; margin-top: 100px;">MENGUMPULKAN DATA PEMENANG...</div>
     <div id="certificates-container"></div>
 
     <script>
@@ -54,47 +76,80 @@
             try {
                 const res = await fetch(`${sheetUrl}&nocache=${new Date().getTime()}`);
                 const csv = await res.text();
+                
+                // Parsing Data: Nama(0), Point(1), Goal(2), Logo(3), POTW/Status(4 atau sesuai urutan kolom)
+                // Berdasarkan script utama lo, status "Best Player" ada di kolom ke-5 (index 4) atau ke-7 tergantung urutan Sheets.
+                // Kita akan scan semua kolom untuk mencari tulisan "Best Player" agar lebih aman.
+                
                 let players = csv.split('\n').slice(1).map(line => {
                     const row = line.split(',').map(c => c.trim().replace(/"/g, ''));
-                    return { nama: row[0], point: parseInt(row[1]) || 0, goals: parseInt(row[2]) || 0 };
+                    return { 
+                        nama: row[0], 
+                        point: parseInt(row[1]) || 0, 
+                        goals: parseInt(row[2]) || 0,
+                        fullRow: line.toLowerCase() // Untuk scan status "Best Player"
+                    };
                 }).filter(p => p.nama);
-
-                // Sorting buat nentukan pemenang
-                const rankWinners = [...players].sort((a, b) => b.point - a.point || b.goals - a.goals);
-                const scorerWinners = [...players].sort((a, b) => b.goals - a.goals);
-
-                const dataPemenang = [
-                    { type: 'cert-juara1', title: '1st PLACE CHAMPION', name: rankWinners[0].nama, desc: 'Atas prestasi luar biasa menjadi pemuncak klasemen akhir musim 2025/2026.' },
-                    { type: 'cert-juara2', title: '2nd PLACE RUNNER UP', name: rankWinners[1].nama, desc: 'Atas perjuangan luar biasa meraih posisi kedua pada musim 2025/2026.' },
-                    { type: 'cert-juara3', title: '3rd PLACE WINNER', name: rankWinners[2].nama, desc: 'Atas keberhasilan menempati posisi tiga besar pada kompetisi musim ini.' },
-                    { type: 'cert-topscorer', title: 'GOLDEN BOOT (TOP SCORER)', name: scorerWinners[0].nama, desc: 'Dianugerahkan kepada pencetak gol terbanyak sepanjang kompetisi bergulir.' },
-                    { type: 'cert-poty', title: 'PLAYER OF THE YEAR', name: rankWinners[0].nama, desc: 'Pemain terbaik dengan kontribusi dan konsistensi paling tinggi musim ini.' }
-                ];
 
                 const container = document.getElementById('certificates-container');
                 document.getElementById('loading').style.display = 'none';
 
-                dataPemenang.forEach(cert => {
-                    container.innerHTML += `
-                        <div class="certificate ${cert.type}">
-                            <div class="inner-border"></div>
-                            <div class="corner top-left"></div><div class="corner top-right"></div>
-                            <div class="corner bottom-left"></div><div class="corner bottom-right"></div>
-                            <div class="header">Official Achievement</div>
-                            <div class="award-title">${cert.title}</div>
-                            <div class="presented-to">Diberikan Kepada:</div>
-                            <div class="winner-name">${cert.name}</div>
-                            <div class="league-name">FOOTBALL LEAGUE-I</div>
-                            <div class="description">${cert.desc}</div>
-                            <div class="footer">
-                                <div class="sig-box"><div class="sig-line">Official Admin</div></div>
-                                <div class="sig-box"><div class="sig-line">League Manager</div></div>
-                            </div>
-                        </div>
-                    `;
+                // 1. Ambil Juara Berdasarkan Poin & Goal
+                const rankWinners = [...players].sort((a, b) => b.point - a.point || b.goals - a.goals);
+                const scorerWinners = [...players].sort((a, b) => b.goals - a.goals);
+
+                // --- DATA PIAGAM UTAMA ---
+                const mainAwards = [
+                    { type: 'cert-juara1', title: '1st PLACE CHAMPION', name: rankWinners[0].nama, desc: 'Atas prestasi luar biasa menjadi pemuncak klasemen akhir musim 2025/2026.' },
+                    { type: 'cert-juara2', title: '2nd PLACE RUNNER UP', name: rankWinners[1].nama, desc: 'Atas perjuangan luar biasa meraih posisi kedua pada musim 2025/2026.' },
+                    { type: 'cert-juara3', title: '3rd PLACE WINNER', name: rankWinners[2].nama, desc: 'Atas keberhasilan menempati posisi tiga besar pada kompetisi musim ini.' },
+                    { type: 'cert-topscorer', title: 'GOLDEN BOOT (TOP SCORER)', name: scorerWinners[0].nama, desc: 'Dianugerahkan kepada pencetak gol terbanyak sepanjang kompetisi bergulir.' }
+                ];
+
+                // Render Piagam Utama
+                mainAwards.forEach(cert => {
+                    renderHTML(container, cert);
                 });
-            } catch (e) { console.error(e); }
+
+                // --- DATA PLAYER OF THE YEAR (BERDASARKAN STATUS DI SHEETS) ---
+                // Mencari semua pemain yang punya teks "best player" di barisnya
+                const potyWinners = players.filter(p => p.fullRow.includes("best player"));
+
+                potyWinners.forEach(winner => {
+                    renderHTML(container, {
+                        type: 'cert-poty',
+                        title: 'PLAYER OF THE YEAR',
+                        name: winner.nama,
+                        desc: 'Dianugerahkan atas konsistensi dan performa terbaik sebagai pemain pilihan minggu ini.'
+                    });
+                });
+
+            } catch (e) { 
+                console.error(e); 
+                document.getElementById('loading').innerText = "Gagal memuat data. Cek koneksi.";
+            }
         }
+
+        function renderHTML(container, cert) {
+            container.innerHTML += `
+                <div class="certificate ${cert.type}">
+                    <div class="inner-border"></div>
+                    <div class="corner top-left"></div><div class="corner top-right"></div>
+                    <div class="corner bottom-left"></div><div class="corner bottom-right"></div>
+                    <div class="header">Official Achievement</div>
+                    <div class="award-title">${cert.title}</div>
+                    <div class="presented-to">Diberikan Kepada:</div>
+                    <div class="winner-name">${cert.name}</div>
+                    <div class="league-name">FOOTBALL LEAGUE-I</div>
+                    <div class="description">${cert.desc}</div>
+                    <div class="footer">
+                        <div class="sig-box"><div class="sig-line">Official Admin</div></div>
+                        <div class="sig-box"><div class="sig-line">League Manager</div></div>
+                    </div>
+                </div>
+            `;
+        }
+
         generateCertificates();
     </script>
 </body>
