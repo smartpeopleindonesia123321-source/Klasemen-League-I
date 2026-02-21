@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>PIAGAM PENGHARGAAN | FOOTBALL LEAGUE-I</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37; --silver: #aaa9ad; --bronze: #cd7f32;
+            --dark: #0a0a0a; --white: #ffffff;
+        }
+        body { background: #222; font-family: 'Kanit', sans-serif; display: flex; flex-direction: column; align-items: center; gap: 50px; padding: 50px 0; }
+        
+        /* Layout Piagam */
+        .certificate {
+            width: 800px; height: 560px; background: var(--white);
+            position: relative; border: 20px solid var(--dark);
+            display: flex; flex-direction: column; align-items: center;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5); overflow: hidden;
+            color: var(--dark);
+        }
+
+        /* Border Dalam ala Liga 1 */
+        .inner-border {
+            position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px;
+            border: 2px solid var(--dark); pointer-events: none;
+        }
+
+        /* Aksen Sudut Batik/Ornament */
+        .corner { position: absolute; width: 100px; height: 100px; border: 8px solid var(--gold); }
+        .top-left { top: 0; left: 0; border-right: none; border-bottom: none; }
+        .top-right { top: 0; right: 0; border-left: none; border-bottom: none; }
+        .bottom-left { bottom: 0; left: 0; border-right: none; border-top: none; }
+        .bottom-right { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+        /* Content */
+        .header { margin-top: 60px; text-transform: uppercase; letter-spacing: 5px; font-weight: 400; font-size: 14px; }
+        .award-title { font-family: 'Playfair Display', serif; font-size: 50px; margin: 10px 0; color: var(--gold); text-transform: uppercase; }
+        .presented-to { margin-top: 20px; font-size: 16px; font-style: italic; }
+        .winner-name { font-size: 45px; font-weight: 900; text-decoration: underline; margin: 5px 0; text-transform: uppercase; }
+        .league-name { font-weight: bold; color: #1e40af; margin-top: 10px; font-size: 20px; }
+        .description { width: 80%; text-align: center; font-size: 14px; margin-top: 20px; line-height: 1.6; }
+
+        /* Footer Tanda Tangan */
+        .footer { margin-top: 40px; display: flex; justify-content: space-around; width: 100%; }
+        .sig-box { text-align: center; width: 200px; }
+        .sig-line { border-top: 2px solid var(--dark); margin-top: 50px; padding-top: 5px; font-weight: bold; }
+
+        /* Variasi Warna */
+        .cert-juara1 .award-title { color: var(--gold); }
+        .cert-juara2 .award-title { color: var(--silver); }
+        .cert-juara2 .corner { border-color: var(--silver); }
+        .cert-juara3 .award-title { color: var(--bronze); }
+        .cert-juara3 .corner { border-color: var(--bronze); }
+        .cert-topscorer .award-title { color: #cc0000; }
+        .cert-topscorer .corner { border-color: #cc0000; }
+        .cert-poty .award-title { color: #1e40af; }
+        .cert-poty .corner { border-color: #1e40af; }
+    </style>
+</head>
+<body>
+
+    <div class="certificate cert-juara1">
+        <div class="inner-border"></div>
+        <div class="corner top-left"></div><div class="corner top-right"></div>
+        <div class="corner bottom-left"></div><div class="corner bottom-right"></div>
+        <div class="header">Certificate of Achievement</div>
+        <div class="award-title">1st PLACE CHAMPION</div>
+        <div class="presented-to">Diberikan Kepada:</div>
+        <div class="winner-name">DANDI</div>
+        <div class="league-name">FOOTBALL LEAGUE-I</div>
+        <div class="description">Atas prestasi luar biasa dan dedikasi tinggi sehingga berhasil menduduki peringkat pertama pada kompetisi musim 2025/2026.</div>
+        <div class="footer">
+            <div class="sig-box"><div class="sig-line">Official League Admin</div></div>
+            <div class="sig-box"><div class="sig-line">Competition Manager</div></div>
+        </div>
+    </div>
+
+    <div class="certificate cert-topscorer">
+        <div class="inner-border"></div>
+        <div class="corner top-left"></div><div class="corner top-right"></div>
+        <div class="corner bottom-left"></div><div class="corner bottom-right"></div>
+        <div class="header">Individual Award</div>
+        <div class="award-title">GOLDEN BOOT</div>
+        <div class="presented-to">Pencetak Gol Terbanyak:</div>
+        <div class="winner-name">ASEP</div>
+        <div class="league-name">FOOTBALL LEAGUE-I</div>
+        <div class="description">Dianugerahkan atas ketajaman luar biasa di depan gawang dan kontribusi gol terbanyak sepanjang musim ini.</div>
+        <div class="footer">
+            <div class="sig-box"><div class="sig-line">Official League Admin</div></div>
+        </div>
+    </div>
+
+    <p style="color: white;">*Ganti nama di dalam kode HTML sesuai pemenang, lalu simpan/print.</p>
+
+</body>
+</html>
