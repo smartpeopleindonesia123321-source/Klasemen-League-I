@@ -65,6 +65,9 @@ h1 {
 .table-container::-webkit-scrollbar { height: 4px; }
 .table-container::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
+/* --- FIX HEADER AGAR IKUT STICKY KIRI & ATAS --- */
+
+/* 1. Aturan umum untuk semua Header */
 th { 
     padding: 15px 5px; 
     background: #1e40af !important; 
@@ -73,7 +76,19 @@ th {
     text-transform: uppercase;
     position: sticky;
     top: 0;
-    z-index: 30; /* Paling atas */
+    z-index: 30;
+}
+
+/* 2. KHUSUS Judul POS (Kolom 1) - Biar nempel di Atas DAN Kiri */
+#mainTable thead th:nth-child(1) {
+    left: 0;
+    z-index: 45; /* Lebih tinggi dari td agar tidak tertutup */
+}
+
+/* 3. KHUSUS Judul CONTENDER (Kolom 2) - Biar nempel di Atas DAN Kiri */
+#mainTable thead th:nth-child(2) {
+    left: 45px; /* Harus sama dengan left-nya td:nth-child(2) */
+    z-index: 45;
 }
 
 td { 
@@ -238,3 +253,4 @@ body.light-mode #mainTable th:nth-child(2) {
 body.light-mode .rank-1 .team-name {
     color: #854d0e !important; /* Warna emas tua agar kontras dengan putih */
 }
+
