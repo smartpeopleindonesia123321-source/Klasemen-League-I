@@ -13,9 +13,11 @@ const animalDatabase = {
     "Dicky": { sp: "Dicky sang Raja Kingkong", atk: 98, def: 98, spd: 65, desc: 'Benteng pertahanan terakhir : Berdiri sebagai puncak hierarki kekuatan, Dicky adalah raksasa yang memiliki keseimbangan sempurna antara serangan penghancur dan pertahanan yang absolut.' }
 };
 
-// --- MUSIK ---
+// --- MUSIK DENGAN FITUR FADE IN & FADE OUT ---
 const audio = document.getElementById('uclMusic');
 let isPlaying = false;
+let fadeInterval; // Untuk menyimpan timer transisi volume
+
 const musicBtn = document.createElement('div');
 musicBtn.className = 'music-control';
 musicBtn.innerHTML = '🔇';
@@ -23,19 +25,54 @@ document.body.appendChild(musicBtn);
 
 musicBtn.addEventListener('click', () => {
     if (!isPlaying) {
-        audio.play().then(() => { musicBtn.innerHTML = '🔊'; isPlaying = true; });
+        playWithFadeIn();
     } else {
-        audio.pause();
-        // Pakai SVG biar ada icon speaker + tanda silang (X) yang rapi
-        musicBtn.innerHTML = `
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
-                <line x1="23" y1="9" x2="17" y2="15"></line>
-                <line x1="17" y1="9" x2="23" y2="15"></line>
-            </svg>`;
-        isPlaying = false;
+        stopWithFadeOut();
     }
 });
+
+function playWithFadeIn() {
+    clearInterval(fadeInterval); // Bersihkan sisa transisi sebelumnya
+    audio.volume = 0; // Mulai dari suara nol
+    audio.play().then(() => {
+        musicBtn.innerHTML = '🔊';
+        isPlaying = true;
+        
+        // Proses menaikkan volume perlahan
+        fadeInterval = setInterval(() => {
+            if (audio.volume < 0.95) {
+                audio.volume += 0.05; // Naikkan 5% setiap interval
+            } else {
+                audio.volume = 1;
+                clearInterval(fadeInterval);
+            }
+        }, 150); // Kecepatan transisi (150ms)
+    });
+}
+
+function stopWithFadeOut() {
+    clearInterval(fadeInterval);
+    
+    // Proses menurunkan volume perlahan
+    fadeInterval = setInterval(() => {
+        if (audio.volume > 0.05) {
+            audio.volume -= 0.05; // Turunkan 5% setiap interval
+        } else {
+            audio.volume = 0;
+            audio.pause();
+            isPlaying = false;
+            clearInterval(fadeInterval);
+            
+            // Icon speaker mati (X)
+            musicBtn.innerHTML = `
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
+                    <line x1="23" y1="9" x2="17" y2="15"></line>
+                    <line x1="17" y1="9" x2="23" y2="15"></line>
+                </svg>`;
+        }
+    }, 100); // Kecepatan turun suara
+}
 
 // --- DATA FETCH ---
 async function fetchData() {
@@ -192,6 +229,7 @@ function shareToWA() {
     // Buka WhatsApp di tab baru
     window.open(waUrl, '_blank');
 }
+
 
 
 
