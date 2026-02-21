@@ -187,17 +187,29 @@ function renderTopScorer(topPlayers) {
 }
 
 function openModal(name, logo) {
-    // Cari data pemain dari tabel untuk kalkulasi harga
     const tableRows = Array.from(document.querySelectorAll("#mainTable tbody tr"));
     const playerRow = tableRows.find(row => row.querySelector(".team-name").innerText === name);
     
-    // Ambil poin dan gol buat nentuin harga
+    // Ambil data Poin dan Gol
     const points = playerRow ? parseInt(playerRow.querySelectorAll("td")[2].innerText) : 0;
     const goals = playerRow ? parseInt(playerRow.querySelectorAll("td")[3].innerText) : 0;
     
-    // RUMUS HARGA: (Poin x 2jt) + (Gol x 1jt) + Base 10jt
-    const rawValue = (points * 2) + (goals * 1) + 10;
-    const marketValue = "€ " + rawValue + ".000.000";
+    // RUMUS DALAM RUPIAH:
+    // Base 5 Miliar + (Poin * 100jt) + (Gol * 10jt)
+    const baseValue = 5000000000; 
+    const pointValue = points * 100000000;
+    const goalValue = goals * 10000000;
+    
+    const totalValue = baseValue + pointValue + goalValue;
+
+    // Format ke Rupiah (IDR)
+    const formatter = new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0
+    });
+
+    const marketValue = formatter.format(totalValue);
 
     const d = animalDatabase[name] || { sp: name, atk: 50, def: 50, spd: 50, desc: "-" };
     
@@ -206,14 +218,14 @@ function openModal(name, logo) {
         <h2 class="team-name" style="color:var(--accent); margin-bottom:5px;">${d.sp}</h2>
         
         <div class="market-value">
-            <span style="font-size:10px; color:#aaa;">ESTIMATED MARKET VALUE</span>
-            <span class="value-amount">${marketValue}</span>
+            <span style="font-size:10px; color:#aaa; font-weight:bold;">ESTIMATED MARKET VALUE</span>
+            <span class="value-amount" style="font-size: 18px;">${marketValue}</span>
         </div>
 
         <div class="stat-item"><span>ATK</span><div class="progress-bg"><div class="progress-fill atk" style="width:0%"></div></div><span>${d.atk}</span></div>
         <div class="stat-item"><span>DEF</span><div class="progress-bg"><div class="progress-fill def" style="width:0%"></div></div><span>${d.def}</span></div>
         <div class="stat-item"><span>SPD</span><div class="progress-bg"><div class="progress-fill spd" style="width:0%"></div></div><span>${d.spd}</span></div>
-        <p style="font-size:12px; color:#ccc; margin-top:15px; line-height:1.5; font-family:sans-serif;">"${d.desc}"</p>
+        <p style="font-size:11px; color:#ccc; margin-top:15px; line-height:1.5; font-family:sans-serif; font-style: normal;">"${d.desc}"</p>
     `;
     
     document.getElementById('animalModal').style.display = 'block';
@@ -270,4 +282,5 @@ function shareToWA() {
     const waUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
     window.open(waUrl, '_blank');
 }
+
 
