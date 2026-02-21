@@ -55,8 +55,7 @@ function stopWithFadeOut() {
     }, 100);
 }
 
-// --- DATA FETCH ---
-// --- DATA FETCH ---
+// --- DATA FETCH (VERSI FIX TREND & MULTI POTW) ---
 async function fetchData() {
     try {
         const res = await fetch(`${sheetUrl}&nocache=${new Date().getTime()}`);
@@ -73,53 +72,53 @@ async function fetchData() {
             };
         }).filter(p => p.nama);
 
-        // 1. Sorting Klasemen Utama
+        // 1. Sorting Berdasarkan Poin & Goal
         players.sort((a, b) => b.point - a.point || b.goals - a.goals);
 
-        // --- PERBAIKAN: UPDATE TICKER NEWS (MULTI-NAME POTW) ---
-        const tickerEl = document.getElementById('newsTicker');
-        if (tickerEl && players.length > 0) {
-            const leader = players[0].nama;
-            const topScorerData = [...players].sort((a, b) => b.goals - a.goals)[0];
-            
-            // Logika Cari 3 Harga Termahal
-            const topMarketValues = [...players]
-                .map(p => {
-                    const val = 5000000000 + (p.point * 100000000) + (p.goals * 10000000);
-                    return { nama: p.nama, total: val };
-                })
-                .sort((a, b) => b.total - a.total)
-                .slice(0, 3)
-                .map((p, i) => {
-                    const milyar = (p.total / 1000000000).toFixed(1);
-                    return `#${i+1} ${p.nama.toUpperCase()} (Rp ${milyar}M)`;
-                })
-                .join(" | ");
-
-            // --- INI PERBAIKANNYA: AMBIL SEMUA YANG ADA TULISAN BEST PLAYER ---
-            const allPotw = players
-                .filter(p => p.potw.toLowerCase().includes("best player"))
-                .map(p => p.nama.toUpperCase());
-            
-            const bestPlayerText = allPotw.length > 0 ? allPotw.join(", ") : "BELUM DITENTUKAN";
-
-            // Update teks Ticker dengan format baru
-            tickerEl.innerText = `📢 NEWS UPDATE: ${leader.toUpperCase()} MEMIMPIN KLASEMEN! --- 💰 TOP MARKET VALUE: ${topMarketValues} --- ⭐ BEST PLAYER OF THE WEEK: ${bestPlayerText} --- 🔥 TOP SCORER: ${topScorerData.nama.toUpperCase()} (${topScorerData.goals} GOALS) ---`;
-        }
-
-        // 2. LOGIKA TREND
+        // 2. LOGIKA TREND (Ambil data LAMA sebelum diupdate)
         const lastPositions = JSON.parse(localStorage.getItem('lastPos')) || {};
+        
         players = players.map((player, index) => {
             const currentRank = index + 1;
-            const previousRank = lastPositions[player.nama] || currentRank; 
-            return { ...player, prevPos: previousRank };
+            // Cari posisi dia sebelumnya di localStorage
+            const previousRank = lastPositions[player.nama]; 
+            
+            return { 
+                ...player, 
+                // Kalau ga ada data lama (pemain baru), anggap tetap di posisi skrg
+                prevPos: previousRank ? previousRank : currentRank 
+            };
         });
 
+        // Simpan posisi SEKARANG ke localStorage buat perbandingan fetch berikutnya
         const newPositions = {};
         players.forEach((p, i) => { newPositions[p.nama] = i + 1; });
         localStorage.setItem('lastPos', JSON.stringify(newPositions));
 
-        // 3 & 4. Render Tabel & Top Scorer
+        // 3. UPDATE TICKER NEWS
+        const tickerEl = document.getElementById('newsTicker');
+        if (tickerEl && players.length > 0) {
+            const leader = players[0].nama;
+            const topScorerData = [...players].sort((a, b) => b.goals - a.goals)[0];
+            const topMarketValues = [...players]
+                .map(p => ({
+                    nama: p.nama,
+                    total: 5000000000 + (p.point * 100000000) + (p.goals * 10000000)
+                }))
+                .sort((a, b) => b.total - a.total)
+                .slice(0, 3)
+                .map((p, i) => `#${i+1} ${p.nama.toUpperCase()} (Rp ${(p.total/1000000000).toFixed(1)}M)`)
+                .join(" | ");
+
+            const allPotw = players
+                .filter(p => p.potw.toLowerCase().includes("best player"))
+                .map(p => p.nama.toUpperCase());
+            const bestPlayerText = allPotw.length > 0 ? allPotw.join(", ") : "BELUM DITENTUKAN";
+
+            tickerEl.innerText = `📢 NEWS UPDATE: ${leader.toUpperCase()} MEMIMPIN KLASEMEN! --- 💰 TOP MARKET VALUE: ${topMarketValues} --- ⭐ BEST PLAYER OF THE WEEK: ${bestPlayerText} --- 🔥 TOP SCORER: ${topScorerData.nama.toUpperCase()} (${topScorerData.goals} GOALS) ---`;
+        }
+
+        // 4. Render
         renderTable(players);
         const topScorers = [...players].sort((a, b) => b.goals - a.goals).slice(0, 3);
         renderTopScorer(topScorers);
@@ -137,23 +136,29 @@ function renderTable(players) {
     players.forEach((p, i) => {
         const tr = document.createElement("tr");
         const currentRank = i + 1;
+        
+        // HITUNG SELISIH (PENTING: previous - current)
+        // Jika prev: 4 dan current: 3, maka diff = +1 (Naik)
         const diff = p.prevPos - currentRank;
 
-        let trendIcon = `<svg width="40" height="20"><line x1="0" y1="10" x2="40" y2="10" stroke="#444" stroke-width="2"/></svg>`;
+        let trendIcon = `<svg width="40" height="20"><line x1="5" y1="10" x2="35" y2="10" stroke="#444" stroke-width="2"/></svg>`;
         let diffText = "-";
         let diffClass = "";
 
         if (diff > 0) {
-            trendIcon = `<svg width="40" height="20"><line x1="5" y1="15" x2="35" y2="5" stroke="#00ff88" stroke-width="3" stroke-linecap="round"/></svg>`;
+            trendIcon = `<svg width="40" height="20"><path d="M10 15L20 5L30 15" fill="none" stroke="#00ff88" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
             diffText = `+${diff}`;
             diffClass = "pos-up";
         } else if (diff < 0) {
-            trendIcon = `<svg width="40" height="20"><line x1="5" y1="5" x2="35" y2="15" stroke="#ff4444" stroke-width="3" stroke-linecap="round"/></svg>`;
-            diffText = diff;
+            trendIcon = `<svg width="40" height="20"><path d="M10 5L20 15L30 5" fill="none" stroke="#ff4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+            diffText = diff; // Sudah ada tanda minus dari hasil hitung
             diffClass = "pos-down";
         }
 
-        let potwContent = p.potw.toLowerCase() === "best player" ? `<span class="potw-highlight">Best Player Of The Week</span>` : `<span style="opacity:0.3">-</span>`;
+        // Fix: Menggunakan includes agar flexible jika input "Best Player Pekan 1"
+        let potwContent = p.potw.toLowerCase().includes("best player") 
+            ? `<span class="potw-highlight">Best Player Of The Week</span>` 
+            : `<span style="opacity:0.3">-</span>`;
         
         if(currentRank === 1) tr.className = "rank-1";
         else if(currentRank === 2) tr.className = "rank-2";
@@ -359,6 +364,7 @@ function shareToWA() {
     const waUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
     window.open(waUrl, '_blank');
 }
+
 
 
 
