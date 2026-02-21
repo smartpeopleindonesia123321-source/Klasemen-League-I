@@ -72,20 +72,35 @@ async function fetchData() {
             };
         }).filter(p => p.nama);
 
-        // 1. Sorting Klasemen Utama
+        // 1. Sorting Klasemen Utama (Berdasarkan Poin & Gol)
         players.sort((a, b) => b.point - a.point || b.goals - a.goals);
 
-        // --- TAMBAHAN: UPDATE TICKER NEWS OTOMATIS (TERMASUK POTW) ---
+        // --- TAMBAHAN: UPDATE TICKER NEWS DENGAN 3 MARKET VALUE TERMAHAL ---
         const tickerEl = document.getElementById('newsTicker');
         if (tickerEl && players.length > 0) {
             const leader = players[0].nama;
             const topScorerData = [...players].sort((a, b) => b.goals - a.goals)[0];
             
+            // Logika Cari 3 Harga Termahal
+            const topMarketValues = [...players]
+                .map(p => {
+                    const val = 5000000000 + (p.point * 100000000) + (p.goals * 10000000);
+                    return { nama: p.nama, total: val };
+                })
+                .sort((a, b) => b.total - a.total)
+                .slice(0, 3)
+                .map((p, i) => {
+                    const milyar = (p.total / 1000000000).toFixed(1);
+                    return `#${i+1} ${p.nama.toUpperCase()} (Rp ${milyar}M)`;
+                })
+                .join(" | ");
+
             // Cari siapa Best Player-nya
             const bestPlayerObj = players.find(p => p.potw.toLowerCase().includes("best player"));
             const bestPlayerName = bestPlayerObj ? bestPlayerObj.nama.toUpperCase() : "BELUM DITENTUKAN";
 
-            tickerEl.innerText = `📢 NEWS UPDATE: ${leader.toUpperCase()} MEMIMPIN KLASEMEN! --- ⭐ BEST PLAYER OF THE WEEK: ${bestPlayerName} --- 🔥 TOP SCORER: ${topScorerData.nama.toUpperCase()} (${topScorerData.goals} GOALS) --- ⚽ SELAMAT BERTANDING! ---`;
+            // Update teks Ticker
+            tickerEl.innerText = `📢 NEWS UPDATE: ${leader.toUpperCase()} MEMIMPIN KLASEMEN! --- 💰 MARKET VALUE HIGHLIGHTS: ${topMarketValues} --- ⭐ BEST PLAYER: ${bestPlayerName} --- 🔥 TOP SCORER: ${topScorerData.nama.toUpperCase()} (${topScorerData.goals} GOALS) ---`;
         }
 
         // 2. LOGIKA TREND (Memory Storage)
@@ -293,6 +308,7 @@ function shareToWA() {
     const waUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
     window.open(waUrl, '_blank');
 }
+
 
 
 
