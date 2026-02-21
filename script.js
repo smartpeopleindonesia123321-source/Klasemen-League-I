@@ -78,7 +78,7 @@ function renderTable(players) {
         // Logika Highlight POTW (Kolom E)
         let potwContent = "";
         if (p.potw.toLowerCase() === "best player") {
-            potwContent = `<span class="potw-highlight">Best Player Of The Weak</span>`;
+            potwContent = `<span class="potw-highlight">Best Player Of The Week</span>`;
         } else {
             potwContent = `<span style="opacity:0.3">-</span>`;
         }
@@ -192,6 +192,7 @@ function shareToWA() {
     // Buka WhatsApp di tab baru
     window.open(waUrl, '_blank');
 }
+
 
 
 
