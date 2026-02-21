@@ -284,16 +284,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function shareToWA() {
     const rows = document.querySelectorAll("#mainTable tbody tr");
-    const tickerText = document.getElementById('newsTicker').innerText; // Ambil berita berjalan
+    const tickerEl = document.getElementById('newsTicker');
+    let tickerText = tickerEl ? tickerEl.innerText : "";
 
     let text = "🗞️ *FOOTBALL LEAGUE-I NEWS UPDATE* 🗞️\n";
-    // Bersihkan tanda --- jadi baris baru biar rapi di WA
-    text += "_" + tickerText.replace(/---/g, "\n") + "_\n\n"; 
+    
+    // 1. Bagian Berita & Market Value
+    text += "_" + tickerText.replace(/---/g, "\n") + "_\n";
+    
+    // 2. TAMBAHAN PENJELASAN RUMUS (Hanya di WA)
+    text += "--------------------------------------\n";
+    text += "📑 *INFO MARKET VALUE CALCULATION:*\n";
+    text += "Base (Rp 5M) + (1 Pts = 100jt) + (1 Goal = 10jt)\n";
+    text += "--------------------------------------\n\n";
     
     text += "🏆 *KLASEMEN TERBARU* 🏆\n";
     text += "POS | CONTENDER | PTS | AGG\n";
     text += "--------------------------------------\n";
 
+    // 3. Looping data tabel
     rows.forEach((row) => {
         const cells = row.querySelectorAll("td");
         if (cells.length > 0) {
@@ -302,11 +311,10 @@ function shareToWA() {
             const pts = cells[2].innerText;
             const agg = cells[3].innerText;
             
-            // CEK STATUS POTW: ambil dari kolom ke-6 (indeks 6)
-            const potwStatus = cells[6].innerText.trim();
+            // Cek POTW (Kolom ke-7 / Indeks 6)
+            const potwStatus = cells[6] ? cells[6].innerText.trim() : "";
             let potwIcon = "";
             
-            // Jika ada teks 'Best Player', kasih icon bintang & bold
             if (potwStatus.toLowerCase().includes("best player")) {
                 potwIcon = " ⭐ *[POTW]*"; 
             }
@@ -320,6 +328,7 @@ function shareToWA() {
     const waUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
     window.open(waUrl, '_blank');
 }
+
 
 
 
