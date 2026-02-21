@@ -418,9 +418,13 @@ body.light-mode .rank-1 .team-name {
 }
 .value-amount {
     display: block;
-    font-size: 20px;
-    color: #ffd700; /* Warna Emas */
+    font-size: 18px; /* Tadi 22px, kita turunin biar gak nabrak box */
+    color: #ffd700; 
     font-weight: 900;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    font-style: italic;
+    letter-spacing: 1px;
 }
+
 
 
