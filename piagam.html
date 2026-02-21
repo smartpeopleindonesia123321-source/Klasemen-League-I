@@ -27,39 +27,36 @@
         .bottom-left { bottom: 0; left: 0; border-right: none; border-top: none; }
         .bottom-right { bottom: 0; right: 0; border-left: none; border-top: none; }
 
-        /* Trophy & Medal Icons */
-        .trophy-box { 
-            font-size: 70px; 
+        /* Trophy Box Image Styling */
+        .trophy-image-container { 
+            height: 100px; 
             margin-top: 10px;
-            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.2));
             display: flex;
-            gap: 15px;
+            gap: 20px;
             align-items: center;
+            justify-content: center;
+            z-index: 2;
         }
+        .trophy-img { height: 100%; object-fit: contain; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)); }
 
         /* Typography */
         .header { margin-top: 40px; text-transform: uppercase; letter-spacing: 5px; font-weight: 400; font-size: 14px; }
-        .award-title { font-family: 'Playfair Display', serif; font-size: 42px; margin: 5px 0; color: var(--gold); text-transform: uppercase; text-align: center; width: 80%; line-height: 1.1; }
+        .award-title { font-family: 'Playfair Display', serif; font-size: 38px; margin: 5px 0; color: var(--gold); text-transform: uppercase; text-align: center; width: 85%; line-height: 1.1; }
         .presented-to { margin-top: 10px; font-size: 16px; font-style: italic; }
-        .winner-name { font-size: 40px; font-weight: 900; text-decoration: underline; margin: 2px 0; text-transform: uppercase; color: #111; text-align: center; z-index: 2; }
+        .winner-name { font-size: 42px; font-weight: 900; text-decoration: underline; margin: 2px 0; text-transform: uppercase; color: #111; text-align: center; }
         .league-name { font-weight: bold; color: #1e40af; margin-top: 5px; font-size: 18px; }
-        .description { width: 80%; text-align: center; font-size: 13px; margin-top: 10px; line-height: 1.4; color: #444; }
+        .description { width: 80%; text-align: center; font-size: 13px; margin-top: 10px; line-height: 1.4; color: #333; }
 
         /* Footer */
-        .footer { margin-top: 30px; display: flex; justify-content: space-around; width: 100%; }
+        .footer { margin-top: auto; margin-bottom: 40px; display: flex; justify-content: space-around; width: 100%; }
         .sig-box { text-align: center; width: 200px; }
         .sig-line { border-top: 2px solid var(--dark); margin-top: 40px; padding-top: 5px; font-weight: bold; font-size: 14px; }
         
-        /* Variasi Warna & Icon */
-        .cert-juara1 .award-title { color: var(--gold); }
-        .cert-juara2 .award-title { color: var(--silver); } 
-        .cert-juara2 .corner { border-color: var(--silver); }
-        .cert-juara3 .award-title { color: var(--bronze); } 
-        .cert-juara3 .corner { border-color: var(--bronze); }
-        .cert-topscorer .award-title { color: #cc0000; } 
-        .cert-topscorer .corner { border-color: #cc0000; }
-        .cert-poty .award-title { color: #1e40af; } 
-        .cert-poty .corner { border-color: #1e40af; }
+        /* Variasi Warna */
+        .cert-juara2 .award-title { color: var(--silver); } .cert-juara2 .corner { border-color: var(--silver); }
+        .cert-juara3 .award-title { color: var(--bronze); } .cert-juara3 .corner { border-color: var(--bronze); }
+        .cert-topscorer .award-title { color: #cc0000; } .cert-topscorer .corner { border-color: #cc0000; }
+        .cert-poty .award-title { color: #1e40af; } .cert-poty .corner { border-color: #1e40af; }
 
         .btn-print {
             position: fixed; top: 20px; left: 20px; padding: 12px 25px;
@@ -77,11 +74,21 @@
 <body>
 
     <button class="btn-print" onclick="window.print()">📥 SIMPAN PIAGAM (PDF)</button>
-    <div id="loading" style="color: white; margin-top: 100px;">🔄 SEDANG MENGAMBIL DATA JUARA...</div>
+    <div id="loading" style="color: white; margin-top: 100px;">🔄 MEMUAT DATA PIAGAM...</div>
     <div id="certificates-container"></div>
 
     <script>
         const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=0&single=true&output=csv';
+
+        // Resource Gambar Piala & Medali
+        const assets = {
+            pialaKuping: 'https://cdn-icons-png.flaticon.com/512/3112/3112946.png',
+            medaliEmas: 'https://cdn-icons-png.flaticon.com/512/179/179249.png',
+            medaliPerak: 'https://cdn-icons-png.flaticon.com/512/179/179251.png',
+            medaliPerunggu: 'https://cdn-icons-png.flaticon.com/512/179/179250.png',
+            sepatuEmas: 'https://cdn-icons-png.flaticon.com/512/5355/5355931.png',
+            bolaEmas: 'https://cdn-icons-png.flaticon.com/512/4603/4603612.png'
+        };
 
         async function generateCertificates() {
             try {
@@ -104,31 +111,49 @@
                 const rankWinners = [...players].sort((a, b) => b.point - a.point || b.goals - a.goals);
                 const scorerWinners = [...players].sort((a, b) => b.goals - a.goals);
 
-                // Mapping Icon
-                // Juara 1: Piala Kuping Besar (🏆) + Medali Emas (🥇)
-                // Juara 2: Medali Perak (🥈)
-                // Juara 3: Medali Perunggu (🥉)
-                // Top Scorer: Sepatu Emas (👟⚽)
-                // POTY: Bola Emas (🟡⚽)
-
+                // DATA PIAGAM
                 const mainAwards = [
-                    { type: 'cert-juara1', icon: '🏆🥇', title: '1st PLACE CHAMPION', name: rankWinners[0].nama, desc: 'Atas prestasi luar biasa menjadi pemuncak klasemen akhir dan menunjukkan dominasi total sepanjang musim.' },
-                    { type: 'cert-juara2', icon: '🥈', title: '2nd PLACE RUNNER UP', name: rankWinners[1].nama, desc: 'Atas perjuangan luar biasa dan konsistensi tinggi hingga berhasil meraih posisi kedua musim ini.' },
-                    { type: 'cert-juara3', icon: '🥉', title: '3rd PLACE WINNER', name: rankWinners[2].nama, desc: 'Atas keberhasilan menunjukkan kualitas tim yang solid dan menempati posisi tiga besar.' },
-                    { type: 'cert-topscorer', icon: '👟⚽', title: 'GOLDEN BOOT (TOP SCORER)', name: scorerWinners[0].nama, desc: 'Dianugerahkan kepada predator kotak penalti dengan catatan gol terbanyak sepanjang kompetisi.' }
+                    { 
+                        type: 'cert-juara1', 
+                        imgs: [assets.pialaKuping, assets.medaliEmas], 
+                        title: '1st PLACE CHAMPION', 
+                        name: rankWinners[0].nama, 
+                        desc: 'Atas prestasi luar biasa menjadi pemuncak klasemen akhir dan menunjukkan dominasi total sepanjang musim.' 
+                    },
+                    { 
+                        type: 'cert-juara2', 
+                        imgs: [assets.medaliPerak], 
+                        title: '2nd PLACE RUNNER UP', 
+                        name: rankWinners[1].nama, 
+                        desc: 'Atas perjuangan luar biasa dan konsistensi tinggi hingga berhasil meraih posisi kedua musim ini.' 
+                    },
+                    { 
+                        type: 'cert-juara3', 
+                        imgs: [assets.medaliPerunggu], 
+                        title: '3rd PLACE WINNER', 
+                        name: rankWinners[2].nama, 
+                        desc: 'Atas keberhasilan menunjukkan kualitas tim yang solid dan menempati posisi tiga besar.' 
+                    },
+                    { 
+                        type: 'cert-topscorer', 
+                        imgs: [assets.sepatuEmas], 
+                        title: 'GOLDEN BOOT (TOP SCORER)', 
+                        name: scorerWinners[0].nama, 
+                        desc: 'Dianugerahkan kepada predator kotak penalti dengan catatan gol terbanyak sepanjang kompetisi.' 
+                    }
                 ];
 
                 mainAwards.forEach(cert => renderHTML(container, cert));
 
-                // Player of the Year Logic
+                // POTY Logic
                 const potyWinners = players.filter(p => p.fullRow.includes("best player"));
                 potyWinners.forEach(winner => {
                     renderHTML(container, {
                         type: 'cert-poty',
-                        icon: '🟡⚽',
+                        imgs: [assets.bolaEmas],
                         title: 'PLAYER OF THE YEAR',
                         name: winner.nama,
-                        desc: 'Penghargaan individu paling prestisius bagi pemain dengan performa, skill, dan pengaruh paling besar di lapangan.'
+                        desc: 'Penghargaan individu paling prestisius bagi pemain dengan performa dan pengaruh paling besar musim ini.'
                     });
                 });
 
@@ -139,6 +164,8 @@
         }
 
         function renderHTML(container, cert) {
+            let imagesHTML = cert.imgs.map(src => `<img src="${src}" class="trophy-img">`).join('');
+            
             container.innerHTML += `
                 <div class="certificate ${cert.type}">
                     <div class="inner-border"></div>
@@ -148,7 +175,9 @@
                     <div class="header">Official Achievement</div>
                     <div class="award-title">${cert.title}</div>
                     
-                    <div class="trophy-box">${cert.icon}</div>
+                    <div class="trophy-image-container">
+                        ${imagesHTML}
+                    </div>
 
                     <div class="presented-to">Diberikan Kepada:</div>
                     <div class="winner-name">${cert.name}</div>
