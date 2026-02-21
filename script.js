@@ -136,5 +136,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+function shareToWA() {
+    // Ambil semua baris di body tabel
+    const rows = document.querySelectorAll("#mainTable tbody tr");
+    let text = "🏆 *FOOTBALL LEAGUE-I - KLASEMEN TERBARU* 🏆\n\n";
+    text += "POS | CONTENDER | PTS | AGG\n";
+    text += "------------------------------\n";
+
+    // Ambil data top 5 saja biar gak kepanjangan di WA
+    rows.forEach((row, index) => {
+        if (index < 10) { // Kita ambil top 10
+            const cells = row.querySelectorAll("td");
+            const pos = cells[0].innerText;
+            const name = row.querySelector(".team-name").innerText;
+            const pts = cells[2].innerText;
+            const agg = cells[3].innerText;
+            
+            // Format tiap baris
+            text += `${pos}. *${name}* - ${pts} Pts (${agg})\n`;
+        }
+    });
+
+    text += "\n📍 Cek klasemen lengkap di sini:\n";
+    text += window.location.href; // Ini otomatis ngambil link web lo
+
+    // Encode teks ke format URL WhatsApp
+    const waUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
+    
+    // Buka WhatsApp di tab baru
+    window.open(waUrl, '_blank');
+}
+
+
 
 
