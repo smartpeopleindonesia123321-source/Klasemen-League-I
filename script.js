@@ -129,7 +129,7 @@ function renderTable(players) {
             diffClass = "pos-down";
         }
 
-        let potwContent = p.potw.toLowerCase() === "best player" ? `<span class="potw-highlight">Best Player</span>` : `<span style="opacity:0.3">-</span>`;
+        let potwContent = p.potw.toLowerCase() === "best player" ? `<span class="potw-highlight">Best Player Of The Week</span>` : `<span style="opacity:0.3">-</span>`;
         
         if(currentRank === 1) tr.className = "rank-1";
         else if(currentRank === 2) tr.className = "rank-2";
@@ -218,4 +218,5 @@ function shareToWA() {
     text += "\n📍 Cek klasemen lengkap di sini:\n" + window.location.href;
     window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), '_blank');
 }
+
 
