@@ -377,11 +377,10 @@ openModal = function(name, logo) {
 };
 
 // ==========================================
-// PLUGIN: SIGNATURE THEME & SLOGAN PREDATOR
+// PLUGIN: SIGNATURE THEME & SLOGAN PREDATOR (FIXED VERSION)
 // ==========================================
 
-// 1. Data Slogan & Path Musik
-const signatureData = {
+const predatorDatabase = {
     "Dandi": { slogan: "THE MOUNTAIN CRUSHER", music: "assets/dandi.mp3" },
     "Erni": { slogan: "THE WHITE SHADOW", music: "assets/erni.mp3" },
     "Regi": { slogan: "THE ARCTIC GUARDIAN", music: "assets/regi.mp3" },
@@ -394,80 +393,49 @@ const signatureData = {
     "Dicky": { slogan: "THE KING OF THE JUNGLE", music: "assets/dicky.mp3" }
 };
 
-const signatureAudio = new Audio();
-let wasMainMusicPlaying = false;
+const sigPlayer = new Audio();
+let isMainMusicActive = false;
 
-// 2. Preload Audio (Biar gak loading pas diklik)
-window.addEventListener('load', () => {
-    Object.values(signatureData).forEach(data => {
-        const audio = new Audio();
-        audio.src = data.music;
-        audio.preload = 'auto';
-    });
-});
-
-// 3. Modifikasi Fungsi openModal
-const originalOpenModal = openModal;
+// Override openModal dengan pengaman
+const backupOpenModal = openModal;
 openModal = function(name, logo) {
-    // Jalankan fungsi asli (Modal & Stats)
-    originalOpenModal(name, logo);
+    if (typeof backupOpenModal === 'function') backupOpenModal(name, logo);
 
-    // A. PASANG SLOGAN
-    const modalName = document.querySelector('#modalName');
-    if (modalName && signatureData[name]) {
-        // Hapus slogan lama jika ada
-        const oldSlogan = document.querySelector('.player-slogan');
-        if (oldSlogan) oldSlogan.remove();
+    const titleElem = document.querySelector('#modalName');
+    if (titleElem && predatorDatabase[name]) {
+        const existSlogan = document.querySelector('.player-slogan');
+        if (existSlogan) existSlogan.remove();
 
-        // Buat elemen slogan baru
-        const sloganElem = document.createElement('p');
-        sloganElem.className = 'player-slogan';
-        sloganElem.innerText = signatureData[name].slogan;
-        
-        // Styling Slogan (Emas & Mewah)
-        sloganElem.style.fontSize = '0.75rem';
-        sloganElem.style.letterSpacing = '2px';
-        sloganElem.style.fontWeight = 'bold';
-        sloganElem.style.color = '#facc15'; 
-        sloganElem.style.textTransform = 'uppercase';
-        sloganElem.style.marginTop = '4px';
-        sloganElem.style.textAlign = 'center';
-        
-        // Masukkan tepat di bawah nama
-        modalName.parentNode.insertBefore(sloganElem, modalName.nextSibling);
+        const el = document.createElement('p');
+        el.className = 'player-slogan';
+        el.innerText = predatorDatabase[name].slogan;
+        el.style = "font-size:0.75rem; letter-spacing:2px; font-weight:bold; color:#facc15; text-transform:uppercase; margin-top:4px; text-align:center;";
+        titleElem.parentNode.insertBefore(el, titleElem.nextSibling);
     }
 
-    // B. KONTROL MUSIK
-    const mainAudio = document.getElementById('uclMusic');
-    if (mainAudio && !mainAudio.paused) {
-        wasMainMusicPlaying = true;
-        mainAudio.pause();
-    } else {
-        wasMainMusicPlaying = false;
+    const mainTrack = document.getElementById('uclMusic');
+    if (mainTrack && !mainTrack.paused) {
+        isMainMusicActive = true;
+        mainTrack.pause();
     }
 
-    if (signatureData[name]) {
-        signatureAudio.src = signatureData[name].music;
-        signatureAudio.volume = 0.6;
-        signatureAudio.play().catch(e => console.log("Menunggu interaksi user..."));
+    if (predatorDatabase[name]) {
+        sigPlayer.src = predatorDatabase[name].music;
+        sigPlayer.volume = 0.6;
+        sigPlayer.play().catch(e => {});
     }
 };
 
-// 4. Modifikasi Fungsi closeModal
-const originalCloseModal = closeModal;
+// Override closeModal dengan pengaman
+const backupCloseModal = closeModal;
 closeModal = function() {
-    originalCloseModal();
-
-    // Berhentikan musik signature
-    signatureAudio.pause();
-    signatureAudio.currentTime = 0;
-
-    // Resume musik utama jika tadi menyala
-    const mainAudio = document.getElementById('uclMusic');
-    if (wasMainMusicPlaying && mainAudio) {
-        mainAudio.play();
-    }
+    if (typeof backupCloseModal === 'function') backupCloseModal();
+    sigPlayer.pause();
+    sigPlayer.currentTime = 0;
+    const mainTrack = document.getElementById('uclMusic');
+    if (isMainMusicActive && mainTrack) mainTrack.play();
 };
+
 
 
 
