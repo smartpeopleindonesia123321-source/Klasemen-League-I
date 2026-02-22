@@ -172,41 +172,43 @@
         }
 
         function renderCard(container, data) {
-            let imagesHTML = data.imgs.map(url => `<img src="${url}" alt="award">`).join('');
+    let imagesHTML = data.imgs.map(url => `<img src="${url}" alt="award">`).join('');
+    
+    // Logika teks Ballon d'Or
+    let extraText = data.isBallon ? `<div class="ballon-text">🏆 Ballon d'Or Winner 🏆</div>` : '';
+
+    container.innerHTML += `
+        <div class="certificate ${data.type}">
+            <div class="inner-border"></div>
+            <div class="corner top-left"></div><div class="corner top-right"></div>
+            <div class="corner bottom-left"></div><div class="corner bottom-right"></div>
             
-            // Logika teks Ballon d'Or
-            let extraText = data.isBallon ? `<div class="ballon-text">🏆 Ballon d'Or Winner 🏆</div>` : '';
+            <div class="header">Official Achievement</div>
+            <div class="award-title">${data.title}</div>
+            
+            <div class="trophy-container">
+                ${imagesHTML}
+            </div>
 
-            container.innerHTML += `
-                <div class="certificate ${data.type}">
-                    <div class="inner-border"></div>
-                    <div class="corner top-left"></div><div class="corner top-right"></div>
-                    <div class="corner bottom-left"></div><div class="corner bottom-right"></div>
-                    
-                    <div class="header">Official Achievement</div>
-                    <div class="award-title">${data.title}</div>
-                    
-                    <div class="trophy-container">
-                        ${imagesHTML}
-                    </div>
-
-                    <div class="presented-to">Diberikan Kepada:</div>
-                    <div class="winner-name">${data.name}</div>
-                    ${extraText}
-                    <div class="league-name">FOOTBALL LEAGUE-I</div>
-                    <div class="description">${data.desc}</div>
-                    
-                    <div class="footer">
-                        <div class="sig-box"><div class="sig-line">Official Admin</div></div>
-                        <div class="sig-box"><div class="sig-line">League Manager</div></div>
-                    </div>
-                </div>
-            `;
-        }
+            <div class="presented-to">Diberikan Kepada:</div>
+            <div class="winner-name">${data.name}</div>
+            ${extraText}
+            <div class="league-name">FOOTBALL LEAGUE-I</div>
+            
+            <div class="description">${data.desc}</div>
+            
+            <div class="footer">
+                <div class="sig-box"><div class="sig-line">Official Admin</div></div>
+                <div class="sig-box"><div class="sig-line">League Manager</div></div>
+            </div>
+        </div>
+    `;
+}
 
         generateCertificates();
     </script>
 </body>
 </html>
+
 
 
