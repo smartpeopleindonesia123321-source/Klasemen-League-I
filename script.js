@@ -377,7 +377,7 @@ openModal = function(name, logo) {
 };
 
 // ==========================================
-// PLUGIN: SIGNATURE THEME & SLOGAN PREDATOR (FIXED VERSION)
+// PLUGIN: SIGNATURE THEME & SLOGAN PREDATOR (DIRECT HIT)
 // ==========================================
 
 const predatorDatabase = {
@@ -396,23 +396,36 @@ const predatorDatabase = {
 const sigPlayer = new Audio();
 let isMainMusicActive = false;
 
-// Override openModal dengan pengaman
+// Override openModal
 const backupOpenModal = openModal;
 openModal = function(name, logo) {
     if (typeof backupOpenModal === 'function') backupOpenModal(name, logo);
 
+    // --- LOGIKA SLOGAN (FIXED) ---
     const titleElem = document.querySelector('#modalName');
     if (titleElem && predatorDatabase[name]) {
-        const existSlogan = document.querySelector('.player-slogan');
-        if (existSlogan) existSlogan.remove();
+        // Bersihkan slogan lama
+        const oldSlogan = document.getElementById('sloganCustom');
+        if (oldSlogan) oldSlogan.remove();
 
-        const el = document.createElement('p');
-        el.className = 'player-slogan';
+        // Buat elemen slogan baru
+        const el = document.createElement('div');
+        el.id = 'sloganCustom';
+        el.style.fontSize = '0.8rem';
+        el.style.letterSpacing = '2px';
+        el.style.fontWeight = 'bold';
+        el.style.color = '#facc15';
+        el.style.textTransform = 'uppercase';
+        el.style.marginTop = '5px';
+        el.style.textAlign = 'center';
+        el.style.textShadow = '1px 1px 2px black';
         el.innerText = predatorDatabase[name].slogan;
-        el.style = "font-size:0.75rem; letter-spacing:2px; font-weight:bold; color:#facc15; text-transform:uppercase; margin-top:4px; text-align:center;";
-        titleElem.parentNode.insertBefore(el, titleElem.nextSibling);
+        
+        // TEMBAK LANGSUNG SETELAH NAMA
+        titleElem.after(el);
     }
 
+    // --- LOGIKA MUSIK ---
     const mainTrack = document.getElementById('uclMusic');
     if (mainTrack && !mainTrack.paused) {
         isMainMusicActive = true;
@@ -422,11 +435,11 @@ openModal = function(name, logo) {
     if (predatorDatabase[name]) {
         sigPlayer.src = predatorDatabase[name].music;
         sigPlayer.volume = 0.6;
-        sigPlayer.play().catch(e => {});
+        sigPlayer.play().catch(e => console.log("Play blocked by browser"));
     }
 };
 
-// Override closeModal dengan pengaman
+// Override closeModal
 const backupCloseModal = closeModal;
 closeModal = function() {
     if (typeof backupCloseModal === 'function') backupCloseModal();
@@ -435,6 +448,7 @@ closeModal = function() {
     const mainTrack = document.getElementById('uclMusic');
     if (isMainMusicActive && mainTrack) mainTrack.play();
 };
+
 
 
 
