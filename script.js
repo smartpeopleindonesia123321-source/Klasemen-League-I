@@ -299,38 +299,44 @@ function shareToWA() {
         updatedTicker = updatedTicker.replace(/BEST PLAYER:.*?(?=\n|$)/, `BEST PLAYER OF THE WEEK: ${potwListText}`);
     }
 
+    // 1. PALING ATAS: BERITA BERJALAN
     let text = "🗞️ *FOOTBALL LEAGUE-I NEWS UPDATE* 🗞️\n";
     text += "_" + updatedTicker + "_\n";
-    text += "--------------------------------------\n";
-    text += "📑 *INFO MARKET VALUE CALCULATION:*\n";
-    text += "Base (Rp 5M) + (1 Pts = 100jt) + (1 Goal = 10jt) in Rupiah\n";
-    text += "⭐ *Best player of the week = Persentase kemenangan tertinggi di minggu ini*\n";
     text += "--------------------------------------\n\n";
-    text += "🏆 *KLASEMEN TERBARU* 🏆\nPOS | CONTENDER | PTS | AGG\n--------------------------------------\n";
 
+    // 2. KLASEMEN TERBARU
+    text += "🏆 *KLASEMEN TERBARU* 🏆\nPOS | CONTENDER | PTS | AGG\n--------------------------------------\n";
     rows.forEach((row) => {
         const cells = row.querySelectorAll("td");
         if (cells.length > 0) {
             const potwStatus = cells[6] ? cells[6].innerText.trim() : "";
-            const potwIcon = potwStatus.toLowerCase().includes("best player") ? " ⭐ *[BEST PLAYER OF THE WEEK]*" : "";
+            const potwIcon = potwStatus.toLowerCase().includes("best player") ? " ⭐" : "";
             text += `${cells[0].innerText}. *${row.querySelector(".team-name").innerText.toUpperCase()}* - ${cells[2].innerText} Pts (${cells[3].innerText})${potwIcon}\n`;
         }
     });
 
-    text += "\n📍 *Cek Detail ID Card & Market Value:* \n" + window.location.href;
-    
-    // --- TAMBAHAN PROMOSI PIAGAM (OPSI 2) DI BAWAH INI ---
-    text += "\n\n--------------------------------------\n";
-    text += "🔥 *PIAGAM FOOTBALL LEAGUE-I RILIS!* 🔥\n\n";
-    text += "Cek 5 penghargaan terbaik tahun ini:\n";
-    text += "🏆 *Champion* - Penguasa Klasemen!\n";
-    text += "🥈 *Runner Up* - Perjuangan luar biasa!\n";
-    text += "🥉 *Third Place* - Podium terakhir!\n";
-    text += "🎯 *Golden Boot* - Raja gol musim ini!\n";
-    text += "👑 *Ballon d’Or* - Pemain terbaik sesungguhnya!\n\n";
-    text += "👉 *Lihat Piagam Lo Di Sini:* \nhttps://smartpeopleindonesia123321-source.github.io/Klasemen-League-I/piagam.html";
+    // 3. PROMOSI 5 PIAGAM (DIBERESIN)
+    text += "\n--------------------------------------\n";
+    text += "🔥 *OFFICIAL AWARDS ANNOUNCEMENT* 🔥\n\n";
+    text += "Cek 5 Kategori Penghargaan Musim Ini:\n";
+    text += "🏆 *Champion* (Juara 1)\n";
+    text += "🥈 *Runner Up* (Juara 2)\n";
+    text += "🥉 *Third Place* (Juara 3)\n";
+    text += "🎯 *Golden Boot* (Top Scorer)\n";
+    text += "👑 *Ballon d’Or* (Player of the Year)\n";
+    text += "--------------------------------------\n\n";
+
+    // 4. INFO MARKET VALUE & BEST PLAYER (PINDAH KE BAWAH)
+    text += "📑 *TECHNICAL INFO:*\n";
+    text += "💰 *Market Value:* Base Rp 5M + (1 Pts = 100jt) + (1 Goal = 10jt)\n";
+    text += "⭐ *Best Player:* Persentase kemenangan tertinggi minggu ini.\n\n";
+
+    // 5. SATU LINK SAKTI DI AKHIR
+    text += "🔗 *CEK ID CARD, MARKET VALUE, & PIAGAM:* \n";
+    text += "https://smartpeopleindonesia123321-source.github.io/Klasemen-League-I/";
 
     window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), '_blank');
 }
+
 
 
