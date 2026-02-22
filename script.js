@@ -376,57 +376,93 @@ openModal = function(name, logo) {
     }
 };
 
-// --- PLUGIN SIGNATURE THEME SONG (LOCAL ASSETS VERSION) ---
-const signatureMusic = {
-    "Dandi": "assets/dandi.mp3",
-    "Erni": "assets/erni.mp3",
-    "Regi": "assets/regi.mp3",
-    "Rizal": "assets/rizal.mp3",
-    "Asep": "assets/asep.mp3",
-    "Aries": "assets/aries.mp3",
-    "Ikmal": "assets/ikmal.mp3",
-    "Yanti": "assets/yanti.mp3",
-    "Maya": "assets/maya.mp3",
-    "Dicky": "assets/dicky.mp3"
+// ==========================================
+// PLUGIN: SIGNATURE THEME & SLOGAN PREDATOR
+// ==========================================
+
+// 1. Data Slogan & Path Musik
+const signatureData = {
+    "Dandi": { slogan: "THE MOUNTAIN CRUSHER", music: "assets/dandi.mp3" },
+    "Erni": { slogan: "THE WHITE SHADOW", music: "assets/erni.mp3" },
+    "Regi": { slogan: "THE ARCTIC GUARDIAN", music: "assets/regi.mp3" },
+    "Rizal": { slogan: "THE MIDNIGHT HUNTER", music: "assets/rizal.mp3" },
+    "Asep": { slogan: "THE IRON HORN", music: "assets/asep.mp3" },
+    "Aries": { slogan: "THE GOLDEN EMPEROR", music: "assets/aries.mp3" },
+    "Ikmal": { slogan: "THE FOREST GHOST", music: "assets/ikmal.mp3" },
+    "Yanti": { slogan: "THE SPEED DEMON", music: "assets/yanti.mp3" },
+    "Maya": { slogan: "THE MYSTIC PHANTOM", music: "assets/maya.mp3" },
+    "Dicky": { slogan: "THE KING OF THE JUNGLE", music: "assets/dicky.mp3" }
 };
 
-let signatureAudio = new Audio();
+const signatureAudio = new Audio();
 let wasMainMusicPlaying = false;
 
-// Kita "intersep" fungsi openModal asli tanpa merusaknya
-const musicHandlerOpen = openModal;
-openModal = function(name, logo) {
-    // 1. Jalankan fungsi openModal asli lo (ID Card & Stats)
-    musicHandlerOpen(name, logo);
+// 2. Preload Audio (Biar gak loading pas diklik)
+window.addEventListener('load', () => {
+    Object.values(signatureData).forEach(data => {
+        const audio = new Audio();
+        audio.src = data.music;
+        audio.preload = 'auto';
+    });
+});
 
-    // 2. Cek musik utama (uclMusic)
+// 3. Modifikasi Fungsi openModal
+const originalOpenModal = openModal;
+openModal = function(name, logo) {
+    // Jalankan fungsi asli (Modal & Stats)
+    originalOpenModal(name, logo);
+
+    // A. PASANG SLOGAN
+    const modalName = document.querySelector('#modalName');
+    if (modalName && signatureData[name]) {
+        // Hapus slogan lama jika ada
+        const oldSlogan = document.querySelector('.player-slogan');
+        if (oldSlogan) oldSlogan.remove();
+
+        // Buat elemen slogan baru
+        const sloganElem = document.createElement('p');
+        sloganElem.className = 'player-slogan';
+        sloganElem.innerText = signatureData[name].slogan;
+        
+        // Styling Slogan (Emas & Mewah)
+        sloganElem.style.fontSize = '0.75rem';
+        sloganElem.style.letterSpacing = '2px';
+        sloganElem.style.fontWeight = 'bold';
+        sloganElem.style.color = '#facc15'; 
+        sloganElem.style.textTransform = 'uppercase';
+        sloganElem.style.marginTop = '4px';
+        sloganElem.style.textAlign = 'center';
+        
+        // Masukkan tepat di bawah nama
+        modalName.parentNode.insertBefore(sloganElem, modalName.nextSibling);
+    }
+
+    // B. KONTROL MUSIK
     const mainAudio = document.getElementById('uclMusic');
     if (mainAudio && !mainAudio.paused) {
         wasMainMusicPlaying = true;
-        mainAudio.pause(); // Matikan musik utama sementara
+        mainAudio.pause();
     } else {
         wasMainMusicPlaying = false;
     }
 
-    // 3. Putar musik khusus pemain dari folder assets
-    if (signatureMusic[name]) {
-        signatureAudio.src = signatureMusic[name];
-        signatureAudio.volume = 0.6; // Atur volume 60%
-        signatureAudio.play().catch(e => console.warn("Lagu " + name + " belum ketemu di folder assets."));
+    if (signatureData[name]) {
+        signatureAudio.src = signatureData[name].music;
+        signatureAudio.volume = 0.6;
+        signatureAudio.play().catch(e => console.log("Menunggu interaksi user..."));
     }
 };
 
-// Kita "intersep" fungsi closeModal asli
-const musicHandlerClose = closeModal;
+// 4. Modifikasi Fungsi closeModal
+const originalCloseModal = closeModal;
 closeModal = function() {
-    // 1. Jalankan fungsi closeModal asli lo
-    musicHandlerClose();
+    originalCloseModal();
 
-    // 2. Matikan musik pemain
+    // Berhentikan musik signature
     signatureAudio.pause();
     signatureAudio.currentTime = 0;
 
-    // 3. Hidupkan kembali musik utama kalau tadi emang lagi nyala
+    // Resume musik utama jika tadi menyala
     const mainAudio = document.getElementById('uclMusic');
     if (wasMainMusicPlaying && mainAudio) {
         mainAudio.play();
