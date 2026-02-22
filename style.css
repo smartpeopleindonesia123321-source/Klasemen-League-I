@@ -426,6 +426,29 @@ body.light-mode .rank-1 .team-name {
     letter-spacing: 1px;
 }
 
+/* EFEK AURA MENYALA UNTUK SLOGAN PREDATOR */
+#playerSlogan {
+    animation: auraGlow 2s ease-in-out infinite;
+    text-shadow: 0 0 5px rgba(250, 204, 21, 0.5); /* Shadow dasar emas */
+}
+
+@keyframes auraGlow {
+    0% {
+        text-shadow: 0 0 5px rgba(250, 204, 21, 0.4), 
+                     0 0 10px rgba(250, 204, 21, 0.2);
+        transform: scale(1);
+    }
+    50% {
+        text-shadow: 0 0 15px rgba(250, 204, 21, 0.9), 
+                     0 0 25px rgba(250, 204, 21, 0.5);
+        transform: scale(1.02); /* Sedikit membesar pas bercahaya */
+    }
+    100% {
+        text-shadow: 0 0 5px rgba(250, 204, 21, 0.4), 
+                     0 0 10px rgba(250, 204, 21, 0.2);
+        transform: scale(1);
+    }
+}
 
 
 
