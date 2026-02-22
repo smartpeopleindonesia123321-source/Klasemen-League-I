@@ -376,55 +376,57 @@ openModal = function(name, logo) {
     }
 };
 
-// --- PLUGIN SIGNATURE THEME SONG V2 (INTERNET LINK) ---
+// --- PLUGIN SIGNATURE THEME SONG (LOCAL ASSETS VERSION) ---
 const signatureMusic = {
-    "Dandi": "https://cdn.pixabay.com/audio/2022/03/10/audio_c8c8a73056.mp3", // Heavy Cinematic (Grizzly)
-    "Erni": "https://cdn.pixabay.com/audio/2023/10/16/audio_4960579170.mp3",  // Elegant Waltz (Angora)
-    "Regi": "https://cdn.pixabay.com/audio/2022/02/12/audio_f696667311.mp3",  // Epic Heroic (Husky)
-    "Rizal": "https://cdn.pixabay.com/audio/2024/09/02/audio_73110998f8.mp3", // Cyberpunk Stealth (Wolf)
-    "Asep": "https://cdn.pixabay.com/audio/2022/08/04/audio_2d0a068019.mp3",  // Flamenco Energy (Banteng)
-    "Aries": "https://cdn.pixabay.com/audio/2021/11/23/audio_643198150a.mp3", // Majestic King (Lion)
-    "Ikmal": "https://cdn.pixabay.com/audio/2024/02/14/audio_03f56e9c60.mp3", // Whistle Adventure (Rusa)
-    "Yanti": "https://cdn.pixabay.com/audio/2025/01/08/audio_6c9e07802a.mp3", // Hyper-Fast DnB (Kelinci)
-    "Maya": "https://cdn.pixabay.com/audio/2022/01/26/audio_d0c6ff1bdd.mp3",  // Zen Flute Bass (Panda)
-    "Dicky": "https://cdn.pixabay.com/audio/2022/03/15/audio_7749666063.mp3"  // Aggressive Industrial (Kingkong)
+    "Dandi": "assets/dandi.mp3",
+    "Erni": "assets/erni.mp3",
+    "Regi": "assets/regi.mp3",
+    "Rizal": "assets/rizal.mp3",
+    "Asep": "assets/asep.mp3",
+    "Aries": "assets/aries.mp3",
+    "Ikmal": "assets/ikmal.mp3",
+    "Yanti": "assets/yanti.mp3",
+    "Maya": "assets/maya.mp3",
+    "Dicky": "assets/dicky.mp3"
 };
 
 let signatureAudio = new Audio();
 let wasMainMusicPlaying = false;
 
-// Override openModal tanpa merusak aslinya
-const originalOpen = openModal;
+// Kita "intersep" fungsi openModal asli tanpa merusaknya
+const musicHandlerOpen = openModal;
 openModal = function(name, logo) {
-    originalOpen(name, logo);
+    // 1. Jalankan fungsi openModal asli lo (ID Card & Stats)
+    musicHandlerOpen(name, logo);
 
-    // Pause Musik Utama (uclMusic)
+    // 2. Cek musik utama (uclMusic)
     const mainAudio = document.getElementById('uclMusic');
     if (mainAudio && !mainAudio.paused) {
         wasMainMusicPlaying = true;
-        mainAudio.pause();
+        mainAudio.pause(); // Matikan musik utama sementara
     } else {
         wasMainMusicPlaying = false;
     }
 
-    // Mainkan Musik Signature
+    // 3. Putar musik khusus pemain dari folder assets
     if (signatureMusic[name]) {
         signatureAudio.src = signatureMusic[name];
-        signatureAudio.volume = 0.6;
-        signatureAudio.play().catch(e => console.log("Audio play blocked", e));
+        signatureAudio.volume = 0.6; // Atur volume 60%
+        signatureAudio.play().catch(e => console.warn("Lagu " + name + " belum ketemu di folder assets."));
     }
 };
 
-// Override closeModal tanpa merusak aslinya
-const originalClose = closeModal;
+// Kita "intersep" fungsi closeModal asli
+const musicHandlerClose = closeModal;
 closeModal = function() {
-    originalClose();
+    // 1. Jalankan fungsi closeModal asli lo
+    musicHandlerClose();
 
-    // Matikan Musik Signature
+    // 2. Matikan musik pemain
     signatureAudio.pause();
     signatureAudio.currentTime = 0;
 
-    // Balik ke Musik Utama jika sebelumnya nyala
+    // 3. Hidupkan kembali musik utama kalau tadi emang lagi nyala
     const mainAudio = document.getElementById('uclMusic');
     if (wasMainMusicPlaying && mainAudio) {
         mainAudio.play();
