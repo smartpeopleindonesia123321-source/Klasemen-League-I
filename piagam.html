@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>PIAGAM PENGHARGAAN | FOOTBALL LEAGUE-I</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&family=Playfair+Display:wght@700;900&family=Libre+Baskerville:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
             --gold: #d4af37; --silver: #aaa9ad; --bronze: #cd7f32;
@@ -26,35 +26,47 @@
         .bottom-left { bottom: 0; left: 0; border-right: none; border-top: none; }
         .bottom-right { bottom: 0; right: 0; border-left: none; border-top: none; }
 
-        /* Wadah Gambar Piala/Medali - Sudah Dikalibrasi */
-        .trophy-container { 
-            height: 120px; 
-            margin-top: 5px;
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            justify-content: center;
-            z-index: 5;
-        }
-        .trophy-container img { 
-            height: 120px; 
-            width: auto;
-            object-fit: contain; 
-            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2)); 
-        }
+        .trophy-container { height: 115px; margin-top: 5px; display: flex; gap: 15px; align-items: center; justify-content: center; z-index: 5; }
+        .trophy-container img { height: 100%; width: auto; object-fit: contain; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2)); }
 
-        .header { margin-top: 40px; text-transform: uppercase; letter-spacing: 5px; font-weight: 400; font-size: 14px; }
-        .award-title { font-family: 'Playfair Display', serif; font-size: 36px; margin: 5px 0; color: var(--gold); text-transform: uppercase; text-align: center; width: 85%; line-height: 1.1; }
-        .presented-to { margin-top: 5px; font-size: 16px; font-style: italic; }
-        .winner-name { font-size: 45px; font-weight: 900; text-decoration: underline; margin: 2px 0; text-transform: uppercase; color: #111; text-align: center; }
-        .league-name { font-weight: bold; color: #1e40af; margin-top: 5px; font-size: 18px; }
-        .description { width: 80%; text-align: center; font-size: 14px; margin-top: 10px; line-height: 1.4; color: #333; }
-
-        .footer { margin-top: auto; margin-bottom: 45px; display: flex; justify-content: space-around; width: 100%; }
-        .sig-box { text-align: center; width: 200px; }
-        .sig-line { border-top: 2px solid var(--dark); margin-top: 40px; padding-top: 5px; font-weight: bold; font-size: 14px; }
+        .header { margin-top: 35px; text-transform: uppercase; letter-spacing: 5px; font-weight: 400; font-size: 13px; }
+        .award-title { font-family: 'Playfair Display', serif; font-size: 34px; margin: 5px 0; color: var(--gold); text-transform: uppercase; text-align: center; width: 85%; line-height: 1.1; font-weight: 900; }
         
-        /* Variasi Warna Berdasarkan Kategori */
+        .presented-to { margin-top: 5px; font-size: 16px; font-style: italic; font-family: 'Libre Baskerville', serif; }
+        
+        /* Font Nama Baru yang Lebih Mewah */
+        .winner-name { 
+            font-family: 'Libre Baskerville', serif; 
+            font-size: 42px; 
+            font-weight: 700; 
+            margin: 5px 0; 
+            text-transform: uppercase; 
+            color: #111; 
+            text-align: center;
+            letter-spacing: 2px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+            min-width: 60%;
+        }
+
+        /* Teks Tambahan Khusus Ballon d'Or */
+        .ballon-text {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-style: italic;
+            color: var(--gold);
+            font-size: 18px;
+            margin-top: -5px;
+            letter-spacing: 1px;
+        }
+
+        .league-name { font-weight: 900; color: #1e40af; margin-top: 8px; font-size: 20px; letter-spacing: 1px; }
+        .description { width: 80%; text-align: center; font-size: 14px; margin-top: 10px; line-height: 1.4; color: #444; }
+
+        .footer { margin-top: auto; margin-bottom: 40px; display: flex; justify-content: space-around; width: 100%; }
+        .sig-box { text-align: center; width: 220px; }
+        .sig-line { border-top: 2px solid var(--dark); margin-top: 40px; padding-top: 5px; font-weight: bold; font-size: 14px; text-transform: uppercase; }
+        
         .cert-juara2 .award-title { color: var(--silver); } .cert-juara2 .corner { border-color: var(--silver); }
         .cert-juara3 .award-title { color: var(--bronze); } .cert-juara3 .corner { border-color: var(--bronze); }
         .cert-topscorer .award-title { color: #cc0000; } .cert-topscorer .corner { border-color: #cc0000; }
@@ -76,13 +88,12 @@
 <body>
 
     <button class="btn-print" onclick="window.print()">📥 SIMPAN PIAGAM (PDF)</button>
-    <div id="loading" style="color: white; margin-top: 100px;">🔄 MEMUAT DATA & ASET GAMBAR...</div>
+    <div id="loading" style="color: white; margin-top: 100px;">🔄 MEMPROSES DATA...</div>
     <div id="certificates-container"></div>
 
     <script>
         const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=0&single=true&output=csv';
 
-        // Konfigurasi aset sesuai folder 'assets/' di GitHub lo
         const assets = {
             piala: 'assets/piala.png',
             emas: 'assets/emas.png',
@@ -113,7 +124,6 @@
                 const rankWinners = [...players].sort((a, b) => b.point - a.point || b.goals - a.goals);
                 const scorerWinners = [...players].sort((a, b) => b.goals - a.goals);
 
-                // --- DATA KONFIGURASI PIAGAM ---
                 const awards = [
                     { 
                         type: 'cert-juara1', 
@@ -147,26 +157,25 @@
 
                 awards.forEach(data => renderCard(container, data));
 
-                // Player of the Year (POTY)
                 players.filter(p => p.fullRow.includes("best player")).forEach(winner => {
                     renderCard(container, {
                         type: 'cert-poty',
                         imgs: [assets.bola],
                         title: 'PLAYER OF THE YEAR',
                         name: winner.nama,
+                        isBallon: true, // Flag khusus
                         desc: 'Dianugerahkan atas performa konsisten dan kontribusi besar bagi tim musim ini.'
                     });
                 });
 
-            } catch (e) { 
-                console.error(e); 
-                document.getElementById('loading').innerText = "Gagal memuat data juara.";
-            }
+            } catch (e) { console.error(e); }
         }
 
         function renderCard(container, data) {
-            // Mapping gambar ke elemen img
             let imagesHTML = data.imgs.map(url => `<img src="${url}" alt="award">`).join('');
+            
+            // Logika teks Ballon d'Or
+            let extraText = data.isBallon ? `<div class="ballon-text">🏆 Ballon d'Or Winner 🏆</div>` : '';
 
             container.innerHTML += `
                 <div class="certificate ${data.type}">
@@ -183,8 +192,9 @@
 
                     <div class="presented-to">Diberikan Kepada:</div>
                     <div class="winner-name">${data.name}</div>
+                    ${extraText}
                     <div class="league-name">FOOTBALL LEAGUE-I</div>
-                    <div class="description">${data.desc}</div>
+                    <div class="description">${data.desc} Description</div>
                     
                     <div class="footer">
                         <div class="sig-box"><div class="sig-line">Official Admin</div></div>
@@ -198,4 +208,3 @@
     </script>
 </body>
 </html>
-
