@@ -338,5 +338,43 @@ function shareToWA() {
     window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), '_blank');
 }
 
+// --- PLUGIN DYNAMIC JERSEY COLORS (SAFE ADD-ON) ---
+const jerseyColors = {
+    "Dandi": { primary: "#4b2c20", secondary: "#d4af37" }, // Cokelat Beruang & Emas
+    "Erni": { primary: "#f3f4f6", secondary: "#60a5fa" },  // Putih Angora & Biru Muda
+    "Regi": { primary: "#2d3436", secondary: "#00f2ff" },  // Abu Husky & Neon
+    "Rizal": { primary: "#636e72", secondary: "#ffffff" }, // Serigala Abu & Putih
+    "Asep": { primary: "#8b0000", secondary: "#facc15" },  // Merah Banteng & Kuning
+    "Aries": { primary: "#1a1a1a", secondary: "#fbbf24" }, // Hitam Singa & Amber
+    "Ikmal": { primary: "#3f6212", secondary: "#a3e635" }, // Hijau Rusa & Lime
+    "Yanti": { primary: "#be185d", secondary: "#f472b6" }, // Pink Kelinci
+    "Maya": { primary: "#000000", secondary: "#ffffff" }, // Hitam Putih Panda
+    "Dicky": { primary: "#1e1b4b", secondary: "#d4af37" }  // Biru Gelap & Emas Kingkong
+};
+
+// Fungsi ini akan berjalan otomatis tanpa merusak openModal asli
+const originalOpenModal = openModal;
+openModal = function(name, logo) {
+    originalOpenModal(name, logo); // Jalankan fungsi asli lo dulu
+    
+    const colorData = jerseyColors[name];
+    const modalContent = document.querySelector('.modal-content');
+    
+    if (colorData && modalContent) {
+        // Beri transisi halus
+        modalContent.style.transition = "all 0.5s ease";
+        // Ubah background modal sesuai warna karakter
+        modalContent.style.background = `linear-gradient(135deg, ${colorData.primary} 0%, #111 100%)`;
+        // Ubah warna border agar matching
+        modalContent.style.borderColor = colorData.secondary;
+        // Beri efek glow pada border
+        modalContent.style.boxShadow = `0 0 30px ${colorData.secondary}44`;
+    } else if (modalContent) {
+        // Balikin ke warna default kalau nama gak terdaftar
+        modalContent.style.background = "var(--modal-bg)";
+        modalContent.style.borderColor = "var(--accent)";
+    }
+};
+
 
 
