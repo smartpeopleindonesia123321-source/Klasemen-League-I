@@ -304,7 +304,6 @@ function shareToWA() {
     text += "--------------------------------------\n";
     text += "📑 *INFO MARKET VALUE CALCULATION:*\n";
     text += "Base (Rp 5M) + (1 Pts = 100jt) + (1 Goal = 10jt) in Rupiah\n";
-    // --- BARIS BARU DI BAWAH INI ---
     text += "⭐ *Best player of the week = Persentase kemenangan tertinggi di minggu ini*\n";
     text += "--------------------------------------\n\n";
     text += "🏆 *KLASEMEN TERBARU* 🏆\nPOS | CONTENDER | PTS | AGG\n--------------------------------------\n";
@@ -319,6 +318,19 @@ function shareToWA() {
     });
 
     text += "\n📍 *Cek Detail ID Card & Market Value:* \n" + window.location.href;
+    
+    // --- TAMBAHAN PROMOSI PIAGAM (OPSI 2) DI BAWAH INI ---
+    text += "\n\n--------------------------------------\n";
+    text += "🔥 *PIAGAM FOOTBALL LEAGUE-I RILIS!* 🔥\n\n";
+    text += "Cek 5 penghargaan terbaik tahun ini:\n";
+    text += "🏆 *Champion* - Penguasa Klasemen!\n";
+    text += "🥈 *Runner Up* - Perjuangan luar biasa!\n";
+    text += "🥉 *Third Place* - Podium terakhir!\n";
+    text += "🎯 *Golden Boot* - Raja gol musim ini!\n";
+    text += "👑 *Ballon d’Or* - Pemain terbaik sesungguhnya!\n\n";
+    text += "👉 *Lihat Piagam Lo Di Sini:* \nhttps://smartpeopleindonesia123321-source.github.io/Klasemen-League-I/piagam.html";
+
     window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), '_blank');
 }
+
 
