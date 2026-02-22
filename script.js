@@ -377,7 +377,7 @@ openModal = function(name, logo) {
 };
 
 // ==========================================
-// PLUGIN: SIGNATURE THEME & SLOGAN PREDATOR (DIRECT HIT)
+// PLUGIN: SIGNATURE THEME & SLOGAN (FINAL VERSION)
 // ==========================================
 
 const predatorDatabase = {
@@ -396,58 +396,51 @@ const predatorDatabase = {
 const sigPlayer = new Audio();
 let isMainMusicActive = false;
 
-// Override openModal
+// Override fungsi openModal
 const backupOpenModal = openModal;
 openModal = function(name, logo) {
+    // Jalankan modal stats asli
     if (typeof backupOpenModal === 'function') backupOpenModal(name, logo);
 
-    // --- LOGIKA SLOGAN (FIXED) ---
-    const titleElem = document.querySelector('#modalName');
-    if (titleElem && predatorDatabase[name]) {
-        // Bersihkan slogan lama
-        const oldSlogan = document.getElementById('sloganCustom');
-        if (oldSlogan) oldSlogan.remove();
-
-        // Buat elemen slogan baru
-        const el = document.createElement('div');
-        el.id = 'sloganCustom';
-        el.style.fontSize = '0.8rem';
-        el.style.letterSpacing = '2px';
-        el.style.fontWeight = 'bold';
-        el.style.color = '#facc15';
-        el.style.textTransform = 'uppercase';
-        el.style.marginTop = '5px';
-        el.style.textAlign = 'center';
-        el.style.textShadow = '1px 1px 2px black';
-        el.innerText = predatorDatabase[name].slogan;
-        
-        // TEMBAK LANGSUNG SETELAH NAMA
-        titleElem.after(el);
+    // Tampilkan Slogan Emas
+    const sloganArea = document.getElementById('playerSlogan');
+    if (sloganArea && predatorDatabase[name]) {
+        sloganArea.innerText = predatorDatabase[name].slogan;
     }
 
-    // --- LOGIKA MUSIK ---
+    // Kontrol Musik Utama (UCL)
     const mainTrack = document.getElementById('uclMusic');
     if (mainTrack && !mainTrack.paused) {
         isMainMusicActive = true;
         mainTrack.pause();
     }
 
+    // Putar Musik Signature
     if (predatorDatabase[name]) {
         sigPlayer.src = predatorDatabase[name].music;
         sigPlayer.volume = 0.6;
-        sigPlayer.play().catch(e => console.log("Play blocked by browser"));
+        sigPlayer.play().catch(e => console.log("Interaksi dibutuhkan untuk audio"));
     }
 };
 
-// Override closeModal
+// Override fungsi closeModal
 const backupCloseModal = closeModal;
 closeModal = function() {
     if (typeof backupCloseModal === 'function') backupCloseModal();
+    
+    // Reset Tampilan Slogan
+    const sloganArea = document.getElementById('playerSlogan');
+    if (sloganArea) sloganArea.innerText = "";
+
+    // Stop Musik Signature & Resume Musik Utama
     sigPlayer.pause();
     sigPlayer.currentTime = 0;
     const mainTrack = document.getElementById('uclMusic');
-    if (isMainMusicActive && mainTrack) mainTrack.play();
+    if (isMainMusicActive && mainTrack) {
+        mainTrack.play();
+    }
 };
+
 
 
 
