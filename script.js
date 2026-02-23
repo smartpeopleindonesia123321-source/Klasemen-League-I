@@ -287,7 +287,6 @@ function shareToWA() {
     const tickerEl = document.getElementById('newsTicker');
     let tickerText = tickerEl ? tickerEl.innerText : "";
 
-    // 1. Ambil Data Pemain & Persentase
     const allPlayers = Array.from(rows).map(row => {
         const cells = row.querySelectorAll("td");
         return {
@@ -295,30 +294,40 @@ function shareToWA() {
             pts: cells[2] ? cells[2].innerText : "0",
             agg: cells[3] ? cells[3].innerText : "0",
             potwStatus: cells[6] ? cells[6].innerText.trim() : "",
-            // AMBIL PERSENTASE DARI KOLOM TERAKHIR (Index 7)
             percent: cells[7] ? cells[7].innerText.trim() : "0%"
         };
     });
 
-    // Cari Pemenang Teratas buat Headline
-    const topPOTY = [...allPlayers].sort((a, b) => parseFloat(b.percent) - parseFloat(a.percent))[0];
+    // 1. Cari nilai persentase tertinggi dulu
+    const maxPercentValue = Math.max(...allPlayers.map(p => parseFloat(p.percent) || 0));
+    
+    // 2. Filter semua orang yang punya nilai sama dengan nilai tertinggi
+    const topPOTYGroup = allPlayers.filter(p => (parseFloat(p.percent) || 0) === maxPercentValue);
+    
+    // 3. Gabungin nama-namanya kalau lebih dari satu (pake " & ")
+    const leaderNames = topPOTYGroup.map(p => p.name).join(" & ");
+    const displayPercent = maxPercentValue + "%";
 
-    // 2. RAKIT TEXT WA
     let text = "🗞️ *FOOTBALL LEAGUE-I NEWS UPDATE* 🗞️\n";
     text += "_" + tickerText.replace(/---/g, "\n") + "_\n";
     text += "--------------------------------------\n\n";
 
-    // KLASEMEN DENGAN PERSENTASE BALLON D'OR
     text += "🏆 *KLASEMEN & BALLON D'OR RACE* 🏆\nPOS | NAME | PTS | VOTES (%)\n--------------------------------------\n";
     allPlayers.forEach((p, index) => {
         const potwIcon = p.potwStatus.toLowerCase().includes("best player") ? " ⭐" : "";
-        // DI SINI KITA TAMBAHKAN PERSENTASE DI AKHIR BARIS
         text += `${index + 1}. *${p.name}* - ${p.pts} Pts (${p.percent})${potwIcon}\n`;
     });
 
     text += "\n--------------------------------------\n";
     text += "👑 *CURRENT BALLON D'OR LEADER* 👑\n";
-    text += `Target: *${topPOTY.name}* dengan *${topPOTY.percent}* suara!\n`;
+    
+    // Cek kalau ada hasil seri (Draw)
+    if (topPOTYGroup.length > 1) {
+        text += `Status: *SERI (DRAW)*\nLeaders: *${leaderNames}*\nVotes: *${displayPercent}*\n`;
+    } else {
+        text += `Target: *${leaderNames}* dengan *${displayPercent}* suara!\n`;
+    }
+    
     text += "--------------------------------------\n\n";
 
     text += "🔗 *CEK PIAGAM & DETAIL:* \n";
@@ -429,6 +438,7 @@ closeModal = function() {
         mainTrack.play();
     }
 };
+
 
 
 
