@@ -287,6 +287,11 @@ function shareToWA() {
     const tickerEl = document.getElementById('newsTicker');
     let tickerText = tickerEl ? tickerEl.innerText : "";
 
+    // Ambil Waktu Update
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
     const allPlayers = Array.from(rows).map(row => {
         const cells = row.querySelectorAll("td");
         return {
@@ -298,43 +303,39 @@ function shareToWA() {
         };
     });
 
-    // 1. Cari nilai persentase tertinggi
+    // Cari Puncak Ballon d'Or
     const maxPercentValue = Math.max(...allPlayers.map(p => parseFloat(p.percent) || 0));
-    
-    // 2. Filter semua orang yang punya nilai sama dengan nilai tertinggi
     const topPOTYGroup = allPlayers.filter(p => (parseFloat(p.percent) || 0) === maxPercentValue);
-    
-    // 3. Gabungin nama-namanya (Format: A, B & C)
     const leaderNames = topPOTYGroup.map(p => p.name).join(", ").replace(/, ([^,]*)$/, " & $1");
-    const displayPercent = maxPercentValue + "%";
 
-    // --- MULAI RAKIT TEXT WA ---
-    let text = "🗞️ *FOOTBALL LEAGUE-I NEWS UPDATE* 🗞️\n";
-    text += "_" + tickerText.replace(/---/g, "\n") + "_\n";
-    text += "--------------------------------------\n\n";
+    // --- RAKIT TEKS PROFESIONAL ---
+    let text = "🗞️ *FOOTBALL LEAGUE-I OFFICIAL REPORT* 🗞️\n";
+    text += `📅 _Update: ${dateStr} | ${timeStr} WIB_\n`;
+    text += "----------------------------------------------\n\n";
 
-    // Bagian Klasemen
-    text += "🏆 *KLASEMEN & BALLON D'OR RACE* 🏆\nPOS | NAME | PTS | VOTES (%)\n--------------------------------------\n";
+    // Bagian Klasemen & Persentase
+    text += "🏆 *LEAGUE STANDINGS & BALLON D'OR VOTES*\n";
     allPlayers.forEach((p, index) => {
-        const potwIcon = p.potwStatus.toLowerCase().includes("best player") ? " ⭐" : "";
-        text += `${index + 1}. *${p.name}* - ${p.pts} Pts (${p.percent})${potwIcon}\n`;
+        const potwIcon = p.potwStatus.toLowerCase().includes("best player") ? "⭐" : "";
+        // Format: 01. NAMA - 45 Pts (15.5%)
+        const pos = (index + 1).toString().padStart(2, '0');
+        text += `\`${pos}.\` *${p.name}* • ${p.pts} Pts (${p.percent}) ${potwIcon}\n`;
     });
 
-    // --- BAGIAN YANG DIGANTI (OFFICIAL AWARDS ANNOUNCEMENT) ---
-    text += "\n--------------------------------------\n";
-    text += "🔥 *OFFICIAL AWARDS ANNOUNCEMENT* 🔥\n\n";
-    text += "Cek 5 Kategori Penghargaan Musim Ini:\n";
-    text += "🏆 *Champion* (Juara 1)\n";
-    text += "🥈 *Runner Up* (Juara 2)\n";
-    text += "🥉 *Third Place* (Juara 3)\n";
-    text += "🎯 *Golden Boot* (Top Scorer)\n";
-    text += "👑 *Ballon d’Or* (Player of the Year)\n";
-    text += "--------------------------------------\n\n";
+    text += `\n👑 *BALLON D'OR LEADER:* ${leaderNames}\n`;
+    text += "----------------------------------------------\n\n";
 
-    text += "🔗 *CEK ID CARD, MARKET VALUE, & PIAGAM:* \n";
-    text += "https://smartpeopleindonesia123321-source.github.io/Klasemen-League-I/";
+    // Bagian Penghargaan Musim (Compact Mode)
+    text += "🔥 *OFFICIAL AWARDS CATEGORIES* 🔥\n";
+    text += "🏆 Champion | 🥈 Runner Up | 🥉 3rd Place\n";
+    text += "🎯 Golden Boot | 👑 Ballon d’Or\n";
+    text += "----------------------------------------------\n\n";
 
-    // Eksekusi kirim ke WhatsApp
+    // Footer & Link
+    text += "📑 *Digital Card, Market Value, & Certificates:* \n";
+    text += "https://smartpeopleindonesia123321-source.github.io/Klasemen-League-I/\n\n";
+    text += "_Stay Sporty & Keep the Solidarity!_";
+
     window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), '_blank');
 }
 
@@ -440,6 +441,7 @@ closeModal = function() {
         mainTrack.play();
     }
 };
+
 
 
 
