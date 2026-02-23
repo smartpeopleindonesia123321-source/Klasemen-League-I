@@ -69,7 +69,8 @@ async function fetchData() {
                 goals: parseInt(row[2]) || 0, 
                 logo: row[3],
                 potw: row[4] || "",
-                potw_winner: parseInt(row[5]) || 0 // Ambil angka manual dari Kolom F
+                potw_winner: parseInt(row[5]) || 0, // Ambil angka manual dari Kolom F
+                rate: row[6] || "0" // Ambil data RATE dari Kolom G (Index 6)
             };
         }).filter(p => p.nama);
 
@@ -127,7 +128,6 @@ function renderTable(players) {
     body.innerHTML = "";
 
     // 1. HITUNG TOTAL POIN KOLEKTIF DARI KOLOM F (potw_winner)
-    // Ini dasar pembagi untuk persentase Ballon d'Or
     const totalPoinKolektif = players.reduce((acc, p) => acc + (p.potw_winner || 0), 0);
 
     players.forEach((p, i) => {
@@ -143,14 +143,12 @@ function renderTable(players) {
         const history = p.rankHistory || [currentRank];
         const maxRanks = players.length || 10;
         
-        // Titik koordinat SVG
         const points = history.map((rank, idx) => {
             const x = idx * 10;
             const y = (rank / maxRanks) * 20; 
             return `${x},${y}`;
         }).join(" ");
 
-        // Warna Trend: Hijau jika naik (angka rank mengecil), Merah jika turun
         const isImproving = history[0] > history[history.length - 1];
         const isDropping = history[0] < history[history.length - 1];
         const trendColor = isImproving ? "#00ff88" : (isDropping ? "#ff4444" : "#888");
@@ -166,10 +164,15 @@ function renderTable(players) {
         let diffText = diff > 0 ? `+${diff}` : (diff < 0 ? diff : "-");
         let diffClass = diff > 0 ? "pos-up" : (diff < 0 ? "pos-down" : "");
 
-        // 5. STATUS POTW
-        let potwContent = p.potw.toLowerCase().includes("best player") 
-            ? `<span class="potw-highlight">Best Player Of The Week</span>` 
-            : `<span style="opacity:0.3">-</span>`;
+        // 5. STATUS POTW (GABUNGAN RATE & STATUS)
+        let potwContent = "";
+        if (p.potw.toLowerCase().includes("best player")) {
+            // Tampilan jika Best Player (Rate - Teks)
+            potwContent = `<span class="potw-highlight">${p.rate} - Best Player Of The Week</span>`;
+        } else {
+            // Tampilan jika bukan (Hanya angka Rate)
+            potwContent = `<span style="font-weight:bold; opacity:0.8;">${p.rate}</span>`;
+        }
         
         // 6. HIGHLIGHT BARIS (Rank 1-3 & Degradasi)
         if(currentRank === 1) tr.className = "rank-1";
@@ -441,6 +444,7 @@ closeModal = function() {
         mainTrack.play();
     }
 };
+
 
 
 
