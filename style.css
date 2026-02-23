@@ -153,6 +153,9 @@ td {
     display: inline-block;
     box-shadow: 0 0 10px #00f2ff;
     white-space: nowrap;
+    margin-left: 5px; 
+    padding: 2px 8px;
+    font-size: 0.7rem; /* Kecilin dikit biar elegan */
 }
 
 body.light-mode .potw-highlight { background: #1e40af; color: #ffffff !important; box-shadow: none; }
@@ -564,6 +567,7 @@ body.light-mode .rank-1 .team-name {
     .metrics-title { font-size: 1.1rem; }
     .metric-card { padding: 20px; }
 }
+
 
 
 
