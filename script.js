@@ -287,16 +287,32 @@ function shareToWA() {
     const tickerEl = document.getElementById('newsTicker');
     let tickerText = tickerEl ? tickerEl.innerText : "";
 
+    // 1. Ambil Data Pemain & Hitung POTY (Kolom F)
+    let totalPotwPoints = 0;
     const allPlayers = Array.from(rows).map(row => {
         const cells = row.querySelectorAll("td");
+        // Ambil angka dari kolom F (indeks ke-5 atau ke-6 tergantung struktur table lo, 
+        // di sini gue asumsikan kolom ke-7 sesuai script lama lo cells[6])
+        const potyPoints = parseInt(cells[5] ? cells[5].innerText.trim() : 0) || 0; 
+        totalPotwPoints += potyPoints;
+
         return {
             name: row.querySelector(".team-name").innerText.toUpperCase(),
-            potw: cells[6] ? cells[6].innerText.trim() : ""
+            pts: cells[2] ? cells[2].innerText : "0",
+            agg: cells[3] ? cells[3].innerText : "0",
+            potwStatus: cells[6] ? cells[6].innerText.trim() : "",
+            potyPoints: potyPoints
         };
     });
 
+    // Cari Pemenang POTY Tertinggi (Ballon d'Or)
+    const sortedPOTY = [...allPlayers].sort((a, b) => b.potyPoints - a.potyPoints);
+    const topPOTY = sortedPOTY[0];
+    const potyPercent = totalPotwPoints > 0 ? ((topPOTY.potyPoints / totalPotwPoints) * 100).toFixed(1) : 0;
+
+    // Filter POTW List (Best Player per Week)
     const potwPlayers = allPlayers
-        .filter(p => p.potw.toLowerCase().includes("best player"))
+        .filter(p => p.potwStatus.toLowerCase().includes("best player"))
         .map(p => p.name);
 
     let potwListText = potwPlayers.length > 0 ? (potwPlayers.length > 5 ? "\n- " + potwPlayers.join("\n- ") : potwPlayers.join(", ")) : "BELUM DITENTUKAN";
@@ -306,6 +322,8 @@ function shareToWA() {
         updatedTicker = updatedTicker.replace(/BEST PLAYER:.*?(?=\n|$)/, `BEST PLAYER OF THE WEEK: ${potwListText}`);
     }
 
+    // --- MULAI RAKIT TEXT WA ---
+
     // 1. PALING ATAS: BERITA BERJALAN
     let text = "🗞️ *FOOTBALL LEAGUE-I NEWS UPDATE* 🗞️\n";
     text += "_" + updatedTicker + "_\n";
@@ -313,34 +331,37 @@ function shareToWA() {
 
     // 2. KLASEMEN TERBARU
     text += "🏆 *KLASEMEN TERBARU* 🏆\nPOS | CONTENDER | PTS | AGG\n--------------------------------------\n";
-    rows.forEach((row) => {
-        const cells = row.querySelectorAll("td");
-        if (cells.length > 0) {
-            const potwStatus = cells[6] ? cells[6].innerText.trim() : "";
-            const potwIcon = potwStatus.toLowerCase().includes("best player") ? " ⭐" : "";
-            text += `${cells[0].innerText}. *${row.querySelector(".team-name").innerText.toUpperCase()}* - ${cells[2].innerText} Pts (${cells[3].innerText})${potwIcon}\n`;
-        }
+    allPlayers.forEach((p, index) => {
+        const potwIcon = p.potwStatus.toLowerCase().includes("best player") ? " ⭐" : "";
+        text += `${index + 1}. *${p.name}* - ${p.pts} Pts (${p.agg})${potwIcon}\n`;
     });
 
-    // 3. PROMOSI 5 PIAGAM (DIBERESIN)
+    // 3. SPECIAL ANNOUNCEMENT (BALLON D'OR)
     text += "\n--------------------------------------\n";
-    text += "🔥 *OFFICIAL AWARDS ANNOUNCEMENT* 🔥\n\n";
-    text += "Cek 5 Kategori Penghargaan Musim Ini:\n";
-    text += "🏆 *Champion* (Juara 1)\n";
-    text += "🥈 *Runner Up* (Juara 2)\n";
-    text += "🥉 *Third Place* (Juara 3)\n";
-    text += "🎯 *Golden Boot* (Top Scorer)\n";
-    text += "👑 *Ballon d’Or* (Player of the Year)\n";
+    text += "👑 *THE RACE FOR BALLON D'OR* 👑\n";
+    if (totalPotwPoints > 0) {
+        text += `Current Leader: *${topPOTY.name}*\n`;
+        text += `Dominasi Suara: *${potyPercent}% Suara*\n`;
+        text += "_Siapakah yang akan menjadi Player of the Year?_\n";
+    } else {
+        text += "_Voting Player of the Year belum dimulai._\n";
+    }
     text += "--------------------------------------\n\n";
 
-    // 4. INFO MARKET VALUE & BEST PLAYER (PINDAH KE BAWAH)
-    text += "📑 *TECHNICAL INFO:*\n";
-    text += "💰 *Market Value Formula:* base (1 x Rp.5M)+(Pt x Rp.100Jt)+(1Gd x Rp10Jt)\n";
-    text += "⭐ *Rate Player Formula:* base (Std 7)+(Total Wins x 0.3)\n";
-    text += "⭐ *MOTM Formula:* Highest Rate Player/Week\n\n";
+    // 4. INFO PENGHARGAAN
+    text += "🔥 *OFFICIAL AWARDS CATEGORIES* 🔥\n";
+    text += "🏆 *Champion* | 🥈 *Runner Up* | 🥉 *Third Place*\n";
+    text += "🎯 *Golden Boot* | 👑 *Ballon d’Or*\n";
+    text += "--------------------------------------\n\n";
 
-    // 5. SATU LINK SAKTI DI AKHIR
-    text += "🔗 *CEK ID CARD, MARKET VALUE, & PIAGAM, Selengkapnya di link berikut:* \n";
+    // 5. INFO TEKNIS
+    text += "📑 *TECHNICAL INFO:*\n";
+    text += "💰 *Market Value:* base (1x5M)+(Pt x 100Jt)+(1Gd x 10Jt)\n";
+    text += "⭐ *Rate Player:* base (7)+(Total Wins x 0.3)\n";
+    text += "⭐ *MOTM:* Highest Rate Player/Week\n\n";
+
+    // 6. LINK SAKTI
+    text += "🔗 *CEK ID CARD, MARKET VALUE, & PIAGAM:* \n";
     text += "https://smartpeopleindonesia123321-source.github.io/Klasemen-League-I/";
 
     window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), '_blank');
@@ -448,6 +469,7 @@ closeModal = function() {
         mainTrack.play();
     }
 };
+
 
 
 
