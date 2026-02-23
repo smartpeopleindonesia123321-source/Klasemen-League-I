@@ -164,14 +164,16 @@ function renderTable(players) {
         let diffText = diff > 0 ? `+${diff}` : (diff < 0 ? diff : "-");
         let diffClass = diff > 0 ? "pos-up" : (diff < 0 ? "pos-down" : "");
 
-        // 5. STATUS POTW (GABUNGAN RATE & STATUS)
+        // 5. STATUS POTW (RATE + STATUS TERPISAH FORMATNYA)
         let potwContent = "";
+        const currentRate = p.rate || "0"; 
+        
         if (p.potw.toLowerCase().includes("best player")) {
-            // Tampilan jika Best Player (Rate - Teks)
-            potwContent = `<span class="potw-highlight">${p.rate} - Best Player Of The Week</span>`;
+            // Angka rate ditampilkan biasa, hanya teks "BEST PLAYER..." yang pakai highlight
+            potwContent = `<strong>${currentRate}</strong> - <span class="potw-highlight">BEST PLAYER OF THE WEEK</span>`;
         } else {
-            // Tampilan jika bukan (Hanya angka Rate)
-            potwContent = `<span style="font-weight:bold; opacity:0.8;">${p.rate}</span>`;
+            // Tampilan standar untuk yang bukan best player
+            potwContent = `<span style="opacity:0.8; font-weight:bold;">${currentRate}</span>`;
         }
         
         // 6. HIGHLIGHT BARIS (Rank 1-3 & Degradasi)
@@ -444,6 +446,7 @@ closeModal = function() {
         mainTrack.play();
     }
 };
+
 
 
 
