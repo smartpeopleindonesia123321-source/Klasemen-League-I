@@ -305,7 +305,6 @@ function shareToWA() {
     const topPOTYGroup = allPlayers.filter(p => (parseFloat(p.percent) || 0) === maxPercentValue);
     
     // 3. Gabungin nama-namanya (Format: A, B & C)
-    // Logika ini otomatis menghandle 1 orang, 2 orang, atau lebih.
     const leaderNames = topPOTYGroup.map(p => p.name).join(", ").replace(/, ([^,]*)$/, " & $1");
     const displayPercent = maxPercentValue + "%";
 
@@ -314,31 +313,25 @@ function shareToWA() {
     text += "_" + tickerText.replace(/---/g, "\n") + "_\n";
     text += "--------------------------------------\n\n";
 
+    // Bagian Klasemen
     text += "🏆 *KLASEMEN & BALLON D'OR RACE* 🏆\nPOS | NAME | PTS | VOTES (%)\n--------------------------------------\n";
     allPlayers.forEach((p, index) => {
         const potwIcon = p.potwStatus.toLowerCase().includes("best player") ? " ⭐" : "";
         text += `${index + 1}. *${p.name}* - ${p.pts} Pts (${p.percent})${potwIcon}\n`;
     });
 
+    // --- BAGIAN YANG DIGANTI (OFFICIAL AWARDS ANNOUNCEMENT) ---
     text += "\n--------------------------------------\n";
-    text += "👑 *CURRENT BALLON D'OR LEADER* 👑\n";
-    
-    // Cek Kondisi: Jika lebih dari 1 orang memiliki nilai tertinggi
-    if (topPOTYGroup.length > 1) {
-        text += "Status: 🔥 *PERSAINGAN SENGIT (DRAW)*\n";
-        text += `Leaders: *${leaderNames}*\n`;
-        text += `Votes: *${displayPercent}*\n`;
-        text += "_Siapa yang akan memecah kebuntuan?_ ⚔️\n";
-    } else {
-        // Jika hanya 1 orang (Leader Tunggal)
-        text += `Target: *${leaderNames}*\n`;
-        text += `Dominasi: *${displayPercent}* suara!\n`;
-        text += "_Mampukah yang lain mengejar?_ 💨\n";
-    }
-    
+    text += "🔥 *OFFICIAL AWARDS ANNOUNCEMENT* 🔥\n\n";
+    text += "Cek 5 Kategori Penghargaan Musim Ini:\n";
+    text += "🏆 *Champion* (Juara 1)\n";
+    text += "🥈 *Runner Up* (Juara 2)\n";
+    text += "🥉 *Third Place* (Juara 3)\n";
+    text += "🎯 *Golden Boot* (Top Scorer)\n";
+    text += "👑 *Ballon d’Or* (Player of the Year)\n";
     text += "--------------------------------------\n\n";
 
-    text += "🔗 *CEK PIAGAM, MARKET VALUE & DETAIL:* \n";
+    text += "🔗 *CEK ID CARD, MARKET VALUE, & PIAGAM:* \n";
     text += "https://smartpeopleindonesia123321-source.github.io/Klasemen-League-I/";
 
     // Eksekusi kirim ke WhatsApp
@@ -447,6 +440,7 @@ closeModal = function() {
         mainTrack.play();
     }
 };
+
 
 
 
