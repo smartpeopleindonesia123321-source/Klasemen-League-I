@@ -450,92 +450,121 @@ body.light-mode .rank-1 .team-name {
     }
 }
 
-/* Styling for Valuation Metrics Section */
+/* ==========================================
+   VALUATION & RANKING METRICS SECTION
+   ========================================== */
+
 .metrics-container {
-    margin: 40px auto;
+    margin: 50px auto 30px;
     max-width: 1000px;
-    padding: 20px;
+    padding: 30px 20px;
     font-family: 'Segoe UI', Roboto, sans-serif;
+    /* Memberikan pemisah halus dari konten atas */
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
 }
 
 .metrics-title {
     text-align: center;
-    color: var(--accent, #facc15); /* Pakai warna accent lo */
-    font-size: 1.5rem;
+    color: var(--accent, #facc15);
+    font-size: 1.3rem;
     font-weight: 800;
-    letter-spacing: 2px;
-    margin-bottom: 30px;
+    letter-spacing: 3px;
+    margin-bottom: 35px;
     text-transform: uppercase;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .metrics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
 }
 
 .metric-card {
-    background: rgba(30, 30, 30, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
-    padding: 20px;
-    backdrop-filter: blur(10px);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: rgba(20, 20, 20, 0.6); /* Sedikit lebih gelap biar kontras */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 25px;
+    backdrop-filter: blur(12px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
 }
 
+/* Efek cahaya halus di hover */
 .metric-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-8px);
     border-color: var(--accent, #facc15);
+    background: rgba(30, 30, 30, 0.8);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .metric-header {
     display: flex;
     align-items: center;
     gap: 15px;
-    margin-bottom: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 12px;
 }
 
 .metric-icon {
-    font-size: 1.5rem;
-    padding: 10px;
-    border-radius: 10px;
-    background: rgba(0, 0, 0, 0.3);
+    font-size: 1.4rem;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
 }
 
 .metric-label {
     font-weight: 900;
-    font-size: 1.1rem;
-    color: #fff;
-    letter-spacing: 1px;
+    font-size: 1rem;
+    color: #ffffff;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
 }
 
 .metric-formula {
-    background: rgba(0, 0, 0, 0.4);
-    padding: 12px;
-    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    border-radius: 12px;
     font-family: 'Courier New', monospace;
-    color: #00ff88; /* Warna hijau matrix biar techy */
-    font-size: 0.9rem;
-    margin-bottom: 10px;
+    color: #00ff88; /* Hijau Matrix */
+    font-size: 0.85rem;
+    margin-bottom: 15px;
     text-align: center;
+    border: 1px inset rgba(255, 255, 255, 0.05);
+    font-weight: bold;
+    word-break: break-word; /* Biar gak berantakan di HP */
 }
 
 .metric-desc {
-    font-size: 0.85rem;
-    color: #aaa;
-    line-height: 1.4;
+    font-size: 0.8rem;
+    color: #bbbbbb;
+    line-height: 1.6;
+    margin: 0;
+    font-style: italic;
 }
 
-/* Glow Effects */
-.gold { color: #facc15; }
-.blue { color: #3b82f6; }
-.red { color: #ef4444; }
+/* Glow & Accent Colors */
+.gold { color: #facc15; text-shadow: 0 0 10px rgba(250, 204, 21, 0.4); }
+.blue { color: #3b82f6; text-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
+.red { color: #ef4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
 
 .shadow-red:hover {
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.15);
 }
+
+/* Responsivitas untuk Mobile */
+@media (max-width: 600px) {
+    .metrics-title { font-size: 1.1rem; }
+    .metric-card { padding: 20px; }
+}
+
 
 
 
