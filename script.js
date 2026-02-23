@@ -314,7 +314,7 @@ function shareToWA() {
     text += "----------------------------------------------\n\n";
 
     // Bagian Klasemen & Persentase
-    text += "🏆 *LEAGUE STANDINGS & BALLON D'OR VOTES*\n";
+    text += "🏆 *LEAGUE STANDINGS & BALLON D'OR PERCENTAGE*\n";
     allPlayers.forEach((p, index) => {
         const potwIcon = p.potwStatus.toLowerCase().includes("best player") ? "⭐" : "";
         // Format: 01. NAMA - 45 Pts (15.5%)
@@ -441,6 +441,7 @@ closeModal = function() {
         mainTrack.play();
     }
 };
+
 
 
 
