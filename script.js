@@ -298,16 +298,18 @@ function shareToWA() {
         };
     });
 
-    // 1. Cari nilai persentase tertinggi dulu
+    // 1. Cari nilai persentase tertinggi
     const maxPercentValue = Math.max(...allPlayers.map(p => parseFloat(p.percent) || 0));
     
     // 2. Filter semua orang yang punya nilai sama dengan nilai tertinggi
     const topPOTYGroup = allPlayers.filter(p => (parseFloat(p.percent) || 0) === maxPercentValue);
     
-    // 3. Gabungin nama-namanya kalau lebih dari satu (pake " & ")
-    const leaderNames = topPOTYGroup.map(p => p.name).join(" & ");
+    // 3. Gabungin nama-namanya (Format: A, B & C)
+    // Logika ini otomatis menghandle 1 orang, 2 orang, atau lebih.
+    const leaderNames = topPOTYGroup.map(p => p.name).join(", ").replace(/, ([^,]*)$/, " & $1");
     const displayPercent = maxPercentValue + "%";
 
+    // --- MULAI RAKIT TEXT WA ---
     let text = "🗞️ *FOOTBALL LEAGUE-I NEWS UPDATE* 🗞️\n";
     text += "_" + tickerText.replace(/---/g, "\n") + "_\n";
     text += "--------------------------------------\n\n";
@@ -321,18 +323,25 @@ function shareToWA() {
     text += "\n--------------------------------------\n";
     text += "👑 *CURRENT BALLON D'OR LEADER* 👑\n";
     
-    // Cek kalau ada hasil seri (Draw)
+    // Cek Kondisi: Jika lebih dari 1 orang memiliki nilai tertinggi
     if (topPOTYGroup.length > 1) {
-        text += `Status: *SERI (DRAW)*\nLeaders: *${leaderNames}*\nVotes: *${displayPercent}*\n`;
+        text += "Status: 🔥 *PERSAINGAN SENGIT (DRAW)*\n";
+        text += `Leaders: *${leaderNames}*\n`;
+        text += `Votes: *${displayPercent}*\n`;
+        text += "_Siapa yang akan memecah kebuntuan?_ ⚔️\n";
     } else {
-        text += `Target: *${leaderNames}* dengan *${displayPercent}* suara!\n`;
+        // Jika hanya 1 orang (Leader Tunggal)
+        text += `Target: *${leaderNames}*\n`;
+        text += `Dominasi: *${displayPercent}* suara!\n`;
+        text += "_Mampukah yang lain mengejar?_ 💨\n";
     }
     
     text += "--------------------------------------\n\n";
 
-    text += "🔗 *CEK PIAGAM & DETAIL:* \n";
+    text += "🔗 *CEK PIAGAM, MARKET VALUE & DETAIL:* \n";
     text += "https://smartpeopleindonesia123321-source.github.io/Klasemen-League-I/";
 
+    // Eksekusi kirim ke WhatsApp
     window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), '_blank');
 }
 
@@ -438,6 +447,7 @@ closeModal = function() {
         mainTrack.play();
     }
 };
+
 
 
 
