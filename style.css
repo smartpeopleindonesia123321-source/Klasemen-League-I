@@ -146,16 +146,17 @@ td {
     color: #000 !important;
     font-weight: 900;
     font-style: italic;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 10px;
+    padding: 2px 6px; /* Padding lebih tipis biar nggak makan tempat */
+    border-radius: 4px;
+    font-size: 0.65rem; /* Ukuran font lebih kecil biar sejajar sama angka */
     text-transform: uppercase;
-    display: inline-block;
-    box-shadow: 0 0 10px #00f2ff;
+    display: inline-flex; /* Ganti ke inline-flex agar alignment vertikalnya sempurna */
+    align-items: center;
+    box-shadow: 0 0 10px rgba(0, 242, 255, 0.5); /* Glow dibuat lebih soft */
     white-space: nowrap;
     margin-left: 5px; 
-    padding: 2px 8px;
-    font-size: 0.7rem; /* Kecilin dikit biar elegan */
+    letter-spacing: 0.3px;
+    line-height: 1;
 }
 
 body.light-mode .potw-highlight { background: #1e40af; color: #ffffff !important; box-shadow: none; }
@@ -567,6 +568,7 @@ body.light-mode .rank-1 .team-name {
     .metrics-title { font-size: 1.1rem; }
     .metric-card { padding: 20px; }
 }
+
 
 
 
