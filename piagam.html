@@ -102,115 +102,65 @@
         };
 
         async function generateCertificates() {
-            try {
-                const forceUpdate = new Date().getTime();
-                const res = await fetch(`${sheetUrl}&t=${forceUpdate}`);
-                const csv = await res.text();
-                
-                let players = csv.split('\n').slice(1).map(line => {
-                    const row = line.split(',').map(c => c.trim().replace(/"/g, ''));
-                    return { 
-                        nama: row[0], 
-                        point: parseInt(row[1]) || 0, 
-                        goals: parseInt(row[2]) || 0,
-                        potw_winner: parseInt(row[5]) || 0 
-                    };
-                }).filter(p => p.nama);
-
-                const container = document.getElementById('certificates-container');
-                container.innerHTML = ""; 
-                document.getElementById('loading').style.display = 'none';
-
-                const rankWinners = [...players].sort((a, b) => b.point - a.point || b.goals - a.goals);
-                const scorerWinners = [...players].sort((a, b) => b.goals - a.goals);
-
-                // 1. Cari angka tertinggi yang ada di kolom POTW (Kolom F)
-                const maxPotwValue = Math.max(...players.map(p => p.potw_winner));
-                
-                // 2. Filter semua pemain yang punya skor sama dengan angka tertinggi tersebut
-                // Kita juga pastiin skornya harus lebih dari 0
-                const topPotyWinners = players.filter(p => p.potw_winner === maxPotwValue && maxPotwValue > 0);
-                
-                // 3. Render piagam standar (Juara 1-3 & Top Scorer)
-                awards.forEach(data => renderCard(container, data));
-                
-                // 4. LOGIKA MULTI-WINNER: Loop semua pemenang dengan persentase/poin tertinggi
-                topPotyWinners.forEach(winner => {
-                    renderCard(container, {
-                        type: 'cert-poty',
-                        imgs: [assets.bola],
-                        title: 'PLAYER OF THE YEAR',
-                        name: winner.nama,
-                        isBallon: true,
-                        desc: `Penghargaan tertinggi atas pencapaian individu dan konsistensi performa sebagai pemain terbaik sepanjang musim bergulir.`
-                    });
+        try {
+            const forceUpdate = new Date().getTime();
+            const res = await fetch(`${sheetUrl}&t=${forceUpdate}`);
+            const csv = await res.text();
+            
+            let players = csv.split('\n').slice(1).map(line => {
+                const row = line.split(',').map(c => c.trim().replace(/"/g, ''));
+                return { 
+                    nama: row[0], 
+                    point: parseInt(row[1]) || 0, 
+                    goals: parseInt(row[2]) || 0,
+                    potw_winner: parseInt(row[5]) || 0 
+                };
+            }).filter(p => p.nama);
+    
+            const container = document.getElementById('certificates-container');
+            container.innerHTML = ""; 
+            document.getElementById('loading').style.display = 'none';
+    
+            // 1. Urutkan untuk Juara & Top Scorer
+            const rankWinners = [...players].sort((a, b) => b.point - a.point || b.goals - a.goals);
+            const scorerWinners = [...players].sort((a, b) => b.goals - a.goals);
+    
+            // 2. Logika Mencari Skor POTW Tertinggi (Bisa Lebih dari 1 Orang)
+            const maxPotwValue = Math.max(...players.map(p => p.potw_winner));
+            const topPotyWinners = players.filter(p => p.potw_winner === maxPotwValue && maxPotwValue > 0);
+    
+            // 3. Definisi Daftar Penghargaan Standar (Juara 1-3 & Top Scorer)
+            const awards = [
+                { type: 'cert-juara1', imgs: [assets.piala, assets.emas], title: '1st PLACE CHAMPION', name: rankWinners[0]?.nama || "N/A", desc: 'Atas prestasi luar biasa menjadi pemuncak klasemen akhir musim.' },
+                { type: 'cert-juara2', imgs: [assets.perak], title: '2nd PLACE RUNNER UP', name: rankWinners[1]?.nama || "N/A", desc: 'Atas perjuangan luar biasa meraih posisi kedua pada kompetisi musim ini.' },
+                { type: 'cert-juara3', imgs: [assets.perunggu], title: '3rd PLACE WINNER', name: rankWinners[2]?.nama || "N/A", desc: 'Atas keberhasilan menempati posisi tiga besar pada kompetisi musim ini.' },
+                { type: 'cert-topscorer', imgs: [assets.sepatu], title: 'GOLDEN BOOT (TOP SCORER)', name: scorerWinners[0]?.nama || "N/A", desc: `Pencetak gol terbanyak dengan koleksi ${scorerWinners[0]?.goals || 0} gol.` }
+            ];
+    
+            // 4. Render Penghargaan Standar
+            awards.forEach(data => renderCard(container, data));
+    
+            // 5. Render Penghargaan POTY (Mendukung Multi-Winner)
+            topPotyWinners.forEach(winner => {
+                renderCard(container, {
+                    type: 'cert-poty',
+                    imgs: [assets.bola],
+                    title: 'PLAYER OF THE YEAR',
+                    name: winner.nama,
+                    isBallon: true,
+                    desc: `Penghargaan tertinggi atas pencapaian individu dan konsistensi performa sebagai pemain terbaik sepanjang musim bergulir.`
                 });
-
-                const winningPercent = totalPoinKolektif > 0 
-                    ? ((winnerPOTY.potw_winner / totalPoinKolektif) * 100).toFixed(1) 
-                    : 0;
-
-                const awards = [
-                    { type: 'cert-juara1', imgs: [assets.piala, assets.emas], title: '1st PLACE CHAMPION', name: rankWinners[0].nama, desc: 'Atas prestasi luar biasa menjadi pemuncak klasemen akhir musim.' },
-                    { type: 'cert-juara2', imgs: [assets.perak], title: '2nd PLACE RUNNER UP', name: rankWinners[1].nama, desc: 'Atas perjuangan luar biasa meraih posisi kedua pada kompetisi musim ini.' },
-                    { type: 'cert-juara3', imgs: [assets.perunggu], title: '3rd PLACE WINNER', name: rankWinners[2].nama, desc: 'Atas keberhasilan menempati posisi tiga besar pada kompetisi musim ini.' },
-                    { type: 'cert-topscorer', imgs: [assets.sepatu], title: 'GOLDEN BOOT (TOP SCORER)', name: scorerWinners[0].nama, desc: `Pencetak gol terbanyak dengan koleksi ${scorerWinners[0].goals} gol.` }
-                ];
-
-                awards.forEach(data => renderCard(container, data));
-
-                if (winnerPOTY && winnerPOTY.potw_winner > 0) {
-                    renderCard(container, {
-                        type: 'cert-poty',
-                        imgs: [assets.bola],
-                        title: 'PLAYER OF THE YEAR',
-                        name: winnerPOTY.nama,
-                        isBallon: true,
-                        desc: `Penghargaan tertinggi atas pencapaian individu dan konsistensi performa sebagai pemain terbaik sepanjang musim bergulir.`
-                    });
-                }
-
-            } catch (e) { 
-                console.error("Waduh error, Bro:", e); 
-            }
+            });
+    
+        } catch (e) { 
+            console.error("Waduh error, Bro:", e); 
+            document.getElementById('loading').innerText = "❌ GAGAL MEMUAT DATA!";
         }
-
-        function renderCard(container, data) {
-            let imagesHTML = data.imgs.map(url => `<img src="${url}" alt="award">`).join('');
-            let extraText = data.isBallon ? `<div class="ballon-text">🏆 Ballon d'Or Winner 🏆</div>` : '';
-
-            container.innerHTML += `
-                <div class="certificate ${data.type}">
-                    <div class="inner-border"></div>
-                    <div class="corner top-left"></div><div class="corner top-right"></div>
-                    <div class="corner bottom-left"></div><div class="corner bottom-right"></div>
-                    
-                    <div class="header">Official Achievement</div>
-                    <div class="award-title">${data.title}</div>
-                    
-                    <div class="trophy-container">
-                        ${imagesHTML}
-                    </div>
-
-                    <div class="presented-to">Diberikan Kepada:</div>
-                    <div class="winner-name">${data.name}</div>
-                    ${extraText}
-                    <div class="league-name">FOOTBALL LEAGUE-I</div>
-                    
-                    <div class="description">${data.desc}</div>
-                    
-                    <div class="footer">
-                        <div class="sig-box"><div class="sig-line">Official Admin</div></div>
-                        <div class="sig-box"><div class="sig-line">League Manager</div></div>
-                    </div>
-                </div>
-            `;
-        }
-
-        generateCertificates();
+    }
     </script>
 </body>
 </html>
+
 
 
 
