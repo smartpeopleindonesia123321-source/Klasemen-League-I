@@ -55,7 +55,7 @@ function stopWithFadeOut() {
     }, 100);
 }
 
-// --- DATA FETCH ---
+// --- DATA FETCH (REVISED FOR POTY %) ---
 async function fetchData() {
     try {
         const res = await fetch(`${sheetUrl}&nocache=${new Date().getTime()}`);
@@ -68,30 +68,22 @@ async function fetchData() {
                 point: parseInt(row[1]) || 0, 
                 goals: parseInt(row[2]) || 0, 
                 logo: row[3],
-                potw: row[4] || "" 
+                potw: row[4] || "",
+                potw_winner: parseInt(row[5]) || 0 // Ambil angka manual dari Kolom F
             };
         }).filter(p => p.nama);
 
         // 1. Sorting Berdasarkan Poin & Goal
         players.sort((a, b) => b.point - a.point || b.goals - a.goals);
 
-        // 2. LOGIKA SPARKLINE TREND (Simpan riwayat 5 posisi terakhir)
+        // 2. LOGIKA SPARKLINE TREND
         let history = JSON.parse(localStorage.getItem('rankHistory')) || {};
-        
         players = players.map((player, index) => {
             const currentRank = index + 1;
             if (!history[player.nama]) history[player.nama] = [];
-            
-            // Masukkan posisi baru ke riwayat
             history[player.nama].push(currentRank);
-            
-            // Batasi riwayat hanya 5 data terakhir
             if (history[player.nama].length > 5) history[player.nama].shift();
-            
-            return { 
-                ...player, 
-                rankHistory: history[player.nama] 
-            };
+            return { ...player, rankHistory: history[player.nama] };
         });
         localStorage.setItem('rankHistory', JSON.stringify(history));
 
@@ -119,7 +111,7 @@ async function fetchData() {
         }
 
         // 4. Render
-        renderTable(players);
+        renderTable(players); 
         const topScorers = [...players].sort((a, b) => b.goals - a.goals).slice(0, 3);
         renderTopScorer(topScorers);
 
@@ -133,22 +125,28 @@ async function fetchData() {
 function renderTable(players) {
     const body = document.querySelector("#mainTable tbody");
     body.innerHTML = "";
+
+    // HITUNG TOTAL POIN DARI SEMUA PEMAIN DI KOLOM F
+    const totalPoinKolektif = players.reduce((acc, p) => acc + (p.potw_winner || 0), 0);
+
     players.forEach((p, i) => {
         const tr = document.createElement("tr");
         const currentRank = i + 1;
         
+        // LOGIKA PERSENTASE POTY (Angka individu / Total Kolektif)
+        const persentase = totalPoinKolektif > 0 
+            ? ((p.potw_winner / totalPoinKolektif) * 100).toFixed(1) 
+            : 0;
+
         // --- GAMBAR SPARKLINE SVG ---
         const history = p.rankHistory || [currentRank];
         const maxRanks = players.length || 10;
-        
-        // x = jarak titik (0, 10, 20, 30, 40), y = posisi (tinggi box 20px)
         const points = history.map((rank, idx) => {
             const x = idx * 10;
             const y = (rank / maxRanks) * 20; 
             return `${x},${y}`;
         }).join(" ");
 
-        // Warna garis: Hijau jika posisi membaik (angka rank mengecil)
         const isImproving = history[0] > history[history.length - 1];
         const isDropping = history[0] < history[history.length - 1];
         const trendColor = isImproving ? "#00ff88" : (isDropping ? "#ff4444" : "#888");
@@ -159,7 +157,6 @@ function renderTable(players) {
                 <circle cx="${(history.length - 1) * 10}" cy="${(history[history.length - 1] / maxRanks) * 20}" r="2.5" fill="${trendColor}" />
             </svg>`;
 
-        // HITUNG ANGKA +/-
         const diff = history.length > 1 ? history[history.length - 2] - currentRank : 0;
         let diffText = diff > 0 ? `+${diff}` : (diff < 0 ? diff : "-");
         let diffClass = diff > 0 ? "pos-up" : (diff < 0 ? "pos-down" : "");
@@ -186,7 +183,7 @@ function renderTable(players) {
             <td>${sparkline}</td>
             <td class="${diffClass}"><strong>${diffText}</strong></td>
             <td>${potwContent}</td>
-        `;
+            <td style="color:#facc15; font-weight:900;">${persentase}%</td> `;
         body.appendChild(tr);
     });
 }
@@ -441,6 +438,7 @@ closeModal = function() {
         mainTrack.play();
     }
 };
+
 
 
 
