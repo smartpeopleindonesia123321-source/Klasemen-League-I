@@ -126,27 +126,31 @@ function renderTable(players) {
     const body = document.querySelector("#mainTable tbody");
     body.innerHTML = "";
 
-    // HITUNG TOTAL POIN DARI SEMUA PEMAIN DI KOLOM F
+    // 1. HITUNG TOTAL POIN KOLEKTIF DARI KOLOM F (potw_winner)
+    // Ini dasar pembagi untuk persentase Ballon d'Or
     const totalPoinKolektif = players.reduce((acc, p) => acc + (p.potw_winner || 0), 0);
 
     players.forEach((p, i) => {
         const tr = document.createElement("tr");
         const currentRank = i + 1;
         
-        // LOGIKA PERSENTASE POTY (Angka individu / Total Kolektif)
+        // 2. LOGIKA PERSENTASE POTY (Individu / Total * 100)
         const persentase = totalPoinKolektif > 0 
             ? ((p.potw_winner / totalPoinKolektif) * 100).toFixed(1) 
             : 0;
 
-        // --- GAMBAR SPARKLINE SVG ---
+        // 3. LOGIKA SPARKLINE TREND (SVG)
         const history = p.rankHistory || [currentRank];
         const maxRanks = players.length || 10;
+        
+        // Titik koordinat SVG
         const points = history.map((rank, idx) => {
             const x = idx * 10;
             const y = (rank / maxRanks) * 20; 
             return `${x},${y}`;
         }).join(" ");
 
+        // Warna Trend: Hijau jika naik (angka rank mengecil), Merah jika turun
         const isImproving = history[0] > history[history.length - 1];
         const isDropping = history[0] < history[history.length - 1];
         const trendColor = isImproving ? "#00ff88" : (isDropping ? "#ff4444" : "#888");
@@ -157,19 +161,23 @@ function renderTable(players) {
                 <circle cx="${(history.length - 1) * 10}" cy="${(history[history.length - 1] / maxRanks) * 20}" r="2.5" fill="${trendColor}" />
             </svg>`;
 
+        // 4. HITUNG SELISIH POSISI (+/-)
         const diff = history.length > 1 ? history[history.length - 2] - currentRank : 0;
         let diffText = diff > 0 ? `+${diff}` : (diff < 0 ? diff : "-");
         let diffClass = diff > 0 ? "pos-up" : (diff < 0 ? "pos-down" : "");
 
+        // 5. STATUS POTW
         let potwContent = p.potw.toLowerCase().includes("best player") 
             ? `<span class="potw-highlight">Best Player Of The Week</span>` 
             : `<span style="opacity:0.3">-</span>`;
         
+        // 6. HIGHLIGHT BARIS (Rank 1-3 & Degradasi)
         if(currentRank === 1) tr.className = "rank-1";
         else if(currentRank === 2) tr.className = "rank-2";
         else if(currentRank === 3) tr.className = "rank-3";
         else if(currentRank === players.length) tr.className = "degradasi";
 
+        // 7. INJECT HTML KE BARIS TABEL
         tr.innerHTML = `
             <td>${currentRank}</td>
             <td style="text-align:left">
@@ -183,7 +191,9 @@ function renderTable(players) {
             <td>${sparkline}</td>
             <td class="${diffClass}"><strong>${diffText}</strong></td>
             <td>${potwContent}</td>
-            <td style="color:#facc15; font-weight:900;">${persentase}%</td> `;
+            <td style="color:#facc15; font-weight:900;">${persentase}%</td>
+        `;
+        
         body.appendChild(tr);
     });
 }
@@ -438,6 +448,7 @@ closeModal = function() {
         mainTrack.play();
     }
 };
+
 
 
 
