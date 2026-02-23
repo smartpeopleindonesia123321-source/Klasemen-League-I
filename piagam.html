@@ -34,7 +34,6 @@
         
         .presented-to { margin-top: 5px; font-size: 16px; font-style: italic; font-family: 'Libre Baskerville', serif; }
         
-        /* Font Nama Baru yang Lebih Mewah */
         .winner-name { 
             font-family: 'Libre Baskerville', serif; 
             font-size: 42px; 
@@ -49,7 +48,6 @@
             min-width: 60%;
         }
 
-        /* Teks Tambahan Khusus Ballon d'Or */
         .ballon-text {
             font-family: 'Playfair Display', serif;
             font-weight: 700;
@@ -114,15 +112,21 @@
                         nama: row[0], 
                         point: parseInt(row[1]) || 0, 
                         goals: parseInt(row[2]) || 0,
-                        fullRow: line.toLowerCase() 
+                        potw_winner: parseInt(row[5]) || 0 // Kolom F (Data poin POTY)
                     };
                 }).filter(p => p.nama);
 
                 const container = document.getElementById('certificates-container');
                 document.getElementById('loading').style.display = 'none';
 
+                // Sorting untuk Juara & Top Scorer
                 const rankWinners = [...players].sort((a, b) => b.point - a.point || b.goals - a.goals);
                 const scorerWinners = [...players].sort((a, b) => b.goals - a.goals);
+
+                // Logika Penentuan POTY Berdasarkan Persentase (Poin Tertinggi di Kolom F)
+                const totalPoinKolektif = players.reduce((acc, p) => acc + p.potw_winner, 0);
+                const potyWinner = [...players].sort((a, b) => b.potw_winner - a.potw_winner)[0];
+                const winningPercent = totalPoinKolektif > 0 ? ((potyWinner.potw_winner / totalPoinKolektif) * 100).toFixed(1) : 0;
 
                 const awards = [
                     { 
@@ -151,65 +155,61 @@
                         imgs: [assets.sepatu], 
                         title: 'GOLDEN BOOT (TOP SCORER)', 
                         name: scorerWinners[0].nama, 
-                        desc: 'Dianugerahkan kepada pencetak gol terbanyak sepanjang kompetisi bergulir.' 
+                        desc: `Dianugerahkan kepada pencetak gol terbanyak dengan total koleksi ${scorerWinners[0].goals} gol.` 
                     }
                 ];
 
+                // Render Award Klasemen & Top Scorer
                 awards.forEach(data => renderCard(container, data));
 
-                players.filter(p => p.fullRow.includes("best player")).forEach(winner => {
+                // Render Piagam POTY (Ballon d'Or) otomatis dari Kolom F
+                if (totalPoinKolektif > 0) {
                     renderCard(container, {
                         type: 'cert-poty',
                         imgs: [assets.bola],
                         title: 'PLAYER OF THE YEAR',
-                        name: winner.nama,
-                        isBallon: true, // Flag khusus
-                        desc: 'Dianugerahkan atas performa konsisten menjadi best player terbanyak sepanjang musim bergulir.'
+                        name: potyWinner.nama,
+                        isBallon: true,
+                        desc: `Dianugerahkan atas performa paling fenomenal musim ini dengan perolehan suara tertinggi sebesar ${winningPercent}% suara.`
                     });
-                });
+                }
 
             } catch (e) { console.error(e); }
         }
 
         function renderCard(container, data) {
-    let imagesHTML = data.imgs.map(url => `<img src="${url}" alt="award">`).join('');
-    
-    // Logika teks Ballon d'Or
-    let extraText = data.isBallon ? `<div class="ballon-text">🏆 Ballon d'Or Winner 🏆</div>` : '';
+            let imagesHTML = data.imgs.map(url => `<img src="${url}" alt="award">`).join('');
+            let extraText = data.isBallon ? `<div class="ballon-text">🏆 Ballon d'Or Winner 🏆</div>` : '';
 
-    container.innerHTML += `
-        <div class="certificate ${data.type}">
-            <div class="inner-border"></div>
-            <div class="corner top-left"></div><div class="corner top-right"></div>
-            <div class="corner bottom-left"></div><div class="corner bottom-right"></div>
-            
-            <div class="header">Official Achievement</div>
-            <div class="award-title">${data.title}</div>
-            
-            <div class="trophy-container">
-                ${imagesHTML}
-            </div>
+            container.innerHTML += `
+                <div class="certificate ${data.type}">
+                    <div class="inner-border"></div>
+                    <div class="corner top-left"></div><div class="corner top-right"></div>
+                    <div class="corner bottom-left"></div><div class="corner bottom-right"></div>
+                    
+                    <div class="header">Official Achievement</div>
+                    <div class="award-title">${data.title}</div>
+                    
+                    <div class="trophy-container">
+                        ${imagesHTML}
+                    </div>
 
-            <div class="presented-to">Diberikan Kepada:</div>
-            <div class="winner-name">${data.name}</div>
-            ${extraText}
-            <div class="league-name">FOOTBALL LEAGUE-I</div>
-            
-            <div class="description">${data.desc}</div>
-            
-            <div class="footer">
-                <div class="sig-box"><div class="sig-line">Official Admin</div></div>
-                <div class="sig-box"><div class="sig-line">League Manager</div></div>
-            </div>
-        </div>
-    `;
-}
+                    <div class="presented-to">Diberikan Kepada:</div>
+                    <div class="winner-name">${data.name}</div>
+                    ${extraText}
+                    <div class="league-name">FOOTBALL LEAGUE-I</div>
+                    
+                    <div class="description">${data.desc}</div>
+                    
+                    <div class="footer">
+                        <div class="sig-box"><div class="sig-line">Official Admin</div></div>
+                        <div class="sig-box"><div class="sig-line">League Manager</div></div>
+                    </div>
+                </div>
+            `;
+        }
 
         generateCertificates();
     </script>
 </body>
 </html>
-
-
-
-
