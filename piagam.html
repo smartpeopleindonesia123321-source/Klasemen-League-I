@@ -102,62 +102,63 @@
         };
 
         async function generateCertificates() {
-            try {
-                const res = await fetch(`${sheetUrl}&nocache=${new Date().getTime()}`);
-                const csv = await res.text();
-                
-                let players = csv.split('\n').slice(1).map(line => {
-                    const row = line.split(',').map(c => c.trim().replace(/"/g, ''));
-                    return { 
-                        nama: row[0], 
-                        point: parseInt(row[1]) || 0, 
-                        goals: parseInt(row[2]) || 0,
-                        potw_winner: parseInt(row[5]) || 0 // Kolom F (Data poin POTY)
-                    };
-                }).filter(p => p.nama);
+    try {
+        // JURUS ANTI CACHE: Tambah timestamp unik agar data selalu segar dari Google Sheets
+        const forceUpdate = new Date().getTime();
+        const res = await fetch(`${sheetUrl}&t=${forceUpdate}`);
+        const csv = await res.text();
+        
+        let players = csv.split('\n').slice(1).map(line => {
+            const row = line.split(',').map(c => c.trim().replace(/"/g, ''));
+            return { 
+                nama: row[0], 
+                point: parseInt(row[1]) || 0, 
+                goals: parseInt(row[2]) || 0,
+                potw_winner: parseInt(row[5]) || 0 // Kolom F
+            };
+        }).filter(p => p.nama);
 
-                const container = document.getElementById('certificates-container');
-                document.getElementById('loading').style.display = 'none';
+        const container = document.getElementById('certificates-container');
+        container.innerHTML = ""; // Bersihkan container biar nggak tumpuk
+        document.getElementById('loading').style.display = 'none';
 
-                // Sorting untuk Juara & Top Scorer
-                const rankWinners = [...players].sort((a, b) => b.point - a.point || b.goals - a.goals);
-                const scorerWinners = [...players].sort((a, b) => b.goals - a.goals);
+        // 1. Sorting Klasemen & Top Scorer
+        const rankWinners = [...players].sort((a, b) => b.point - a.point || b.goals - a.goals);
+        const scorerWinners = [...players].sort((a, b) => b.goals - a.goals);
 
-                // Logika Penentuan POTY Berdasarkan Persentase (Poin Tertinggi di Kolom F)
-                const totalPoinKolektif = players.reduce((acc, p) => acc + p.potw_winner, 0);
-                const potyWinner = [...players].sort((a, b) => b.potw_winner - a.potw_winner)[0];
-                const winningPercent = totalPoinKolektif > 0 ? ((potyWinner.potw_winner / totalPoinKolektif) * 100).toFixed(1) : 0;
+        // 2. LOGIKA BARU: Ambil CUMA 1 PEMENANG (Angka Terbesar di Kolom F)
+        const totalPoinKolektif = players.reduce((acc, p) => acc + p.potw_winner, 0);
+        
+        // Kita sort berdasarkan potw_winner dari yang paling gede ke kecil
+        const potyRank = [...players].sort((a, b) => b.potw_winner - a.potw_winner);
+        const winnerPOTY = potyRank[0]; // Ambil yang paling atas (Regi)
 
-                const awards = [
-                    { 
-                        type: 'cert-juara1', 
-                        imgs: [assets.piala, assets.emas], 
-                        title: '1st PLACE CHAMPION', 
-                        name: rankWinners[0].nama, 
-                        desc: 'Atas prestasi luar biasa menjadi pemuncak klasemen akhir musim 2025/2026.' 
-                    },
-                    { 
-                        type: 'cert-juara2', 
-                        imgs: [assets.perak], 
-                        title: '2nd PLACE RUNNER UP', 
-                        name: rankWinners[1].nama, 
-                        desc: 'Atas perjuangan luar biasa meraih posisi kedua pada kompetisi musim ini.' 
-                    },
-                    { 
-                        type: 'cert-juara3', 
-                        imgs: [assets.perunggu], 
-                        title: '3rd PLACE WINNER', 
-                        name: rankWinners[2].nama, 
-                        desc: 'Atas keberhasilan menempati posisi tiga besar pada kompetisi musim ini.' 
-                    },
-                    { 
-                        type: 'cert-topscorer', 
-                        imgs: [assets.sepatu], 
-                        title: 'GOLDEN BOOT (TOP SCORER)', 
-                        name: scorerWinners[0].nama, 
-                        desc: `Dianugerahkan kepada pencetak gol terbanyak dengan total koleksi ${scorerWinners[0].goals} gol.` 
-                    }
-                ];
+        const winningPercent = totalPoinKolektif > 0 
+            ? ((winnerPOTY.potw_winner / totalPoinKolektif) * 100).toFixed(1) 
+            : 0;
+
+        // 3. Daftar Award Utama
+        const awards = [
+            { type: 'cert-juara1', imgs: [assets.piala, assets.emas], title: '1st PLACE CHAMPION', name: rankWinners[0].nama, desc: 'Atas prestasi luar biasa menjadi pemuncak klasemen akhir musim.' },
+            { type: 'cert-topscorer', imgs: [assets.sepatu], title: 'GOLDEN BOOT (TOP SCORER)', name: scorerWinners[0].nama, desc: `Pencetak gol terbanyak dengan koleksi ${scorerWinners[0].goals} gol.` }
+        ];
+
+        awards.forEach(data => renderCard(container, data));
+
+        // 4. Tampilkan Piagam POTY HANYA untuk si nomor 1 di Kolom F
+        if (winnerPOTY && winnerPOTY.potw_winner > 0) {
+            renderCard(container, {
+                type: 'cert-poty',
+                imgs: [assets.bola],
+                title: 'PLAYER OF THE YEAR',
+                name: winnerPOTY.nama, // Harusnya REGI sekarang
+                isBallon: true,
+                desc: `Dianugerahkan sebagai pemain terbaik dengan dominasi ${winningPercent}% suara kolektif.`
+            });
+        }
+
+    } catch (e) { console.error("Waduh error, Bro:", e); }
+}
 
                 // Render Award Klasemen & Top Scorer
                 awards.forEach(data => renderCard(container, data));
@@ -213,3 +214,4 @@
     </script>
 </body>
 </html>
+
