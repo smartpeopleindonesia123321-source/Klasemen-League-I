@@ -328,11 +328,12 @@ function shareToWA() {
 
     // 4. INFO MARKET VALUE & BEST PLAYER (PINDAH KE BAWAH)
     text += "📑 *TECHNICAL INFO:*\n";
-    text += "💰 *Market Value:* Base Rp 5M + (1 Pts = 100jt) + (1 Goal = 10jt)\n";
-    text += "⭐ *Best Player:* Persentase kemenangan tertinggi minggu ini.\n\n";
+    text += "💰 *Market Value Formula:* base (1 x Rp.5M)+(Pt x Rp.100Jt)+(1Gd x Rp10Jt)\n";
+    text += "⭐ *Rate Player Formula:* base (Std 7)+(Total Wins x 0.3)\n\n";
+    text += "⭐ *MOTM Formula:* Highest Rate Player/Week\n\n";
 
     // 5. SATU LINK SAKTI DI AKHIR
-    text += "🔗 *CEK ID CARD, MARKET VALUE, & PIAGAM:* \n";
+    text += "🔗 *CEK ID CARD, MARKET VALUE, & PIAGAM, Selengkapnya di link berikut:* \n";
     text += "https://smartpeopleindonesia123321-source.github.io/Klasemen-League-I/";
 
     window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), '_blank');
@@ -440,6 +441,7 @@ closeModal = function() {
         mainTrack.play();
     }
 };
+
 
 
 
