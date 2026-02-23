@@ -88,11 +88,29 @@ async function fetchData() {
         });
         localStorage.setItem('rankHistory', JSON.stringify(history));
 
-        // 3. UPDATE TICKER NEWS
+        // 3. UPDATE TICKER NEWS (DINAMIS DENGAN LEADER POTY)
         const tickerEl = document.getElementById('newsTicker');
         if (tickerEl && players.length > 0) {
             const leader = players[0].nama;
             const topScorerData = [...players].sort((a, b) => b.goals - a.goals)[0];
+            
+            // --- LOGIKA CARI LEADER POTY (BISA BANYAK ORANG) ---
+            // Cari nilai tertinggi di kolom potw_winner (Kolom F)
+            const maxPotwValue = Math.max(...players.map(p => p.potw_winner));
+            
+            // Filter semua pemain yang punya nilai sama dengan nilai tertinggi
+            const potyLeaders = players
+                .filter(p => p.potw_winner === maxPotwValue && maxPotwValue > 0)
+                .map(p => p.nama.toUpperCase());
+            
+            // Gabungkan nama (Contoh: "DANDI & ERNI & REGI")
+            let potyText = "";
+            if (potyLeaders.length > 0) {
+                const namesJoined = potyLeaders.join(" & ");
+                potyText = `👑 POTY LEADER: ${namesJoined} (${maxPotwValue} WINS) --- `;
+            }
+
+            // --- DATA MARKET VALUE ---
             const topMarketValues = [...players]
                 .map(p => ({
                     nama: p.nama,
@@ -108,7 +126,8 @@ async function fetchData() {
                 .map(p => p.nama.toUpperCase());
             const bestPlayerText = allPotw.length > 0 ? allPotw.join(", ") : "BELUM DITENTUKAN";
 
-            tickerEl.innerText = `📢 NEWS UPDATE: ${leader.toUpperCase()} MEMIMPIN KLASEMEN! --- 💰 TOP 3 MARKET VALUE: ${topMarketValues} --- ⭐ BEST PLAYER OF THE WEEK: ${bestPlayerText} --- 🔥 TOP SCORER: ${topScorerData.nama.toUpperCase()} (${topScorerData.goals} GOALS) ---`;
+            // TAMPILKAN KE RUNNING TEXT
+            tickerEl.innerText = `📢 NEWS UPDATE: ${leader.toUpperCase()} MEMIMPIN KLASEMEN! --- ${potyText}💰 TOP 3 MARKET VALUE: ${topMarketValues} --- ⭐ BEST PLAYER OF THE WEEK: ${bestPlayerText} --- 🔥 TOP SCORER: ${topScorerData.nama.toUpperCase()} (${topScorerData.goals} GOALS) ---`;
         }
 
         // 4. Render
@@ -450,6 +469,7 @@ closeModal = function() {
         mainTrack.play();
     }
 };
+
 
 
 
