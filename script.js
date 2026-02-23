@@ -329,7 +329,7 @@ function shareToWA() {
     // 4. INFO MARKET VALUE & BEST PLAYER (PINDAH KE BAWAH)
     text += "📑 *TECHNICAL INFO:*\n";
     text += "💰 *Market Value Formula:* base (1 x Rp.5M)+(Pt x Rp.100Jt)+(1Gd x Rp10Jt)\n";
-    text += "⭐ *Rate Player Formula:* base (Std 7)+(Total Wins x 0.3)\n\n";
+    text += "⭐ *Rate Player Formula:* base (Std 7)+(Total Wins x 0.3)\n";
     text += "⭐ *MOTM Formula:* Highest Rate Player/Week\n\n";
 
     // 5. SATU LINK SAKTI DI AKHIR
@@ -441,6 +441,7 @@ closeModal = function() {
         mainTrack.play();
     }
 };
+
 
 
 
