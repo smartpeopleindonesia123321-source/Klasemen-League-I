@@ -450,6 +450,92 @@ body.light-mode .rank-1 .team-name {
     }
 }
 
+/* Styling for Valuation Metrics Section */
+.metrics-container {
+    margin: 40px auto;
+    max-width: 1000px;
+    padding: 20px;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.metrics-title {
+    text-align: center;
+    color: var(--accent, #facc15); /* Pakai warna accent lo */
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.metric-card {
+    background: rgba(30, 30, 30, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent, #facc15);
+}
+
+.metric-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+.metric-icon {
+    font-size: 1.5rem;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.metric-label {
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.metric-formula {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 12px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    color: #00ff88; /* Warna hijau matrix biar techy */
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.metric-desc {
+    font-size: 0.85rem;
+    color: #aaa;
+    line-height: 1.4;
+}
+
+/* Glow Effects */
+.gold { color: #facc15; }
+.blue { color: #3b82f6; }
+.red { color: #ef4444; }
+
+.shadow-red:hover {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+}
 
 
 
