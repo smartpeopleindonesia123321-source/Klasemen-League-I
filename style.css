@@ -581,6 +581,41 @@ body.light-mode .rank-1 .team-name {
     gap: 20px;
 }
 
+.poty-podium-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px;
+}
+
+.poty-level-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* Warna khusus tiap level */
+.level-1 { border: 1px solid #facc15; background: rgba(250, 204, 21, 0.05); }
+.level-2 { border: 1px solid #bdc3c7; }
+.level-3 { border: 1px solid #d97706; }
+
+.poty-card-small {
+    text-align: center;
+    width: 70px;
+}
+
+.poty-photo-small {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 2px solid #facc15;
+    object-fit: cover;
+}
+
 
 
 
