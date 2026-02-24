@@ -69,8 +69,8 @@ async function fetchData() {
                 goals: parseInt(row[2]) || 0, 
                 logo: row[3],
                 potw: row[4] || "",
-                potw_winner: parseInt(row[5]) || 0, // Ambil angka manual dari Kolom F
-                rate: row[6] || "0" // Ambil data RATE dari Kolom G (Index 6)
+                potw_winner: parseInt(row[5]) || 0, 
+                rate: row[6] || "0"
             };
         }).filter(p => p.nama);
 
@@ -88,29 +88,23 @@ async function fetchData() {
         });
         localStorage.setItem('rankHistory', JSON.stringify(history));
 
-        // 3. UPDATE TICKER NEWS (DINAMIS DENGAN LEADER POTY)
+        // 3. UPDATE TICKER NEWS
         const tickerEl = document.getElementById('newsTicker');
         if (tickerEl && players.length > 0) {
             const leader = players[0].nama;
             const topScorerData = [...players].sort((a, b) => b.goals - a.goals)[0];
             
-            // --- LOGIKA CARI LEADER POTY (BISA BANYAK ORANG) ---
-            // Cari nilai tertinggi di kolom potw_winner (Kolom F)
             const maxPotwValue = Math.max(...players.map(p => p.potw_winner));
-            
-            // Filter semua pemain yang punya nilai sama dengan nilai tertinggi
             const potyLeaders = players
                 .filter(p => p.potw_winner === maxPotwValue && maxPotwValue > 0)
                 .map(p => p.nama.toUpperCase());
             
-            // Gabungkan nama (Contoh: "DANDI & ERNI & REGI")
             let potyText = "";
             if (potyLeaders.length > 0) {
                 const namesJoined = potyLeaders.join(" & ");
                 potyText = `👑 POTY LEADER: ${namesJoined} (${maxPotwValue} WINS) --- `;
             }
 
-            // --- DATA MARKET VALUE ---
             const topMarketValues = [...players]
                 .map(p => ({
                     nama: p.nama,
@@ -126,20 +120,71 @@ async function fetchData() {
                 .map(p => p.nama.toUpperCase());
             const bestPlayerText = allPotw.length > 0 ? allPotw.join(", ") : "BELUM DITENTUKAN";
 
-            // TAMPILKAN KE RUNNING TEXT
             tickerEl.innerText = `📢 NEWS UPDATE: ${leader.toUpperCase()} MEMIMPIN KLASEMEN! --- ${potyText}💰 TOP 3 MARKET VALUE: ${topMarketValues} --- ⭐ BEST PLAYER OF THE WEEK: ${bestPlayerText} --- 🔥 TOP SCORER: ${topScorerData.nama.toUpperCase()} (${topScorerData.goals} GOALS) ---`;
         }
 
-        // 4. Render
+        // 4. Render Utama
         renderTable(players); 
+        
+        // Render Podium Top Scorer
         const topScorers = [...players].sort((a, b) => b.goals - a.goals).slice(0, 3);
         renderTopScorer(topScorers);
+
+        // --- RENDER PODIUM POTY (BALLON D'OR) ---
+        renderPotyPodium(players);
 
         document.getElementById('status').innerText = "LIVE • TERKONEKSI";
     } catch (e) { 
         console.error(e);
         document.getElementById('status').innerText = "OFFLINE"; 
     }
+}
+
+function renderPotyPodium(players) {
+    const container = document.getElementById("potyPodium");
+    if(!container) return;
+    container.innerHTML = "";
+
+    // 1. Cari nilai unik kemenangan yang lebih dari 0 dan urutkan dari yang terbesar
+    const uniqueWins = [...new Set(players.map(p => p.potw_winner))]
+        .filter(win => win > 0)
+        .sort((a, b) => b - a);
+    
+    // 2. Ambil maksimal 3 level nilai tertinggi
+    const levelsToShow = uniqueWins.slice(0, 3);
+    const totalWinsKolektif = players.reduce((acc, p) => acc + (p.potw_winner || 0), 0);
+
+    // 3. Loop untuk setiap level
+    levelsToShow.forEach((winValue, index) => {
+        const levelPlayers = players.filter(p => p.potw_winner === winValue);
+        const percentage = ((winValue / totalWinsKolektif) * 100).toFixed(1);
+        
+        // Buat Baris Level
+        const row = document.createElement("div");
+        row.className = `poty-level-row level-${index + 1}`;
+        
+        // Header Level
+        let content = `
+            <div style="width:100%; font-size:11px; font-weight:900; color:#facc15; margin-bottom:10px; text-shadow: 0 0 5px rgba(0,0,0,0.5);">
+                LEVEL ${index + 1} • ${percentage}% PROBABILITY
+            </div>
+        `;
+        
+        // Tambahkan foto pemain yang ada di level ini
+        levelPlayers.forEach(p => {
+            content += `
+                <div class="poty-card-small">
+                    <img src="${p.logo}" class="poty-photo-small" style="border-color: ${index === 0 ? '#facc15' : (index === 1 ? '#bdc3c7' : '#d97706')}">
+                    <div style="font-size:10px; font-weight:800; color:white; margin-top:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        ${p.nama.toUpperCase()}
+                    </div>
+                </div>
+            `;
+        });
+
+        row.innerHTML = content;
+        container.appendChild(row);
+    });
 }
 
 function renderTable(players) {
@@ -469,6 +514,7 @@ closeModal = function() {
         mainTrack.play();
     }
 };
+
 
 
 
