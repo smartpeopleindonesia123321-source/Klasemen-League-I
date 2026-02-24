@@ -569,6 +569,17 @@ body.light-mode .rank-1 .team-name {
     .metric-card { padding: 20px; }
 }
 
+.shadow-green:hover {
+    box-shadow: 0 0 25px rgba(0, 255, 136, 0.2);
+    border-color: #00ff88 !important;
+}
+
+/* Memastikan grid otomatis menyesuaikan jadi 4 kolom jika layar lebar */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Ukuran disesuaikan agar 4 kartu muat */
+    gap: 20px;
+}
 
 
 
