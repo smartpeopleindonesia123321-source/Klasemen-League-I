@@ -145,32 +145,27 @@ function renderPotyPodium(players) {
     if(!container) return;
     container.innerHTML = "";
 
-    // 1. Cari nilai unik kemenangan yang lebih dari 0 dan urutkan dari yang terbesar
     const uniqueWins = [...new Set(players.map(p => p.potw_winner))]
         .filter(win => win > 0)
         .sort((a, b) => b - a);
     
-    // 2. Ambil maksimal 3 level nilai tertinggi
-    const levelsToShow = uniqueWins.slice(0, 3);
+    const topLevels = uniqueWins.slice(0, 3);
     const totalWinsKolektif = players.reduce((acc, p) => acc + (p.potw_winner || 0), 0);
 
-    // 3. Loop untuk setiap level
-    levelsToShow.forEach((winValue, index) => {
+    topLevels.forEach((winValue, index) => {
         const levelPlayers = players.filter(p => p.potw_winner === winValue);
         const percentage = ((winValue / totalWinsKolektif) * 100).toFixed(1);
-        
-        // Buat Baris Level
+
         const row = document.createElement("div");
         row.className = `poty-level-row level-${index + 1}`;
         
-        // Header Level
+        // --- DI SINI PERUBAHANNYA: LEVEL GANTI JADI RANK ---
         let content = `
-            <div style="width:100%; font-size:11px; font-weight:900; color:#facc15; margin-bottom:10px; text-shadow: 0 0 5px rgba(0,0,0,0.5);">
-                LEVEL ${index + 1} • ${percentage}% PROBABILITY
+            <div style="width:100%; font-size:11px; font-weight:900; color:#facc15; margin-bottom:10px; text-shadow: 0 0 5px rgba(0,0,0,0.5); letter-spacing: 2px;">
+                RANK ${index + 1} • ${percentage}% PROBABILITY
             </div>
         `;
         
-        // Tambahkan foto pemain yang ada di level ini
         levelPlayers.forEach(p => {
             content += `
                 <div class="poty-card-small">
@@ -514,6 +509,7 @@ closeModal = function() {
         mainTrack.play();
     }
 };
+
 
 
 
