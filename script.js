@@ -397,6 +397,7 @@ function shareToWA() {
     text += "🔥 *OFFICIAL AWARDS CATEGORIES* 🔥\n";
     text += "🏆 Champion | 🥈 Runner Up | 🥉 3rd Place\n";
     text += "🎯 Golden Boot | 👑 Ballon d’Or\n";
+    text += "⚖️ Best Witness by Vote | 🤝 Fair Play Trophy by vote\n";
     text += "----------------------------------------------\n\n";
 
     // Footer & Link
@@ -509,6 +510,7 @@ closeModal = function() {
         mainTrack.play();
     }
 };
+
 
 
 
