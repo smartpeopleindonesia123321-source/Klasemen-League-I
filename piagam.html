@@ -89,109 +89,144 @@
     <div id="loading" style="color: white; margin-top: 100px;">🔄 MEMPROSES DATA...</div>
     <div id="certificates-container"></div>
 
-    <script>
-        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=0&single=true&output=csv';
+   <script>
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=0&single=true&output=csv';
 
-        const assets = {
-            piala: 'assets/piala.png',
-            emas: 'assets/emas.png',
-            perak: 'assets/perak.png',
-            perunggu: 'assets/perunggu.png',
-            sepatu: 'assets/sepatu.png',
-            bola: 'assets/bola.png'
-        };
+    // ============================================================
+    // SETTING NAMA PENERIMA MANUAL (GANTI DI SINI)
+    // ============================================================
+    const NAMA_SAKSI_TERBAIK = "DICKY"; // <--- GANTI NAMA SAKSI DI SINI
+    const NAMA_FAIR_PLAY = "MAYA";    // <--- GANTI NAMA PENERIMA FAIR PLAY DI SINI
+    // ============================================================
 
-        async function generateCertificates() {
-            try {
-                const forceUpdate = new Date().getTime();
-                const res = await fetch(`${sheetUrl}&t=${forceUpdate}`);
-                const csv = await res.text();
-                
-                let players = csv.split('\n').slice(1).map(line => {
-                    const row = line.split(',').map(c => c.trim().replace(/"/g, ''));
-                    return { 
-                        nama: row[0], 
-                        point: parseInt(row[1]) || 0, 
-                        goals: parseInt(row[2]) || 0,
-                        potw_winner: parseInt(row[5]) || 0 
-                    };
-                }).filter(p => p.nama);
+    const assets = {
+        piala: 'assets/piala.png',
+        emas: 'assets/emas.png',
+        perak: 'assets/perak.png',
+        perunggu: 'assets/perunggu.png',
+        sepatu: 'assets/sepatu.png',
+        bola: 'assets/bola.png'
+    };
 
-                const container = document.getElementById('certificates-container');
-                container.innerHTML = ""; 
-                document.getElementById('loading').style.display = 'none';
+    async function generateCertificates() {
+        try {
+            const forceUpdate = new Date().getTime();
+            const res = await fetch(`${sheetUrl}&t=${forceUpdate}`);
+            const csv = await res.text();
+            
+            let players = csv.split('\n').slice(1).map(line => {
+                const row = line.split(',').map(c => c.trim().replace(/"/g, ''));
+                return { 
+                    nama: row[0], 
+                    point: parseInt(row[1]) || 0, 
+                    goals: parseInt(row[2]) || 0,
+                    potw_winner: parseInt(row[5]) || 0 
+                };
+            }).filter(p => p.nama);
 
-                // 1. Urutkan untuk Juara & Top Scorer
-                const rankWinners = [...players].sort((a, b) => b.point - a.point || b.goals - a.goals);
-                const scorerWinners = [...players].sort((a, b) => b.goals - a.goals);
+            const container = document.getElementById('certificates-container');
+            container.innerHTML = ""; 
+            document.getElementById('loading').style.display = 'none';
 
-                // 2. Logika POTY Tertinggi
-                const maxPotwValue = Math.max(...players.map(p => p.potw_winner));
-                const topPotyWinners = players.filter(p => p.potw_winner === maxPotwValue && maxPotwValue > 0);
+            // 1. Urutkan untuk Juara & Top Scorer
+            const rankWinners = [...players].sort((a, b) => b.point - a.point || b.goals - a.goals);
+            const scorerWinners = [...players].sort((a, b) => b.goals - a.goals);
 
-                // 3. Render Piagam Utama (Juara 1-3 & Top Scorer)
-                const awards = [
-                    { type: 'cert-juara1', imgs: [assets.piala, assets.emas], title: '1st PLACE CHAMPION', name: rankWinners[0]?.nama || "N/A", desc: 'Atas prestasi luar biasa menjadi pemuncak klasemen akhir musim.' },
-                    { type: 'cert-juara2', imgs: [assets.perak], title: '2nd PLACE RUNNER UP', name: rankWinners[1]?.nama || "N/A", desc: 'Atas perjuangan luar biasa meraih posisi kedua pada kompetisi musim ini.' },
-                    { type: 'cert-juara3', imgs: [assets.perunggu], title: '3rd PLACE WINNER', name: rankWinners[2]?.nama || "N/A", desc: 'Atas keberhasilan menempati posisi tiga besar pada kompetisi musim ini.' },
-                    { type: 'cert-topscorer', imgs: [assets.sepatu], title: 'GOLDEN BOOT (TOP SCORER)', name: scorerWinners[0]?.nama || "N/A", desc: `Pencetak gol terbanyak dengan koleksi ${scorerWinners[0]?.goals || 0} gol.` }
-                ];
+            // 2. Logika POTY Tertinggi
+            const maxPotwValue = Math.max(...players.map(p => p.potw_winner));
+            const topPotyWinners = players.filter(p => p.potw_winner === maxPotwValue && maxPotwValue > 0);
 
-                awards.forEach(data => renderCard(container, data));
+            // 3. Render Piagam Utama (Juara 1-3 & Top Scorer)
+            const awards = [
+                { type: 'cert-juara1', imgs: [assets.piala, assets.emas], title: '1st PLACE CHAMPION', name: rankWinners[0]?.nama || "N/A", desc: 'Atas prestasi luar biasa menjadi pemuncak klasemen akhir musim.' },
+                { type: 'cert-juara2', imgs: [assets.perak], title: '2nd PLACE RUNNER UP', name: rankWinners[1]?.nama || "N/A", desc: 'Atas perjuangan luar biasa meraih posisi kedua pada kompetisi musim ini.' },
+                { type: 'cert-juara3', imgs: [assets.perunggu], title: '3rd PLACE WINNER', name: rankWinners[2]?.nama || "N/A", desc: 'Atas keberhasilan menempati posisi tiga besar pada kompetisi musim ini.' },
+                { type: 'cert-topscorer', imgs: [assets.sepatu], title: 'GOLDEN BOOT (TOP SCORER)', name: scorerWinners[0]?.nama || "N/A", desc: `Pencetak gol terbanyak dengan koleksi ${scorerWinners[0]?.goals || 0} gol.` }
+            ];
 
-                // 4. Render Piagam POTY untuk Semua yang Berhak (Skor Tertinggi Sama)
-                topPotyWinners.forEach(winner => {
-                    renderCard(container, {
-                        type: 'cert-poty',
-                        imgs: [assets.bola],
-                        title: 'PLAYER OF THE YEAR',
-                        name: winner.nama,
-                        isBallon: true,
-                        desc: `Penghargaan tertinggi atas pencapaian individu dan konsistensi performa sebagai pemain terbaik sepanjang musim bergulir.`
-                    });
+            awards.forEach(data => renderCard(container, data));
+
+            // 4. Render Piagam POTY untuk Semua yang Berhak
+            topPotyWinners.forEach(winner => {
+                renderCard(container, {
+                    type: 'cert-poty',
+                    imgs: [assets.bola],
+                    title: 'PLAYER OF THE YEAR',
+                    name: winner.nama,
+                    isBallon: true,
+                    desc: `Penghargaan tertinggi atas pencapaian individu dan konsistensi performa sebagai pemain terbaik sepanjang musim bergulir.`
                 });
+            });
 
-            } catch (e) { 
-                console.error("Waduh error, Bro:", e); 
-                document.getElementById('loading').innerText = "❌ GAGAL MEMUAT DATA!";
-            }
+            // 5. RENDER PIAGAM MANUAL (SAKSI TERBAIK & FAIR PLAY)
+            // Piagam Saksi Terbaik
+            renderCard(container, {
+                type: 'cert-witness',
+                imgs: [], // Kosongkan jika pakai emoji di title/icon
+                customIcon: '⚖️',
+                title: 'BEST WITNESS',
+                name: NAMA_SAKSI_TERBAIK,
+                desc: 'Penghargaan atas dedikasi dan integritas dalam menyaksikan serta mengawasi setiap prosedur kompetisi agar berjalan sesuai regulasi.'
+            });
+
+            // Piagam Fair Play
+            renderCard(container, {
+                type: 'cert-fairplay',
+                imgs: [],
+                customIcon: '🤝',
+                title: 'FAIR PLAY TROPHY',
+                name: NAMA_FAIR_PLAY,
+                desc: 'Penghargaan ini diberikan kepada individu yang menunjukkan perilaku sportif, disiplin tinggi, menghormati lawan, serta mematuhi peraturan permainan.'
+            });
+
+        } catch (e) { 
+            console.error("Waduh error, Bro:", e); 
+            document.getElementById('loading').innerText = "❌ GAGAL MEMUAT DATA!";
         }
+    }
 
-        // FUNGSI INI WAJIB ADA SUPAYA GAMBAR PIAGAM MUNCUL
-        function renderCard(container, data) {
-            let imagesHTML = data.imgs.map(url => `<img src="${url}" alt="award">`).join('');
-            let extraText = data.isBallon ? `<div class="ballon-text">🏆 Ballon d'Or Winner 🏆</div>` : '';
+    function renderCard(container, data) {
+        let imagesHTML = data.imgs && data.imgs.length > 0 
+            ? data.imgs.map(url => `<img src="${url}" alt="award">`).join('') 
+            : `<div style="font-size: 80px; margin-bottom: 10px;">${data.customIcon || '🏆'}</div>`;
+            
+        let extraText = data.isBallon ? `<div class="ballon-text">🏆 Ballon d'Or Winner 🏆</div>` : '';
 
-            container.innerHTML += `
-                <div class="certificate ${data.type}">
-                    <div class="inner-border"></div>
-                    <div class="corner top-left"></div><div class="corner top-right"></div>
-                    <div class="corner bottom-left"></div><div class="corner bottom-right"></div>
-                    
-                    <div class="header">Official Achievement</div>
-                    <div class="award-title">${data.title}</div>
-                    
-                    <div class="trophy-container">
-                        ${imagesHTML}
-                    </div>
-
-                    <div class="presented-to">Diberikan Kepada:</div>
-                    <div class="winner-name">${data.name}</div>
-                    ${extraText}
-                    <div class="league-name">FOOTBALL LEAGUE-I</div>
-                    
-                    <div class="description">${data.desc}</div>
-                    
-                    <div class="footer">
-                        <div class="sig-box"><div class="sig-line">Official Admin</div></div>
-                        <div class="sig-box"><div class="sig-line">League Manager</div></div>
-                    </div>
+        container.innerHTML += `
+            <div class="certificate ${data.type}">
+                <div class="inner-border"></div>
+                <div class="corner top-left"></div><div class="corner top-right"></div>
+                <div class="corner bottom-left"></div><div class="corner bottom-right"></div>
+                
+                <div class="header">Official Achievement</div>
+                <div class="award-title">${data.title}</div>
+                
+                <div class="trophy-container">
+                    ${imagesHTML}
                 </div>
-            `;
-        }
+
+                <div class="presented-to">Diberikan Kepada:</div>
+                <div class="winner-name">${data.name}</div>
+                ${extraText}
+                <div class="league-name">FOOTBALL LEAGUE-I</div>
+                
+                <div class="description">${data.desc}</div>
+                
+                <div class="footer">
+                    <div class="sig-box"><div class="sig-line">Official Admin</div></div>
+                    <div class="sig-box"><div class="sig-line">League Manager</div></div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Jalankan fungsi
+    generateCertificates();
+</script>
 
         // Jalankan fungsi utama
         generateCertificates();
     </script>
 </body>
 </html>
+
