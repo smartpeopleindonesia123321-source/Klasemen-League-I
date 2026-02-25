@@ -69,8 +69,6 @@
         .cert-juara3 .award-title { color: var(--bronze); } .cert-juara3 .corner { border-color: var(--bronze); }
         .cert-topscorer .award-title { color: #cc0000; } .cert-topscorer .corner { border-color: #cc0000; }
         .cert-poty .award-title { color: #1e40af; } .cert-poty .corner { border-color: #1e40af; }
-
-        /* Warna Khusus Kategori Tambahan */
         .cert-witness .award-title { color: #546e7a; } .cert-witness .corner { border-color: #546e7a; }
         .cert-fairplay .award-title { color: #2e7d32; } .cert-fairplay .corner { border-color: #2e7d32; }
 
@@ -99,8 +97,8 @@
     // ============================================================
     // SETTING NAMA PENERIMA MANUAL (GANTI DI SINI)
     // ============================================================
-    const NAMA_SAKSI_TERBAIK = "DICKY"; // <--- GANTI NAMA SAKSI DI SINI
-    const NAMA_FAIR_PLAY = "MAYA";    // <--- GANTI NAMA PENERIMA FAIR PLAY DI SINI
+    const NAMA_SAKSI_TERBAIK = "DICKY"; 
+    const NAMA_FAIR_PLAY = "MAYA";    
     // ============================================================
 
     const assets = {
@@ -133,15 +131,12 @@
             container.innerHTML = ""; 
             document.getElementById('loading').style.display = 'none';
 
-            // 1. Urutkan untuk Juara & Top Scorer
             const rankWinners = [...players].sort((a, b) => b.point - a.point || b.goals - a.goals);
             const scorerWinners = [...players].sort((a, b) => b.goals - a.goals);
 
-            // 2. Logika POTY Tertinggi
             const maxPotwValue = Math.max(...players.map(p => p.potw_winner));
             const topPotyWinners = players.filter(p => p.potw_winner === maxPotwValue && maxPotwValue > 0);
 
-            // 3. Render Piagam Utama (Juara 1-3 & Top Scorer)
             const awards = [
                 { type: 'cert-juara1', imgs: [assets.piala, assets.emas], title: '1st PLACE CHAMPION', name: rankWinners[0]?.nama || "N/A", desc: 'Atas prestasi luar biasa menjadi pemuncak klasemen akhir musim.' },
                 { type: 'cert-juara2', imgs: [assets.perak], title: '2nd PLACE RUNNER UP', name: rankWinners[1]?.nama || "N/A", desc: 'Atas perjuangan luar biasa meraih posisi kedua pada kompetisi musim ini.' },
@@ -151,7 +146,6 @@
 
             awards.forEach(data => renderCard(container, data));
 
-            // 4. Render Piagam POTY
             topPotyWinners.forEach(winner => {
                 renderCard(container, {
                     type: 'cert-poty',
@@ -163,11 +157,10 @@
                 });
             });
 
-            // 5. RENDER PIAGAM MANUAL
             // Piagam Saksi Terbaik
             renderCard(container, {
                 type: 'cert-witness',
-                imgs: [assets.saksi], // <--- Ganti [] jadi [assets.saksi]
+                imgs: [assets.saksi],
                 title: 'BEST WITNESS',
                 name: NAMA_SAKSI_TERBAIK,
                 desc: 'Penghargaan atas dedikasi dan integritas dalam menyaksikan serta mengawasi setiap prosedur kompetisi agar berjalan sesuai regulasi.'
@@ -224,10 +217,7 @@
         `;
     }
 
-    // Jalankan fungsi utama
     generateCertificates();
     </script>
 </body>
 </html>
-
-
