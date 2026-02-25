@@ -27,7 +27,14 @@
         .bottom-right { bottom: 0; right: 0; border-left: none; border-top: none; }
 
         .trophy-container { height: 115px; margin-top: 5px; display: flex; gap: 15px; align-items: center; justify-content: center; z-index: 5; }
-        .trophy-container img { height: 100%; width: auto; object-fit: contain; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2)); }
+        .trophy-container img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
+            /* Tambahkan ini untuk mencoba menghilangkan background putih */
+            mix-blend-mode: multiply; 
+        }
 
         .header { margin-top: 35px; text-transform: uppercase; letter-spacing: 5px; font-weight: 400; font-size: 13px; }
         .award-title { font-family: 'Playfair Display', serif; font-size: 34px; margin: 5px 0; color: var(--gold); text-transform: uppercase; text-align: center; width: 85%; line-height: 1.1; font-weight: 900; }
@@ -221,3 +228,4 @@
     </script>
 </body>
 </html>
+
