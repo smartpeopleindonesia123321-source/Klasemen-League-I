@@ -115,7 +115,8 @@
         perunggu: 'assets/perunggu.png',
         sepatu: 'assets/sepatu.png',
         bola: 'assets/bola.png',
-        saksi: 'assets/saksi.png'
+        saksi: 'assets/saksi.png',
+        fairplay: 'assets/fairplay.png'
     };
 
     async function generateCertificates() {
@@ -177,7 +178,7 @@
             renderCard(container, {
                 type: 'cert-fairplay',
                 imgs: [],
-                customIcon: '🤝',
+                imgs: [assets.fairplay],
                 title: 'FAIR PLAY TROPHY',
                 name: NAMA_FAIR_PLAY,
                 desc: 'Penghargaan ini diberikan kepada individu yang menunjukkan perilaku sportif, disiplin tinggi, menghormati lawan, serta mematuhi peraturan permainan.'
@@ -228,4 +229,5 @@
     </script>
 </body>
 </html>
+
 
