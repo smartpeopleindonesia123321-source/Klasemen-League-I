@@ -70,6 +70,10 @@
         .cert-topscorer .award-title { color: #cc0000; } .cert-topscorer .corner { border-color: #cc0000; }
         .cert-poty .award-title { color: #1e40af; } .cert-poty .corner { border-color: #1e40af; }
 
+        /* Warna Khusus Kategori Tambahan */
+        .cert-witness .award-title { color: #546e7a; } .cert-witness .corner { border-color: #546e7a; }
+        .cert-fairplay .award-title { color: #2e7d32; } .cert-fairplay .corner { border-color: #2e7d32; }
+
         .btn-print {
             position: fixed; top: 20px; left: 20px; padding: 12px 25px;
             background: #00f2ff; border: none; font-weight: bold; cursor: pointer;
@@ -89,7 +93,7 @@
     <div id="loading" style="color: white; margin-top: 100px;">🔄 MEMPROSES DATA...</div>
     <div id="certificates-container"></div>
 
-   <script>
+    <script>
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=0&single=true&output=csv';
 
     // ============================================================
@@ -146,7 +150,7 @@
 
             awards.forEach(data => renderCard(container, data));
 
-            // 4. Render Piagam POTY untuk Semua yang Berhak
+            // 4. Render Piagam POTY
             topPotyWinners.forEach(winner => {
                 renderCard(container, {
                     type: 'cert-poty',
@@ -158,11 +162,11 @@
                 });
             });
 
-            // 5. RENDER PIAGAM MANUAL (SAKSI TERBAIK & FAIR PLAY)
+            // 5. RENDER PIAGAM MANUAL
             // Piagam Saksi Terbaik
             renderCard(container, {
                 type: 'cert-witness',
-                imgs: [], // Kosongkan jika pakai emoji di title/icon
+                imgs: [],
                 customIcon: '⚖️',
                 title: 'BEST WITNESS',
                 name: NAMA_SAKSI_TERBAIK,
@@ -188,7 +192,7 @@
     function renderCard(container, data) {
         let imagesHTML = data.imgs && data.imgs.length > 0 
             ? data.imgs.map(url => `<img src="${url}" alt="award">`).join('') 
-            : `<div style="font-size: 80px; margin-bottom: 10px;">${data.customIcon || '🏆'}</div>`;
+            : `<div style="font-size: 80px; margin-bottom: 10px; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));">${data.customIcon || '🏆'}</div>`;
             
         let extraText = data.isBallon ? `<div class="ballon-text">🏆 Ballon d'Or Winner 🏆</div>` : '';
 
@@ -220,13 +224,8 @@
         `;
     }
 
-    // Jalankan fungsi
+    // Jalankan fungsi utama
     generateCertificates();
-</script>
-
-        // Jalankan fungsi utama
-        generateCertificates();
     </script>
 </body>
 </html>
-
