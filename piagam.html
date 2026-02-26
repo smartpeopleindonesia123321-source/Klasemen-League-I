@@ -68,67 +68,26 @@
         .description { width: 80%; text-align: center; font-size: 14px; margin-top: 10px; line-height: 1.4; color: #444; }
 
         /* FOOTER SETTINGS */
-        /* --- UPDATE BAGIAN INI AGAR TEKS TIDAK HILANG --- */
-        .footer { 
-            margin-top: auto; 
-            margin-bottom: 5px; /* Kurangi margin bawah agar lebih naik sedikit */
-            display: flex; 
-            justify-content: space-around; 
-            width: 100%; 
-            position: relative; 
-            height: 120px; /* Kunci tinggi footer agar stabil */
-        }
-
-        .sig-box { 
-            text-align: center; 
-            width: 220px; 
-            position: relative; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: flex-end; /* Paksa teks jabatan tetap di bawah */
-        }
+        .footer { margin-top: auto; margin-bottom: 20px; display: flex; justify-content: space-around; width: 100%; position: relative; }
+        .sig-box { text-align: center; width: 220px; position: relative; display: flex; flex-direction: column; align-items: center; }
         
-        /* Ukuran TTD Tetap Besar */
-        .sig-img { 
-            height: 85px; /* Sedikit disesuaikan agar tidak terlalu rakus tempat */
-            width: auto; 
-            margin-bottom: -20px; 
-            z-index: 2; 
-            mix-blend-mode: multiply; 
-        }
+        /* TTD diperbesar */
+        .sig-img { height: 120px; width: auto; margin-bottom: -25px; z-index: 2; mix-blend-mode: multiply; }
         
-        /* Cap diperkecil & digeser ke atas sesuai request lo sebelumnya */
+        /* Cap diperkecil & digeser ke atas */
         .stamp-img { 
             position: absolute; 
-            width: 65px; 
+            width: 75px; 
             height: auto; 
-            bottom: 55px; /* Naik lebih tinggi biar gak ganggu Rizal */
-            left: 65%; 
+            bottom: 45px; /* Naik ke atas */
+            left: 60%; /* Geser ke samping */
             z-index: 1; 
             opacity: 0.8; 
             mix-blend-mode: multiply;
         }
 
-        .sig-line { 
-            border-top: 2px solid var(--dark); 
-            width: 100%; 
-            padding-top: 5px; 
-            font-weight: bold; 
-            font-size: 13px; /* Perkecil dikit biar gak sesak */
-            text-transform: uppercase; 
-            z-index: 3;
-            background: white; /* Jaga agar garis tetap bersih */
-        }
-
-        .sig-role { 
-            font-size: 10px; 
-            color: #444; 
-            text-transform: none; 
-            margin-top: 2px; 
-            font-weight: normal;
-            display: block !important; /* Paksa muncul */
-        }
+        .sig-line { border-top: 2px solid var(--dark); width: 100%; padding-top: 5px; font-weight: bold; font-size: 14px; text-transform: uppercase; z-index: 3; }
+        .sig-role { font-size: 11px; color: #444; text-transform: none; margin-top: 2px; font-weight: normal; }
         
         .cert-juara2 .award-title { color: var(--silver); } .cert-juara2 .corner { border-color: var(--silver); }
         .cert-juara3 .award-title { color: var(--bronze); } .cert-juara3 .corner { border-color: var(--bronze); }
@@ -292,5 +251,3 @@
     </script>
 </body>
 </html>
-
-
