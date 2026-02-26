@@ -4,17 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DRAWING URUTAN | FOOTBALL LEAGUE-I</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #d4af37; --dark: #0a0a0a; --white: #ffffff; --blue: #00f2ff; }
         body { background: #111; font-family: 'Kanit', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: var(--white); padding: 20px; }
         .container { width: 100%; max-width: 650px; background: #1a1a1a; padding: 30px; border-radius: 20px; border: 3px solid var(--gold); box-shadow: 0 0 30px rgba(212, 175, 55, 0.3); text-align: center; position: relative; }
         
-        /* Input Styling */
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; text-align: left; }
         .input-group { display: flex; flex-direction: column; gap: 5px; }
-        .input-group label { font-size: 12px; color: var(--gold); font-weight: bold; text-transform: uppercase; }
-        input { background: #252525; border: 1px solid #444; color: white; padding: 10px; border-radius: 5px; font-family: 'Kanit'; }
+        .input-group label { font-size: 11px; color: var(--gold); font-weight: bold; text-transform: uppercase; }
+        input, select { background: #252525; border: 1px solid #444; color: white; padding: 10px; border-radius: 5px; font-family: 'Kanit'; font-size: 14px; }
         
         #draw-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; filter: blur(10px); transition: 0.5s; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; }
         .draw-item { background: #252525; padding: 10px 15px; border-radius: 8px; border-left: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
@@ -24,13 +23,11 @@
         button { padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; font-family: 'Kanit'; }
         #btn-shuffle { background: var(--gold); color: black; }
         #btn-lock { background: #cc0000; color: white; }
-        #btn-wa { background: #25d366; color: white; display: none; text-decoration: none; align-items: center; justify-content: center; font-family: 'Kanit'; font-weight: bold; }
+        #btn-wa { background: #25d366; color: white; display: none; text-decoration: none; align-items: center; justify-content: center; font-weight: bold; }
         .status-lock { color: var(--blue); margin-top: 15px; font-weight: bold; display: none; }
         
-        /* Admin Style */
-        .admin-section { margin-top: 50px; border-top: 1px solid #333; padding-top: 20px; }
-        .btn-reset { background: none; border: 1px solid #444; color: #444; padding: 5px 15px; font-size: 10px; cursor: pointer; border-radius: 5px; transition: 0.3s; }
-        .btn-reset:hover { border-color: #cc0000; color: #cc0000; }
+        .admin-section { margin-top: 40px; border-top: 1px solid #333; padding-top: 20px; }
+        .btn-reset { background: none; border: 1px solid #444; color: #444; padding: 5px 15px; font-size: 10px; cursor: pointer; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -41,7 +38,7 @@
     </div>
 
     <h1 style="color: var(--gold); margin: 0;">🎰 DRAWING CENTER</h1>
-    <p style="color: #888; margin-bottom: 20px;">Atur jadwal & acak urutan tebak skor</p>
+    <p style="color: #888; margin-bottom: 20px; font-size: 13px;">Tentukan jadwal & biarkan saksi mengacak urutan</p>
 
     <div class="input-grid">
         <div class="input-group">
@@ -49,25 +46,41 @@
             <input type="text" id="match-no" placeholder="Contoh: Match 7">
         </div>
         <div class="input-group">
-            <label>Tanggal</label>
-            <input type="text" id="match-date" placeholder="Contoh: 27 Feb 2026">
+            <label>Tanggal Bermain</label>
+            <input type="date" id="match-date">
         </div>
         <div class="input-group" style="grid-column: span 2;">
             <label>Tim Bertanding</label>
-            <input type="text" id="teams" placeholder="Contoh: PSBS Biak v PSIM Yogyakarta">
+            <input type="text" id="teams" placeholder="Contoh: PSM VS PERSEBAYA">
         </div>
         <div class="input-group">
             <label>Jam Mulai (HH:MM)</label>
-            <input type="time" id="start-time" value="08:00">
+            <input type="time" id="start-time" value="09:00">
         </div>
         <div class="input-group">
             <label>Durasi (Menit)</label>
             <input type="number" id="duration" value="5">
         </div>
+        <div class="input-group" style="grid-column: span 2;">
+            <label>Pilih Saksi (Pemain)</label>
+            <select id="witness-name">
+                <option value="">-- PILIH NAMA SAKSI --</option>
+                <option value="Aries">ARIES</option>
+                <option value="Rizal">RIZAL</option>
+                <option value="Maya">MAYA</option>
+                <option value="Erni">ERNI</option>
+                <option value="Regi">REGI</option>
+                <option value="Ikmal">IKMAL</option>
+                <option value="Yanti">YANTI</option>
+                <option value="Budi">BUDI</option>
+                <option value="Citra">CITRA</option>
+                <option value="Dedi">DEDI</option>
+            </select>
+        </div>
     </div>
 
     <div id="draw-list">
-        <div style="padding: 20px; color: #555;">Klik ACAK untuk memuat nama...</div>
+        <div style="padding: 20px; color: #555;">Saksi silakan klik ACAK...</div>
     </div>
 
     <div class="btn-group">
@@ -76,7 +89,7 @@
         <a id="btn-wa" href="#" onclick="shareToWA()">📲 KIRIM KE WHATSAPP GROUP</a>
     </div>
 
-    <div id="status" class="status-lock">✅ URUTAN DIKUNCI & JADWAL TERBENTUK!</div>
+    <div id="status" class="status-lock">✅ URUTAN SAH & DIKUNCI OLEH SAKSI!</div>
 
     <div class="admin-section">
         <button onclick="resetForNextMatch()" class="btn-reset">⚙️ Admin Reset (PIN Required)</button>
@@ -84,23 +97,18 @@
 </div>
 
 <script>
-    const ADMIN_PIN = "1234"; // Ganti PIN sesuai keinginan lo
+    const ADMIN_PIN = "1234"; 
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=0&single=true&output=csv';
     
     let shuffleCount = 0;
     let currentList = [];
     let isLocked = false;
 
-    // --- SISTEM ANTI-REFRESH (LOAD DATA DARI STORAGE) ---
     window.onload = function() {
         const savedStatus = localStorage.getItem('drawingLocked');
         const isStarted = localStorage.getItem('isStarted');
-
-        if (savedStatus === 'true') {
-            loadLockedData();
-        } else if (isStarted === 'true') {
-            loadProgressData();
-        }
+        if (savedStatus === 'true') { loadLockedData(); } 
+        else if (isStarted === 'true') { loadProgressData(); }
     };
 
     async function getNames() {
@@ -119,14 +127,15 @@
 
     async function shuffleData() {
         if (isLocked) return;
+        
+        const witness = document.getElementById('witness-name').value;
+        if (!witness) return alert("Pilih Nama Saksi dulu, Bro!");
 
-        // Lock Inputs & Simpan Nilainya
-        const inputs = ['match-no', 'match-date', 'teams', 'start-time', 'duration'];
+        const inputs = ['match-no', 'match-date', 'teams', 'start-time', 'duration', 'witness-name'];
         inputs.forEach(id => {
             const el = document.getElementById(id);
-            el.readOnly = true;
+            el.disabled = true; 
             el.style.opacity = "0.6";
-            el.style.cursor = "not-allowed";
             localStorage.setItem(id, el.value);
         });
 
@@ -136,7 +145,6 @@
         document.getElementById('count').innerText = shuffleCount;
         renderList();
 
-        // Simpan Progress agar tidak hilang saat F5
         localStorage.setItem('tempList', JSON.stringify(currentList));
         localStorage.setItem('tempCount', shuffleCount);
         localStorage.setItem('isStarted', 'true');
@@ -153,7 +161,7 @@
 
     function lockResult() {
         if (currentList.length === 0) return alert("Acak dulu, Bro!");
-        if (confirm("Kunci hasil drawing ini? Data tidak bisa diubah lagi!")) {
+        if (confirm("Kunci hasil? Data ini disahkan oleh Saksi.")) {
             isLocked = true;
             localStorage.setItem('drawingLocked', 'true');
             applyLockUI();
@@ -167,44 +175,31 @@
         document.getElementById('status').style.display = "block";
         document.getElementById('btn-wa').style.display = "flex";
         
-        // Pastikan input terkunci visual
-        const inputs = ['match-no', 'match-date', 'teams', 'start-time', 'duration'];
-        inputs.forEach(id => {
-            document.getElementById(id).readOnly = true;
-            document.getElementById(id).style.opacity = "0.6";
-        });
+        const inputs = ['match-no', 'match-date', 'teams', 'start-time', 'duration', 'witness-name'];
+        inputs.forEach(id => { document.getElementById(id).disabled = true; document.getElementById(id).style.opacity = "0.6"; });
     }
 
     function loadProgressData() {
-        const inputs = ['match-no', 'match-date', 'teams', 'start-time', 'duration'];
+        const inputs = ['match-no', 'match-date', 'teams', 'start-time', 'duration', 'witness-name'];
         inputs.forEach(id => {
             document.getElementById(id).value = localStorage.getItem(id) || "";
-            document.getElementById(id).readOnly = true;
+            document.getElementById(id).disabled = true;
             document.getElementById(id).style.opacity = "0.6";
         });
-
         currentList = JSON.parse(localStorage.getItem('tempList')) || [];
         shuffleCount = localStorage.getItem('tempCount') || 0;
         document.getElementById('count').innerText = shuffleCount;
         renderList();
     }
 
-    function loadLockedData() {
-        loadProgressData();
-        applyLockUI();
-    }
+    function loadLockedData() { loadProgressData(); applyLockUI(); }
 
-    // --- SISTEM RESET ADMIN (PASSWORD PROMPT) ---
     function resetForNextMatch() {
-        let pin = prompt("MASUKKAN PIN ADMIN UNTUK RESET DATA:");
+        let pin = prompt("MASUKKAN PIN ADMIN:");
         if (pin === ADMIN_PIN) {
-            if (confirm("PIN Benar. Hapus data drawing untuk Match baru?")) {
-                localStorage.clear();
-                location.reload();
-            }
-        } else if (pin !== null) {
-            alert("PIN SALAH! Akses ditolak.");
-        }
+            localStorage.clear();
+            location.reload();
+        } else if (pin !== null) { alert("PIN SALAH!"); }
     }
 
     function calculateTime(baseTime, addedMinutes) {
@@ -221,10 +216,11 @@
         const teams = document.getElementById('teams').value || "Team A v Team B";
         const startTime = document.getElementById('start-time').value;
         const duration = parseInt(document.getElementById('duration').value);
+        const witness = document.getElementById('witness-name').value;
 
         let message = `*${matchNo.toUpperCase()}* %0A`;
         message += `*${teams.toUpperCase()}* %0A`;
-        message += `_${matchDate}_ %0A%0A`;
+        message += `📅 Tanggal: _${matchDate}_ %0A%0A`;
         message += `*Pos | Nama | In | Out* %0A`;
 
         let currentMinutes = 0;
@@ -235,12 +231,11 @@
             currentMinutes += (duration + 1); 
         });
 
-        message += `%0A_NB: Saksi telah melakukan acakan sebanyak ${shuffleCount} kali._ %0A`;
+        message += `%0A⚖️ Saksi: *${witness.toUpperCase()}* %0A`;
+        message += `🎲 Total Acakan: ${shuffleCount} kali %0A%0A`;
         message += `*FOOTBALL LEAGUE-I* ⚽🔥`;
-
         window.open(`https://wa.me/?text=${message}`, '_blank');
     }
 </script>
-
 </body>
 </html>
