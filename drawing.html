@@ -8,7 +8,7 @@
     <style>
         :root { --gold: #d4af37; --dark: #0a0a0a; --white: #ffffff; --blue: #00f2ff; }
         body { background: #111; font-family: 'Kanit', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: var(--white); padding: 20px; }
-        .container { width: 100%; max-width: 650px; background: #1a1a1a; padding: 30px; border-radius: 20px; border: 3px solid var(--gold); box-shadow: 0 0 30px rgba(212, 175, 55, 0.3); text-align: center; }
+        .container { width: 100%; max-width: 650px; background: #1a1a1a; padding: 30px; border-radius: 20px; border: 3px solid var(--gold); box-shadow: 0 0 30px rgba(212, 175, 55, 0.3); text-align: center; position: relative; }
         
         /* Input Styling */
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; text-align: left; }
@@ -24,13 +24,22 @@
         button { padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; font-family: 'Kanit'; }
         #btn-shuffle { background: var(--gold); color: black; }
         #btn-lock { background: #cc0000; color: white; }
-        #btn-wa { background: #25d366; color: white; display: none; text-decoration: none; align-items: center; justify-content: center; }
+        #btn-wa { background: #25d366; color: white; display: none; text-decoration: none; align-items: center; justify-content: center; font-family: 'Kanit'; font-weight: bold; }
         .status-lock { color: var(--blue); margin-top: 15px; font-weight: bold; display: none; }
+        
+        /* Admin Style */
+        .admin-section { margin-top: 50px; border-top: 1px solid #333; padding-top: 20px; }
+        .btn-reset { background: none; border: 1px solid #444; color: #444; padding: 5px 15px; font-size: 10px; cursor: pointer; border-radius: 5px; transition: 0.3s; }
+        .btn-reset:hover { border-color: #cc0000; color: #cc0000; }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <div style="text-align: left; margin-bottom: 10px;">
+        <a href="index.html" style="color: #666; text-decoration: none; font-size: 12px;">← Kembali ke Klasemen</a>
+    </div>
+
     <h1 style="color: var(--gold); margin: 0;">🎰 DRAWING CENTER</h1>
     <p style="color: #888; margin-bottom: 20px;">Atur jadwal & acak urutan tebak skor</p>
 
@@ -68,14 +77,31 @@
     </div>
 
     <div id="status" class="status-lock">✅ URUTAN DIKUNCI & JADWAL TERBENTUK!</div>
+
+    <div class="admin-section">
+        <button onclick="resetForNextMatch()" class="btn-reset">⚙️ Admin Reset (PIN Required)</button>
+    </div>
 </div>
 
 <script>
+    const ADMIN_PIN = "1234"; // Ganti PIN sesuai keinginan lo
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=0&single=true&output=csv';
     
     let shuffleCount = 0;
     let currentList = [];
     let isLocked = false;
+
+    // --- SISTEM ANTI-REFRESH (LOAD DATA DARI STORAGE) ---
+    window.onload = function() {
+        const savedStatus = localStorage.getItem('drawingLocked');
+        const isStarted = localStorage.getItem('isStarted');
+
+        if (savedStatus === 'true') {
+            loadLockedData();
+        } else if (isStarted === 'true') {
+            loadProgressData();
+        }
+    };
 
     async function getNames() {
         const res = await fetch(`${sheetUrl}&t=${new Date().getTime()}`);
@@ -92,24 +118,29 @@
     }
 
     async function shuffleData() {
-    if (isLocked) return;
+        if (isLocked) return;
 
-    // --- FITUR BARU: LOCK INPUT SAAT ACAK PERTAMA KALI ---
-    const inputs = ['match-no', 'match-date', 'teams', 'start-time', 'duration'];
-    inputs.forEach(id => {
-        const el = document.getElementById(id);
-        el.readOnly = true; // Membuat input tidak bisa diketik lagi
-        el.style.opacity = "0.6"; // Memberi efek visual terkunci
-        el.style.cursor = "not-allowed";
-    });
-    // ----------------------------------------------------
+        // Lock Inputs & Simpan Nilainya
+        const inputs = ['match-no', 'match-date', 'teams', 'start-time', 'duration'];
+        inputs.forEach(id => {
+            const el = document.getElementById(id);
+            el.readOnly = true;
+            el.style.opacity = "0.6";
+            el.style.cursor = "not-allowed";
+            localStorage.setItem(id, el.value);
+        });
 
-    const names = await getNames();
-    currentList = shuffleArray([...names]);
-    shuffleCount++;
-    document.getElementById('count').innerText = shuffleCount;
-    renderList();
-}
+        const names = await getNames();
+        currentList = shuffleArray([...names]);
+        shuffleCount++;
+        document.getElementById('count').innerText = shuffleCount;
+        renderList();
+
+        // Simpan Progress agar tidak hilang saat F5
+        localStorage.setItem('tempList', JSON.stringify(currentList));
+        localStorage.setItem('tempCount', shuffleCount);
+        localStorage.setItem('isStarted', 'true');
+    }
 
     function renderList() {
         const listContainer = document.getElementById('draw-list');
@@ -122,13 +153,57 @@
 
     function lockResult() {
         if (currentList.length === 0) return alert("Acak dulu, Bro!");
-        if (confirm("Kunci hasil drawing ini?")) {
+        if (confirm("Kunci hasil drawing ini? Data tidak bisa diubah lagi!")) {
             isLocked = true;
-            document.getElementById('draw-list').style.filter = "none";
-            document.getElementById('btn-shuffle').disabled = true;
-            document.getElementById('btn-lock').style.display = "none";
-            document.getElementById('status').style.display = "block";
-            document.getElementById('btn-wa').style.display = "flex";
+            localStorage.setItem('drawingLocked', 'true');
+            applyLockUI();
+        }
+    }
+
+    function applyLockUI() {
+        document.getElementById('draw-list').style.filter = "none";
+        document.getElementById('btn-shuffle').disabled = true;
+        document.getElementById('btn-lock').style.display = "none";
+        document.getElementById('status').style.display = "block";
+        document.getElementById('btn-wa').style.display = "flex";
+        
+        // Pastikan input terkunci visual
+        const inputs = ['match-no', 'match-date', 'teams', 'start-time', 'duration'];
+        inputs.forEach(id => {
+            document.getElementById(id).readOnly = true;
+            document.getElementById(id).style.opacity = "0.6";
+        });
+    }
+
+    function loadProgressData() {
+        const inputs = ['match-no', 'match-date', 'teams', 'start-time', 'duration'];
+        inputs.forEach(id => {
+            document.getElementById(id).value = localStorage.getItem(id) || "";
+            document.getElementById(id).readOnly = true;
+            document.getElementById(id).style.opacity = "0.6";
+        });
+
+        currentList = JSON.parse(localStorage.getItem('tempList')) || [];
+        shuffleCount = localStorage.getItem('tempCount') || 0;
+        document.getElementById('count').innerText = shuffleCount;
+        renderList();
+    }
+
+    function loadLockedData() {
+        loadProgressData();
+        applyLockUI();
+    }
+
+    // --- SISTEM RESET ADMIN (PASSWORD PROMPT) ---
+    function resetForNextMatch() {
+        let pin = prompt("MASUKKAN PIN ADMIN UNTUK RESET DATA:");
+        if (pin === ADMIN_PIN) {
+            if (confirm("PIN Benar. Hapus data drawing untuk Match baru?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        } else if (pin !== null) {
+            alert("PIN SALAH! Akses ditolak.");
         }
     }
 
@@ -153,14 +228,10 @@
         message += `*Pos | Nama | In | Out* %0A`;
 
         let currentMinutes = 0;
-
         currentList.forEach((name, index) => {
             let timeIn = calculateTime(startTime, currentMinutes);
             let timeOut = calculateTime(startTime, currentMinutes + duration);
-            
             message += `${index + 1}. *${name.toUpperCase()}* (${timeIn} - ${timeOut}) : %0A`;
-            
-            // Aturan: Selesai Out, tambah 1 menit untuk In peserta berikutnya
             currentMinutes += (duration + 1); 
         });
 
@@ -172,5 +243,4 @@
 </script>
 
 </body>
-
 </html>
