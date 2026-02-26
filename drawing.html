@@ -2,119 +2,134 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DRAWING URUTAN | FOOTBALL LEAGUE-I</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DRAWING CENTER | FOOTBALL LEAGUE-I</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #d4af37; --dark: #0a0a0a; --white: #ffffff; --blue: #00f2ff; }
-        body { background: #111; font-family: 'Kanit', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: var(--white); padding: 20px; }
-        .container { width: 100%; max-width: 650px; background: #1a1a1a; padding: 30px; border-radius: 20px; border: 3px solid var(--gold); box-shadow: 0 0 30px rgba(212, 175, 55, 0.3); text-align: center; position: relative; }
+        :root { --gold: #d4af37; --dark: #0a0a0a; --white: #ffffff; --blue: #00f2ff; --red: #ff4d4d; }
+        body { background: #111; font-family: 'Kanit', sans-serif; margin: 0; color: var(--white); padding: 10px; display: block; }
+        .container { width: 100%; max-width: 500px; background: #1a1a1a; padding: 20px; border-radius: 15px; border: 2px solid var(--gold); box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); margin: auto; box-sizing: border-box; }
         
-        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; text-align: left; }
-        .input-group { display: flex; flex-direction: column; gap: 5px; }
-        .input-group label { font-size: 11px; color: var(--gold); font-weight: bold; text-transform: uppercase; }
-        input, select { background: #252525; border: 1px solid #444; color: white; padding: 10px; border-radius: 5px; font-family: 'Kanit'; font-size: 14px; }
+        h1 { font-size: 22px; color: var(--gold); margin: 10px 0; }
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; text-align: left; }
+        .full-col { grid-column: span 2; }
+        .input-group { display: flex; flex-direction: column; gap: 4px; }
+        .input-group label { font-size: 10px; color: var(--gold); font-weight: bold; text-transform: uppercase; }
+        input, select { background: #252525; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; font-family: 'Kanit'; font-size: 14px; width: 100%; box-sizing: border-box; }
         
-        #draw-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; filter: blur(10px); transition: 0.5s; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; }
-        .draw-item { background: #252525; padding: 10px 15px; border-radius: 8px; border-left: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
-        .rank { font-weight: 900; color: var(--gold); margin-right: 10px; }
+        /* Checkbox Area buat Absen */
+        .absen-container { background: #222; padding: 10px; border-radius: 8px; border: 1px solid #333; margin-top: 5px; max-height: 150px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+        .absen-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #bbb; }
+        .absen-item input { width: auto; }
+
+        #draw-list { display: flex; flex-direction: column; gap: 6px; margin: 15px 0; filter: blur(8px); transition: 0.3s; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; min-height: 100px; }
+        .draw-item { background: #252525; padding: 12px; border-radius: 8px; border-left: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+        .draw-item.absent { border-left-color: var(--red); opacity: 0.7; }
+        .rank { font-weight: 900; color: var(--gold); margin-right: 8px; }
         
-        .btn-group { display: flex; flex-direction: column; gap: 10px; }
-        button { padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; font-family: 'Kanit'; }
+        .btn-group { display: flex; flex-direction: column; gap: 8px; }
+        button { padding: 14px; font-size: 15px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; font-family: 'Kanit'; width: 100%; }
+        #btn-admin-lock { background: #333; color: var(--gold); border: 1px solid var(--gold); }
         #btn-shuffle { background: var(--gold); color: black; }
-        #btn-lock { background: #cc0000; color: white; }
-        #btn-wa { background: #25d366; color: white; display: none; text-decoration: none; align-items: center; justify-content: center; font-weight: bold; }
-        .status-lock { color: var(--blue); margin-top: 15px; font-weight: bold; display: none; }
+        #btn-lock { background: var(--red); color: white; }
+        #btn-wa { background: #25d366; color: white; text-decoration: none; display: none; align-items: center; justify-content: center; }
         
-        .admin-section { margin-top: 40px; border-top: 1px solid #333; padding-top: 20px; }
-        .btn-reset { background: none; border: 1px solid #444; color: #444; padding: 5px 15px; font-size: 10px; cursor: pointer; border-radius: 5px; }
+        .status-lock { color: var(--blue); margin-top: 10px; font-weight: bold; font-size: 12px; display: none; }
+        .admin-section { margin-top: 30px; border-top: 1px solid #333; padding-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div style="text-align: left; margin-bottom: 10px;">
-        <a href="index.html" style="color: #666; text-decoration: none; font-size: 12px;">← Kembali ke Klasemen</a>
-    </div>
-
-    <h1 style="color: var(--gold); margin: 0;">🎰 DRAWING CENTER</h1>
-    <p style="color: #888; margin-bottom: 20px; font-size: 13px;">Tentukan jadwal & biarkan saksi mengacak urutan</p>
+    <div style="text-align: left;"><a href="index.html" style="color: #666; text-decoration: none; font-size: 11px;">← KEMBALI</a></div>
+    <h1>🎰 DRAWING CENTER</h1>
 
     <div class="input-grid">
-        <div class="input-group">
-            <label>Match Ke-</label>
-            <input type="text" id="match-no" placeholder="Contoh: Match 7">
-        </div>
-        <div class="input-group">
-            <label>Tanggal Bermain</label>
-            <input type="date" id="match-date">
-        </div>
-        <div class="input-group" style="grid-column: span 2;">
-            <label>Tim Bertanding</label>
-            <input type="text" id="teams" placeholder="Contoh: PSM VS PERSEBAYA">
-        </div>
-        <div class="input-group">
-            <label>Jam Mulai (HH:MM)</label>
-            <input type="time" id="start-time" value="09:00">
-        </div>
-        <div class="input-group">
-            <label>Durasi (Menit)</label>
-            <input type="number" id="duration" value="5">
-        </div>
-        <div class="input-group" style="grid-column: span 2;">
-            <label>Pilih Saksi (Pemain)</label>
+        <div class="input-group"><label>Match Ke-</label><input type="text" id="match-no" placeholder="Match 7"></div>
+        <div class="input-group"><label>Tanggal</label><input type="date" id="match-date"></div>
+        <div class="input-group full-col"><label>Tim Bertanding</label><input type="text" id="teams" placeholder="TIM A VS TIM B"></div>
+        <div class="input-group"><label>Jam Mulai</label><input type="time" id="start-time" value="09:00"></div>
+        <div class="input-group"><label>Durasi (Menit)</label><input type="number" id="duration" value="5"></div>
+        
+        <div class="input-group full-col">
+            <label>Saksi (Pilih yang di lokasi)</label>
             <select id="witness-name">
-                <option value="">-- PILIH NAMA SAKSI --</option>
-                <option value="Aries">ARIES</option>
-                <option value="Rizal">RIZAL</option>
-                <option value="Maya">MAYA</option>
-                <option value="Erni">ERNI</option>
-                <option value="Regi">REGI</option>
-                <option value="Ikmal">IKMAL</option>
-                <option value="Yanti">YANTI</option>
-                <option value="Budi">ASEP</option>
-                <option value="Citra">DANDI</option>
-                <option value="Dedi">DICKY</option>
+                <option value="">-- PILIH SAKSI --</option>
+                <option value="Aries">ARIES</option><option value="Rizal">RIZAL</option>
+                <option value="Maya">MAYA</option><option value="Erni">ERNI</option>
+                <option value="Regi">REGI</option><option value="Ikmal">IKMAL</option>
+                <option value="Yanti">YANTI</option><option value="Budi">BUDI</option>
+                <option value="Citra">CITRA</option><option value="Dedi">DEDI</option>
             </select>
         </div>
-    </div>
 
-    <div id="draw-list">
-        <div style="padding: 20px; color: #555;">Saksi silakan klik ACAK...</div>
+        <div class="input-group full-col">
+            <label>Pemain Absen (Otomatis Ranking Bawah)</label>
+            <div class="absen-container" id="absen-list">
+                </div>
+        </div>
     </div>
 
     <div class="btn-group">
-        <button id="btn-shuffle" onclick="shuffleData()">🔄 ACAK URUTAN (<span id="count">0</span>)</button>
-        <button id="btn-lock" onclick="lockResult()">🔒 FIX & LOCK HASIL</button>
-        <a id="btn-wa" href="#" onclick="shareToWA()">📲 KIRIM KE WHATSAPP GROUP</a>
+        <button id="btn-admin-lock" onclick="adminPreLock()">✅ SIAPKAN MATCH (ADMIN)</button>
+        <button id="btn-shuffle" onclick="shuffleData()" style="display:none;">🔄 SAKSI: ACAK URUTAN (<span id="count">0</span>)</button>
+        <button id="btn-lock" onclick="lockResult()" style="display:none;">🔒 FIX & LOCK HASIL</button>
+        <a id="btn-wa" href="#" onclick="shareToWA()">📲 KIRIM KE WHATSAPP</a>
     </div>
 
-    <div id="status" class="status-lock">✅ URUTAN SAH & DIKUNCI OLEH SAKSI!</div>
+    <div id="draw-list"></div>
+    <div id="status" class="status-lock">✅ URUTAN SAH & DIKUNCI!</div>
 
     <div class="admin-section">
-        <button onclick="resetForNextMatch()" class="btn-reset">⚙️ Admin Reset (PIN Required)</button>
+        <button onclick="resetForNextMatch()" style="background:none; color:#444; font-size:10px; border:none; cursor:pointer;">⚙️ Reset Match (PIN)</button>
     </div>
 </div>
 
 <script>
-    const ADMIN_PIN = "4321"; 
-    const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=0&single=true&output=csv';
-    
+    const ADMIN_PIN = "1234";
+    const allPlayers = ["Aries", "Rizal", "Maya", "Erni", "Regi", "Ikmal", "Yanti", "Budi", "Citra", "Dedi"];
     let shuffleCount = 0;
     let currentList = [];
     let isLocked = false;
 
+    // Generate Daftar Absen
+    const absenDiv = document.getElementById('absen-list');
+    allPlayers.forEach(p => {
+        absenDiv.innerHTML += `<label class="absen-item"><input type="checkbox" class="absent-check" value="${p}"> ${p}</label>`;
+    });
+
     window.onload = function() {
-        const savedStatus = localStorage.getItem('drawingLocked');
-        const isStarted = localStorage.getItem('isStarted');
-        if (savedStatus === 'true') { loadLockedData(); } 
-        else if (isStarted === 'true') { loadProgressData(); }
+        if (localStorage.getItem('adminLocked') === 'true') { applyAdminLockUI(); }
+        if (localStorage.getItem('drawingLocked') === 'true') { loadLockedData(); }
     };
 
-    async function getNames() {
-        const res = await fetch(`${sheetUrl}&t=${new Date().getTime()}`);
-        const csv = await res.text();
-        return csv.split('\n').slice(1).map(line => line.split(',')[0].trim().replace(/"/g, '')).filter(name => name !== "");
+    function adminPreLock() {
+        const inputs = ['match-no', 'match-date', 'teams', 'start-time', 'duration', 'witness-name'];
+        for(let id of inputs) { if(!document.getElementById(id).value) return alert("Data Match & Saksi harus diisi Admin!"); }
+        
+        if(confirm("Kunci data Match? Saksi tinggal klik acak setelah ini.")) {
+            localStorage.setItem('adminLocked', 'true');
+            inputs.forEach(id => { localStorage.setItem(id, document.getElementById(id).value); });
+            
+            // Simpan siapa yang absen
+            let absent = Array.from(document.querySelectorAll('.absent-check:checked')).map(c => c.value);
+            localStorage.setItem('absentPlayers', JSON.stringify(absent));
+            
+            applyAdminLockUI();
+        }
+    }
+
+    function applyAdminLockUI() {
+        const inputs = ['match-no', 'match-date', 'teams', 'start-time', 'duration', 'witness-name'];
+        inputs.forEach(id => { 
+            document.getElementById(id).value = localStorage.getItem(id);
+            document.getElementById(id).disabled = true; 
+            document.getElementById(id).style.opacity = "0.6";
+        });
+        document.querySelectorAll('.absent-check').forEach(c => c.disabled = true);
+        document.getElementById('btn-admin-lock').style.display = 'none';
+        document.getElementById('btn-shuffle').style.display = 'block';
+        document.getElementById('btn-lock').style.display = 'block';
     }
 
     function shuffleArray(array) {
@@ -125,81 +140,65 @@
         return array;
     }
 
-    async function shuffleData() {
+    function shuffleData() {
         if (isLocked) return;
         
-        const witness = document.getElementById('witness-name').value;
-        if (!witness) return alert("Pilih Nama Saksi dulu, Bro!");
+        let absentPlayers = JSON.parse(localStorage.getItem('absentPlayers') || "[]");
+        let activePlayers = allPlayers.filter(p => !absentPlayers.includes(p));
 
-        const inputs = ['match-no', 'match-date', 'teams', 'start-time', 'duration', 'witness-name'];
-        inputs.forEach(id => {
-            const el = document.getElementById(id);
-            el.disabled = true; 
-            el.style.opacity = "0.6";
-            localStorage.setItem(id, el.value);
-        });
+        // Acak yang masuk dan yang absen (jika absen lebih dari 1 tetap diacak antar mereka di bawah)
+        let shuffledActive = shuffleArray([...activePlayers]);
+        let shuffledAbsent = shuffleArray([...absentPlayers]);
 
-        const names = await getNames();
-        currentList = shuffleArray([...names]);
+        currentList = [...shuffledActive, ...shuffledAbsent];
         shuffleCount++;
         document.getElementById('count').innerText = shuffleCount;
-        renderList();
-
+        
         localStorage.setItem('tempList', JSON.stringify(currentList));
         localStorage.setItem('tempCount', shuffleCount);
         localStorage.setItem('isStarted', 'true');
+        renderList();
     }
 
     function renderList() {
         const listContainer = document.getElementById('draw-list');
-        listContainer.innerHTML = currentList.map((name, index) => `
-            <div class="draw-item">
-                <span><span class="rank">#${index + 1}</span> <b>${name.toUpperCase()}</b></span>
-            </div>
-        `).join('');
+        let absentPlayers = JSON.parse(localStorage.getItem('absentPlayers') || "[]");
+        listContainer.innerHTML = currentList.map((name, index) => {
+            const isAbsent = absentPlayers.includes(name);
+            return `<div class="draw-item ${isAbsent ? 'absent' : ''}">
+                <span><span class="rank">#${index + 1}</span> <b>${name.toUpperCase()}</b> ${isAbsent ? '(ABSEN)' : ''}</span>
+            </div>`;
+        }).join('');
     }
 
     function lockResult() {
-        if (currentList.length === 0) return alert("Acak dulu, Bro!");
-        if (confirm("Kunci hasil? Data ini disahkan oleh Saksi.")) {
+        if (currentList.length === 0) return alert("Minta Saksi klik ACAK dulu!");
+        if (confirm("Kunci Hasil Drawing?")) {
             isLocked = true;
             localStorage.setItem('drawingLocked', 'true');
-            applyLockUI();
+            applyFinalLockUI();
         }
     }
 
-    function applyLockUI() {
+    function applyFinalLockUI() {
         document.getElementById('draw-list').style.filter = "none";
         document.getElementById('btn-shuffle').disabled = true;
         document.getElementById('btn-lock').style.display = "none";
         document.getElementById('status').style.display = "block";
         document.getElementById('btn-wa').style.display = "flex";
-        
-        const inputs = ['match-no', 'match-date', 'teams', 'start-time', 'duration', 'witness-name'];
-        inputs.forEach(id => { document.getElementById(id).disabled = true; document.getElementById(id).style.opacity = "0.6"; });
-    }
-
-    function loadProgressData() {
-        const inputs = ['match-no', 'match-date', 'teams', 'start-time', 'duration', 'witness-name'];
-        inputs.forEach(id => {
-            document.getElementById(id).value = localStorage.getItem(id) || "";
-            document.getElementById(id).disabled = true;
-            document.getElementById(id).style.opacity = "0.6";
-        });
-        currentList = JSON.parse(localStorage.getItem('tempList')) || [];
-        shuffleCount = localStorage.getItem('tempCount') || 0;
-        document.getElementById('count').innerText = shuffleCount;
         renderList();
     }
 
-    function loadLockedData() { loadProgressData(); applyLockUI(); }
+    function loadLockedData() {
+        currentList = JSON.parse(localStorage.getItem('tempList'));
+        shuffleCount = localStorage.getItem('tempCount');
+        document.getElementById('count').innerText = shuffleCount;
+        applyAdminLockUI();
+        applyFinalLockUI();
+    }
 
     function resetForNextMatch() {
-        let pin = prompt("MASUKKAN PIN ADMIN:");
-        if (pin === ADMIN_PIN) {
-            localStorage.clear();
-            location.reload();
-        } else if (pin !== null) { alert("PIN SALAH!"); }
+        if (prompt("PIN ADMIN:") === ADMIN_PIN) { localStorage.clear(); location.reload(); }
     }
 
     function calculateTime(baseTime, addedMinutes) {
@@ -211,33 +210,23 @@
     }
 
     function shareToWA() {
-        const matchNo = document.getElementById('match-no').value || "Match X";
-        const matchDate = document.getElementById('match-date').value || "-";
-        const teams = document.getElementById('teams').value || "Team A v Team B";
-        const startTime = document.getElementById('start-time').value;
-        const duration = parseInt(document.getElementById('duration').value);
-        const witness = document.getElementById('witness-name').value;
+        const matchNo = localStorage.getItem('match-no');
+        const teams = localStorage.getItem('teams');
+        const witness = localStorage.getItem('witness-name');
+        const startTime = localStorage.getItem('start-time');
+        const duration = parseInt(localStorage.getItem('duration'));
 
-        let message = `*${matchNo.toUpperCase()}* %0A`;
-        message += `*${teams.toUpperCase()}* %0A`;
-        message += `📅 Tanggal: _${matchDate}_ %0A%0A`;
-        message += `*Pos | Nama | In | Out* %0A`;
-
+        let message = `*${matchNo.toUpperCase()}* %0A*${teams.toUpperCase()}* %0A%0A*URUTAN TEBAK SKOR:* %0A`;
         let currentMinutes = 0;
         currentList.forEach((name, index) => {
             let timeIn = calculateTime(startTime, currentMinutes);
             let timeOut = calculateTime(startTime, currentMinutes + duration);
-            message += `${index + 1}. *${name.toUpperCase()}* (${timeIn} - ${timeOut}) : %0A`;
+            message += `${index + 1}. *${name.toUpperCase()}* (${timeIn}-${timeOut}) %0A`;
             currentMinutes += (duration + 1); 
         });
-
-        message += `%0A⚖️ Saksi: *${witness.toUpperCase()}* %0A`;
-        message += `🎲 Total Acakan: ${shuffleCount} kali %0A%0A`;
-        message += `*FOOTBALL LEAGUE-I* ⚽🔥`;
+        message += `%0A⚖️ Saksi: ${witness} %0A🎲 Acakan: ${shuffleCount}x %0A*FOOTBALL LEAGUE-I*`;
         window.open(`https://wa.me/?text=${message}`, '_blank');
     }
 </script>
 </body>
 </html>
-
-
