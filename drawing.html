@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRAWING URUTAN | FOOTBALL LEAGUE-I</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #d4af37; --dark: #0a0a0a; --white: #ffffff; --blue: #00f2ff; }
+        body { background: #111; font-family: 'Kanit', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: var(--white); padding: 20px; }
+        .container { width: 100%; max-width: 650px; background: #1a1a1a; padding: 30px; border-radius: 20px; border: 3px solid var(--gold); box-shadow: 0 0 30px rgba(212, 175, 55, 0.3); text-align: center; }
+        
+        /* Input Styling */
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; text-align: left; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group label { font-size: 12px; color: var(--gold); font-weight: bold; text-transform: uppercase; }
+        input { background: #252525; border: 1px solid #444; color: white; padding: 10px; border-radius: 5px; font-family: 'Kanit'; }
+        
+        #draw-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; filter: blur(10px); transition: 0.5s; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; }
+        .draw-item { background: #252525; padding: 10px 15px; border-radius: 8px; border-left: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+        .rank { font-weight: 900; color: var(--gold); margin-right: 10px; }
+        
+        .btn-group { display: flex; flex-direction: column; gap: 10px; }
+        button { padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; font-family: 'Kanit'; }
+        #btn-shuffle { background: var(--gold); color: black; }
+        #btn-lock { background: #cc0000; color: white; }
+        #btn-wa { background: #25d366; color: white; display: none; text-decoration: none; align-items: center; justify-content: center; }
+        .status-lock { color: var(--blue); margin-top: 15px; font-weight: bold; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 style="color: var(--gold); margin: 0;">🎰 DRAWING CENTER</h1>
+    <p style="color: #888; margin-bottom: 20px;">Atur jadwal & acak urutan tebak skor</p>
+
+    <div class="input-grid">
+        <div class="input-group">
+            <label>Match Ke-</label>
+            <input type="text" id="match-no" placeholder="Contoh: Match 7">
+        </div>
+        <div class="input-group">
+            <label>Tanggal</label>
+            <input type="text" id="match-date" placeholder="Contoh: 27 Feb 2026">
+        </div>
+        <div class="input-group" style="grid-column: span 2;">
+            <label>Tim Bertanding</label>
+            <input type="text" id="teams" placeholder="Contoh: PSBS Biak v PSIM Yogyakarta">
+        </div>
+        <div class="input-group">
+            <label>Jam Mulai (HH:MM)</label>
+            <input type="time" id="start-time" value="08:00">
+        </div>
+        <div class="input-group">
+            <label>Durasi (Menit)</label>
+            <input type="number" id="duration" value="5">
+        </div>
+    </div>
+
+    <div id="draw-list">
+        <div style="padding: 20px; color: #555;">Klik ACAK untuk memuat nama...</div>
+    </div>
+
+    <div class="btn-group">
+        <button id="btn-shuffle" onclick="shuffleData()">🔄 ACAK URUTAN (<span id="count">0</span>)</button>
+        <button id="btn-lock" onclick="lockResult()">🔒 FIX & LOCK HASIL</button>
+        <a id="btn-wa" href="#" onclick="shareToWA()">📲 KIRIM KE WHATSAPP GROUP</a>
+    </div>
+
+    <div id="status" class="status-lock">✅ URUTAN DIKUNCI & JADWAL TERBENTUK!</div>
+</div>
+
+<script>
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=0&single=true&output=csv';
+    
+    let shuffleCount = 0;
+    let currentList = [];
+    let isLocked = false;
+
+    async function getNames() {
+        const res = await fetch(`${sheetUrl}&t=${new Date().getTime()}`);
+        const csv = await res.text();
+        return csv.split('\n').slice(1).map(line => line.split(',')[0].trim().replace(/"/g, '')).filter(name => name !== "");
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    async function shuffleData() {
+        if (isLocked) return;
+        const names = await getNames();
+        currentList = shuffleArray([...names]);
+        shuffleCount++;
+        document.getElementById('count').innerText = shuffleCount;
+        renderList();
+    }
+
+    function renderList() {
+        const listContainer = document.getElementById('draw-list');
+        listContainer.innerHTML = currentList.map((name, index) => `
+            <div class="draw-item">
+                <span><span class="rank">#${index + 1}</span> <b>${name.toUpperCase()}</b></span>
+            </div>
+        `).join('');
+    }
+
+    function lockResult() {
+        if (currentList.length === 0) return alert("Acak dulu, Bro!");
+        if (confirm("Kunci hasil drawing ini?")) {
+            isLocked = true;
+            document.getElementById('draw-list').style.filter = "none";
+            document.getElementById('btn-shuffle').disabled = true;
+            document.getElementById('btn-lock').style.display = "none";
+            document.getElementById('status').style.display = "block";
+            document.getElementById('btn-wa').style.display = "flex";
+        }
+    }
+
+    function calculateTime(baseTime, addedMinutes) {
+        let [hours, minutes] = baseTime.split(':').map(Number);
+        let totalMinutes = hours * 60 + minutes + addedMinutes;
+        let newHours = Math.floor(totalMinutes / 60) % 24;
+        let newMinutes = totalMinutes % 60;
+        return `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}`;
+    }
+
+    function shareToWA() {
+        const matchNo = document.getElementById('match-no').value || "Match X";
+        const matchDate = document.getElementById('match-date').value || "-";
+        const teams = document.getElementById('teams').value || "Team A v Team B";
+        const startTime = document.getElementById('start-time').value;
+        const duration = parseInt(document.getElementById('duration').value);
+
+        let message = `*${matchNo.toUpperCase()}* %0A`;
+        message += `*${teams.toUpperCase()}* %0A`;
+        message += `_${matchDate}_ %0A%0A`;
+        message += `*Pos | Nama | In | Out* %0A`;
+
+        let currentMinutes = 0;
+
+        currentList.forEach((name, index) => {
+            let timeIn = calculateTime(startTime, currentMinutes);
+            let timeOut = calculateTime(startTime, currentMinutes + duration);
+            
+            message += `${index + 1}. *${name.toUpperCase()}* (${timeIn} - ${timeOut}) : %0A`;
+            
+            // Aturan: Selesai Out, tambah 1 menit untuk In peserta berikutnya
+            currentMinutes += (duration + 1); 
+        });
+
+        message += `%0A_NB: Saksi telah melakukan acakan sebanyak ${shuffleCount} kali._ %0A`;
+        message += `*FOOTBALL LEAGUE-I* ⚽🔥`;
+
+        window.open(`https://wa.me/?text=${message}`, '_blank');
+    }
+</script>
+
+</body>
+</html>
