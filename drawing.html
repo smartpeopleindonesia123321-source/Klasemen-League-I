@@ -92,13 +92,24 @@
     }
 
     async function shuffleData() {
-        if (isLocked) return;
-        const names = await getNames();
-        currentList = shuffleArray([...names]);
-        shuffleCount++;
-        document.getElementById('count').innerText = shuffleCount;
-        renderList();
-    }
+    if (isLocked) return;
+
+    // --- FITUR BARU: LOCK INPUT SAAT ACAK PERTAMA KALI ---
+    const inputs = ['match-no', 'match-date', 'teams', 'start-time', 'duration'];
+    inputs.forEach(id => {
+        const el = document.getElementById(id);
+        el.readOnly = true; // Membuat input tidak bisa diketik lagi
+        el.style.opacity = "0.6"; // Memberi efek visual terkunci
+        el.style.cursor = "not-allowed";
+    });
+    // ----------------------------------------------------
+
+    const names = await getNames();
+    currentList = shuffleArray([...names]);
+    shuffleCount++;
+    document.getElementById('count').innerText = shuffleCount;
+    renderList();
+}
 
     function renderList() {
         const listContainer = document.getElementById('draw-list');
@@ -161,4 +172,5 @@
 </script>
 
 </body>
+
 </html>
