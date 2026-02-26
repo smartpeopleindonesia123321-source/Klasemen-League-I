@@ -32,7 +32,6 @@
             width: auto;
             object-fit: contain;
             filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
-            /* Tambahkan ini untuk mencoba menghilangkan background putih */
             mix-blend-mode: multiply; 
         }
 
@@ -68,9 +67,27 @@
         .league-name { font-weight: 900; color: #1e40af; margin-top: 8px; font-size: 20px; letter-spacing: 1px; }
         .description { width: 80%; text-align: center; font-size: 14px; margin-top: 10px; line-height: 1.4; color: #444; }
 
-        .footer { margin-top: auto; margin-bottom: 40px; display: flex; justify-content: space-around; width: 100%; }
-        .sig-box { text-align: center; width: 220px; }
-        .sig-line { border-top: 2px solid var(--dark); margin-top: 40px; padding-top: 5px; font-weight: bold; font-size: 14px; text-transform: uppercase; }
+        /* MODIFIKASI FOOTER UNTUK TTD & CAP */
+        .footer { margin-top: auto; margin-bottom: 20px; display: flex; justify-content: space-around; width: 100%; position: relative; }
+        .sig-box { text-align: center; width: 220px; position: relative; display: flex; flex-direction: column; align-items: center; }
+        
+        .sig-img { height: 65px; width: auto; margin-bottom: -15px; z-index: 2; mix-blend-mode: multiply; }
+        
+        .stamp-img { 
+            position: absolute; 
+            width: 100px; 
+            height: auto; 
+            bottom: 15px; 
+            left: 55%; 
+            transform: translateX(-20%); 
+            z-index: 1; 
+            opacity: 0.85; 
+            pointer-events: none; 
+            mix-blend-mode: multiply;
+        }
+
+        .sig-line { border-top: 2px solid var(--dark); width: 100%; padding-top: 5px; font-weight: bold; font-size: 14px; text-transform: uppercase; z-index: 3; }
+        .sig-role { font-size: 11px; color: #444; text-transform: none; margin-top: 2px; font-weight: normal; }
         
         .cert-juara2 .award-title { color: var(--silver); } .cert-juara2 .corner { border-color: var(--silver); }
         .cert-juara3 .award-title { color: var(--bronze); } .cert-juara3 .corner { border-color: var(--bronze); }
@@ -101,12 +118,8 @@
     <script>
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=0&single=true&output=csv';
 
-    // ============================================================
-    // SETTING NAMA PENERIMA MANUAL (GANTI DI SINI)
-    // ============================================================
     const NAMA_SAKSI_TERBAIK = "No Valuable Name"; 
     const NAMA_FAIR_PLAY = "No Valuable Name";    
-    // ============================================================
 
     const assets = {
         piala: 'assets/piala.png',
@@ -116,7 +129,10 @@
         sepatu: 'assets/sepatu.png',
         bola: 'assets/bola.png',
         saksi: 'assets/saksi.png',
-        fairplay: 'assets/fairplay.png'
+        fairplay: 'assets/fairplay.png',
+        ttdRegi: 'assets/ttdregi.png',
+        ttdRizal: 'assets/ttdrizal.png',
+        cap: 'assets/cap.png'
     };
 
     async function generateCertificates() {
@@ -165,7 +181,6 @@
                 });
             });
 
-            // Piagam Saksi Terbaik
             renderCard(container, {
                 type: 'cert-witness',
                 imgs: [assets.saksi],
@@ -174,10 +189,8 @@
                 desc: 'Penghargaan atas dedikasi dan integritas dalam menyaksikan serta mengawasi setiap prosedur kompetisi agar berjalan sesuai regulasi.'
             });
 
-            // Piagam Fair Play
             renderCard(container, {
                 type: 'cert-fairplay',
-                imgs: [],
                 imgs: [assets.fairplay],
                 title: 'FAIR PLAY TROPHY',
                 name: NAMA_FAIR_PLAY,
@@ -218,8 +231,17 @@
                 <div class="description">${data.desc}</div>
                 
                 <div class="footer">
-                    <div class="sig-box"><div class="sig-line">Official Admin</div></div>
-                    <div class="sig-box"><div class="sig-line">League Manager</div></div>
+                    <div class="sig-box">
+                        <img src="${assets.ttdRegi}" class="sig-img" alt="TTD">
+                        <div class="sig-line">Regi Hidayat Putra</div>
+                        <div class="sig-role">Official Admin</div>
+                    </div>
+                    <div class="sig-box">
+                        <img src="${assets.cap}" class="stamp-img" alt="CAP">
+                        <img src="${assets.ttdRizal}" class="sig-img" alt="TTD">
+                        <div class="sig-line">Rizal Amar</div>
+                        <div class="sig-role">League Manager</div>
+                    </div>
                 </div>
             </div>
         `;
@@ -229,6 +251,3 @@
     </script>
 </body>
 </html>
-
-
-
