@@ -72,21 +72,27 @@
     let globalAbsent = [];
 
     // FUNGSI PENAMBAH JADWAL OTOMATIS
-    function calculateSchedule(startTimeStr, index, durationMinutes) {
-        if(!startTimeStr || startTimeStr === "-") return "";
-        let [hours, minutes] = startTimeStr.split(':').map(Number);
-        let startTotalMinutes = hours * 60 + minutes;
-        
-        // Jeda 1 menit antar pemain: (durasi + 1) * index
-        let offset = (parseInt(durationMinutes) + 1) * index;
-        let matchStartMinutes = startTotalMinutes + offset;
-        let matchEndMinutes = matchStartMinutes + parseInt(durationMinutes);
+function calculateSchedule(startTimeStr, index, durationMinutes) {
+    if(!startTimeStr || startTimeStr === "-" || startTimeStr === "") return { start: "", end: "", display: "" };
+    let [hours, minutes] = startTimeStr.split(':').map(Number);
+    let startTotalMinutes = hours * 60 + minutes;
+    
+    // Jeda 1 menit antar pemain
+    let offset = (parseInt(durationMinutes) + 1) * index;
+    let matchStartMinutes = startTotalMinutes + offset;
+    let matchEndMinutes = matchStartMinutes + parseInt(durationMinutes);
 
-        const formatTime = (totalMin) => {
-            let h = Math.floor(totalMin / 60) % 24;
-            let m = totalMin % 60;
-            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-        };
+    const formatTime = (totalMin) => {
+        let h = Math.floor(totalMin / 60) % 24;
+        let m = totalMin % 60;
+        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+    };
+
+    let s = formatTime(matchStartMinutes);
+    let e = formatTime(matchEndMinutes);
+
+    return { start: s, end: e, display: `(${s}-${e})` };
+}
 
         return `(${formatTime(matchStartMinutes)}-${formatTime(matchEndMinutes)})`;
     }
@@ -182,18 +188,28 @@
     }
 
     function renderList() {
-        if (currentList.length === 0) return;
-        const sTime = document.getElementById('start-time').value;
-        const dur = document.getElementById('duration').value;
+    if (currentList.length === 0) return;
+    const sTime = document.getElementById('start-time').value;
+    const dur = document.getElementById('duration').value;
 
-        document.getElementById('draw-list').innerHTML = currentList.map((name, index) => {
-            const isAbs = globalAbsent.includes(name);
-            const timeRange = isAbs ? "" : calculateSchedule(sTime, index, dur);
-            return `<div class="draw-item" style="${isAbs ? 'opacity:0.5; border-left-color:red;' : ''}">
-                <span><span class="rank">#${index+1}</span> <b>${name.toUpperCase()}</b> <span style="color:var(--gold); font-size:12px; margin-left:5px;">${timeRange}</span> ${isAbs ? '(ABSEN)' : ''}</span>
-            </div>`;
-        }).join('');
-    }
+    document.getElementById('draw-list').innerHTML = currentList.map((name, index) => {
+        const isAbs = globalAbsent.includes(name);
+        
+        // --- BAGIAN YANG DIUBAH ---
+        const sched = calculateSchedule(sTime, index, dur);
+        const timeDisplay = isAbs ? "" : sched.display;
+        // --------------------------
+
+        return `<div class="draw-item" style="${isAbs ? 'opacity:0.5; border-left-color:red;' : ''}">
+            <span>
+                <span class="rank">#${index+1}</span> 
+                <b>${name.toUpperCase()}</b> 
+                <span style="color:var(--gold); font-size:12px; margin-left:5px;">${timeDisplay}</span> 
+                ${isAbs ? '(ABSEN)' : ''}
+            </span>
+        </div>`;
+    }).join('');
+}
 
     function lockResult() {
         if (currentList.length === 0) return alert("Klik ACAK dulu!");
@@ -226,27 +242,34 @@
     }
 
     function shareToWA() {
-        const sel = document.getElementById('match-select');
-        const m = sel.options[sel.selectedIndex].text;
-        const dt = document.getElementById('match-date').value;
-        const jm = document.getElementById('start-time').value;
-        const tm = document.getElementById('teams').value;
-        const dr = document.getElementById('duration').value;
-        const ws = document.getElementById('witness-name').value;
+    const sel = document.getElementById('match-select');
+    const m = sel.options[sel.selectedIndex].text;
+    const dt = document.getElementById('match-date').value;
+    const jm = document.getElementById('start-time').value;
+    const tm = document.getElementById('teams').value;
+    const dr = document.getElementById('duration').value;
+    const ws = document.getElementById('witness-name').value;
 
-        let msg = `*${m.toUpperCase()}*%0A*${tm}*%0A%0A`;
-        msg += `📅 Tanggal: ${dt}%0A🕒 Jam Mulai: ${jm}%0A⌛ Durasi: ${dr} Menit%0A%0A`;
-        msg += `*HASIL DRAWING & JADWAL:*%0A`;
-        
-        currentList.forEach((n, i) => {
-            const isAbs = globalAbsent.includes(n);
-            const tRange = isAbs ? "" : calculateSchedule(jm, i, dr);
-            msg += `${i+1}. ${n.toUpperCase()} ${tRange} ${isAbs ? '(ABSEN)' : ''}%0A`;
-        });
-        
-        msg += `%0A⚖️ *Saksi:* ${ws}%0A🎲 *Acakan:* ${shuffleCount}x`;
-        window.open(`https://wa.me/?text=${msg}`, '_blank');
-    }
+    let msg = `*${m.toUpperCase()}*%0A`;
+    msg += `*${tm.toUpperCase()}*%0A%0A`;
+    msg += `📅 Tanggal: ${dt}%0A`;
+    msg += `⚖️ Saksi: ${ws}%0A`;
+    msg += `🎲 Acakan: ${shuffleCount}x%0A%0A`;
+    msg += `*HASIL DRAWING & JADWAL:*%0A`;
+    
+    currentList.forEach((n, i) => {
+        const isAbs = globalAbsent.includes(n);
+        const sched = calculateSchedule(jm, i, dr);
+        if (isAbs) {
+            msg += `${i+1}	${n.toUpperCase()}	ABSEN	: %0A`;
+        } else {
+            // Format: Nomor [Tab] Nama [Tab] JamMulai [Tab] JamSelesai [Tab] :
+            msg += `${i+1}	${n.toUpperCase()}	${sched.start}	${sched.end}	: %0A`;
+        }
+    });
+    
+    window.open(`https://wa.me/?text=${msg}`, '_blank');
+}
 
     window.onload = function() {
         syncData(); 
@@ -255,3 +278,4 @@
 </script>
 </body>
 </html>
+
