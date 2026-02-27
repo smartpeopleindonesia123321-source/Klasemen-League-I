@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DRAWING CENTER | BLIND MODE</title>
+    <title>DRAWING CENTER | DOUBLE LOCK MODE</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #d4af37; --dark: #0a0a0a; --white: #ffffff; --blue: #00f2ff; --red: #ff4d4d; }
@@ -14,29 +14,17 @@
         .input-group { display: flex; flex-direction: column; gap: 5px; }
         .input-group label { font-size: 11px; color: var(--gold); font-weight: bold; text-transform: uppercase; }
         input, select { background: #252525; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; font-family: 'Kanit'; font-size: 14px; width: 100%; box-sizing: border-box; }
-        select:disabled { opacity: 0.8; color: var(--gold); }
+        
+        /* State saat Dropdown Terkunci */
+        select:disabled { opacity: 0.7; color: var(--gold); border: 1px solid var(--gold); cursor: not-allowed; }
+
         .absen-container { background: #111; padding: 10px; border-radius: 8px; border: 1px solid #333; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; }
         .absen-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #ccc; }
         
-        /* --- LOGIKA BLUR --- */
-        #draw-list { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 8px; 
-            margin: 20px 0; 
-            background: rgba(0,0,0,0.2); 
-            padding: 15px; 
-            border-radius: 15px; 
-            min-height: 50px; 
-            transition: filter 0.5s ease; /* Transisi saat buka kunci */
-        }
+        #draw-list { display: flex; flex-direction: column; gap: 8px; margin: 20px 0; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; min-height: 50px; transition: 0.5s ease; }
         
-        /* Kondisi Awal: Hasil Selalu Blur */
-        .is-blind { 
-            filter: blur(15px) grayscale(1); 
-            pointer-events: none; /* Biar gak bisa di-copy saat blur */
-            user-select: none;
-        }
+        /* Blind Mode - Tetap Blur sebelum FIX */
+        .is-blind { filter: blur(20px) grayscale(1); pointer-events: none; user-select: none; }
 
         .draw-item { background: #252525; padding: 12px 15px; border-radius: 8px; border-left: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; font-size: 14px; text-align: left; }
         .rank { font-weight: 900; color: var(--gold); margin-right: 10px; }
@@ -45,14 +33,13 @@
         #btn-lock { background: var(--red); color: white; }
         #btn-wa { background: #25d366; color: white; display: none; text-decoration: none; align-items: center; justify-content: center; padding: 15px; border-radius: 8px; font-weight: bold; }
         .status-lock { color: var(--blue); margin-top: 15px; font-weight: bold; display: none; }
-        .sync-indicator { font-size: 10px; color: #555; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1 style="color: var(--gold); margin: 0 0 5px 0; font-size: 24px;">🎰 DRAWING CENTER</h1>
-    <div class="sync-indicator" id="sync-status">Menghubungkan ke Server...</div>
+    <div id="sync-status" style="font-size: 10px; color: #555; margin-bottom: 10px;">Menghubungkan...</div>
 
     <div class="input-grid">
         <div class="input-group full-col">
@@ -73,12 +60,12 @@
     <div id="draw-list" class="is-blind"></div>
 
     <div id="controls">
-        <button id="btn-shuffle" onclick="shuffleData()">🔄 ACAK URUTAN (Saksi: <span id="count">0</span>)</button>
+        <button id="btn-shuffle" onclick="shuffleData()">🔄 ACAK URUTAN (<span id="count">0</span>)</button>
         <button id="btn-lock" onclick="lockResult()">🔒 FIX & BUKA HASIL</button>
-        <a id="btn-wa" href="#" onclick="shareToWA()">📲 KIRIM HASIL KE WHATSAPP</a>
+        <a id="btn-wa" href="#" onclick="shareToWA()">📲 KIRIM KE WHATSAPP</a>
     </div>
 
-    <div id="status" class="status-lock">✅ HASIL TERBUKA & DIKUNCI!</div>
+    <div id="status" class="status-lock">✅ URUTAN SAH & TERKUNCI</div>
 </div>
 
 <script>
@@ -98,35 +85,35 @@
             const rows = csv.split('\n').slice(1);
             allMatchesData = rows.map(r => r.split(',').map(c => c.trim().replace(/"/g, ''))).filter(r => r[0] !== "");
 
-            // Cek Remote Reset (Kolom H / Index 7)
+            // FITUR REMOTE RESET: Jika Kolom H (Index 7) berisi "RESET"
             if (allMatchesData[0][7] === "RESET") {
                 localStorage.clear();
                 location.reload();
             }
 
-            populateDropdown();
-            checkAdminLock();
+            if (document.getElementById('match-select').options.length === 0) populateDropdown();
+            
+            // KUNCI 1 (ADMIN): Cek jika Kolom H berisi "LOCK"
+            const selectEl = document.getElementById('match-select');
+            if (allMatchesData[0][7] === "LOCK" || isLocked) {
+                selectEl.disabled = true;
+            } else {
+                selectEl.disabled = false;
+            }
+
+            document.getElementById('sync-status').innerText = "✅ Koneksi Stabil";
         } catch (e) { console.log("Sync error"); }
     }
 
     function populateDropdown() {
         const select = document.getElementById('match-select');
-        if (select.options.length > 0) return;
         allMatchesData.forEach((data, index) => {
             let opt = document.createElement('option');
             opt.value = index;
             opt.text = data[0];
             select.appendChild(opt);
         });
-        document.getElementById('sync-status').innerText = "✅ Server Terkoneksi";
-    }
-
-    function checkAdminLock() {
-        if (allMatchesData[0][7] === "LOCK") {
-            document.getElementById('match-select').disabled = true;
-        } else {
-            document.getElementById('match-select').disabled = false;
-        }
+        updateMatchDetails();
     }
 
     function updateMatchDetails() {
@@ -150,15 +137,11 @@
     }
 
     function shuffleData() {
-        if (isLocked || document.getElementById('match-select').value === "") return;
-        
-        // Tetap paksa blur saat mengacak
+        if (isLocked) return;
         document.getElementById('draw-list').classList.add('is-blind');
-
         let active = shuffleArray(playerMaster.filter(p => !globalAbsent.includes(p)));
         let abs = shuffleArray([...globalAbsent]);
         currentList = [...active, ...abs];
-        
         shuffleCount++;
         document.getElementById('count').innerText = shuffleCount;
         renderList();
@@ -175,40 +158,35 @@
 
     function lockResult() {
         if (currentList.length === 0) return alert("Saksi harus klik ACAK dulu!");
-        if (confirm("Buka hasil sekarang dan kunci urutan?")) {
+        if (confirm("Buka hasil dan KUNCI permanen?")) {
             isLocked = true;
-            localStorage.setItem('blindLocked', 'true');
-            localStorage.setItem('savedList', JSON.stringify(currentList));
-            localStorage.setItem('savedCount', shuffleCount);
-            localStorage.setItem('savedMatch', document.getElementById('match-select').value);
+            localStorage.setItem('saved_list', JSON.stringify(currentList));
+            localStorage.setItem('saved_count', shuffleCount);
+            localStorage.setItem('saved_match_idx', document.getElementById('match-select').value);
+            localStorage.setItem('is_locked', 'true');
             applyFinalReveal();
         }
     }
 
     function applyFinalReveal() {
-        // 1. Hapus efek blur (Buka hasil)
-        document.getElementById('draw-list').classList.remove('is-blind');
-        
-        // 2. Sembunyikan tombol acak & lock
+        document.getElementById('draw-list').classList.remove('is-blind'); // Tirai Terbuka
         document.getElementById('btn-shuffle').style.display = "none";
         document.getElementById('btn-lock').style.display = "none";
-        
-        // 3. Munculkan WA & Status
+        document.getElementById('match-select').disabled = true; // Dropdown Terkunci Permanen
         document.getElementById('status').style.display = "block";
         document.getElementById('btn-wa').style.display = "flex";
-        document.getElementById('match-select').disabled = true;
         renderList();
     }
 
     window.onload = function() {
         syncData();
-        setInterval(syncData, 5000);
-        if (localStorage.getItem('blindLocked') === 'true') {
+        setInterval(syncData, 5000); // Cek Remote Control tiap 5 detik
+        if (localStorage.getItem('is_locked') === 'true') {
             isLocked = true;
-            currentList = JSON.parse(localStorage.getItem('savedList'));
-            shuffleCount = localStorage.getItem('savedCount');
+            currentList = JSON.parse(localStorage.getItem('saved_list'));
+            shuffleCount = localStorage.getItem('saved_count');
             setTimeout(() => {
-                document.getElementById('match-select').value = localStorage.getItem('savedMatch');
+                document.getElementById('match-select').value = localStorage.getItem('saved_match_idx');
                 updateMatchDetails();
                 applyFinalReveal();
             }, 1000);
@@ -226,10 +204,9 @@
     function shareToWA() {
         const m = document.getElementById('match-select').options[document.getElementById('match-select').selectedIndex].text;
         const t = document.getElementById('teams').value;
-        const w = document.getElementById('witness-name').value;
         let msg = `*${m}* %0A*${t}* %0A%0A*HASIL DRAWING:* %0A`;
         currentList.forEach((n, i) => msg += `${i+1}. *${n.toUpperCase()}* %0A`);
-        msg += `%0A⚖️ Saksi: ${w} %0A🎲 Acakan: ${shuffleCount}x`;
+        msg += `%0A🎲 Acakan: ${shuffleCount}x`;
         window.open(`https://wa.me/?text=${msg}`, '_blank');
     }
 </script>
