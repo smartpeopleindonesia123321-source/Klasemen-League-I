@@ -47,7 +47,7 @@
         <div class="input-group"><label>Tanggal</label><input type="text" id="match-date" readonly></div>
         <div class="input-group"><label>Jam</label><input type="text" id="start-time" readonly></div>
         <div class="input-group full-col"><label>Tim</label><input type="text" id="teams" readonly></div>
-        <div class="input-group"><label>Durasi</label><input type="text" id="duration" readonly></div>
+        <div class="input-group"><label>Durasi (Mnt)</label><input type="text" id="duration" readonly></div>
         <div class="input-group"><label>Saksi</label><input type="text" id="witness-name" readonly></div>
         <div class="input-group full-col">
             <label>Status Pemain</label>
@@ -64,7 +64,7 @@
     </div>
 
     <div id="status" class="status-lock">✅ URUTAN SAH & TERKUNCI</div>
-    <div class="admin-hint">Admin Control (Sheet2 Kolom H): "LOCK" untuk kunci, "RESET" untuk buka.</div>
+    <div class="admin-hint">Admin Control (Sheet2 Kolom H): "LOCK" kunci baris aktif, "RESET" hapus semua gembok.</div>
 </div>
 
 <script>
@@ -79,11 +79,12 @@
     let globalAbsent = [];
 
     function adminManualLock() {
-        if (document.getElementById('match-select').value === "") return;
-        if (confirm("Kunci Match ini untuk browser ini?")) {
+        const sel = document.getElementById('match-select');
+        if (sel.value === "") return;
+        if (confirm("Kunci Match ini di PC ini?")) {
             isAdminLocked = true;
             localStorage.setItem('manual_admin_lock', 'true');
-            localStorage.setItem('saved_match_idx', document.getElementById('match-select').value);
+            localStorage.setItem('saved_match_idx', sel.value);
             applyAdminLockUI();
         }
     }
@@ -99,20 +100,26 @@
         try {
             const res = await fetch(`${drawingSheetUrl}&nocache=${new Date().getTime()}`);
             const csv = await res.text();
-            const rows = csv.split('\n').slice(1);
-            allMatchesData = rows.map(r => r.split(',').map(c => c.trim().replace(/"/g, ''))).filter(r => r[0] !== "");
+            const rows = csv.split('\n').slice(1).map(r => r.split(',').map(c => c.trim().replace(/"/g, '')));
+            allMatchesData = rows.filter(r => r[0] !== "");
 
-            const hasReset = rows.some(row => row.split(',')[7]?.trim().toUpperCase() === "RESET");
-            if (hasReset) { localStorage.clear(); location.reload(); return; }
+            // 1. Logika RESET: Jika ada kata RESET di manapun di kolom H, hapus semua memori.
+            if (rows.some(row => row[7] === "RESET")) {
+                localStorage.clear();
+                location.reload();
+                return;
+            }
 
             if (document.getElementById('match-select').options.length === 0) populateDropdown();
             
+            // 2. Logika LOCK: Cek baris yang sedang dipilih saja
             const selectEl = document.getElementById('match-select');
-            const hasLock = rows.some(row => row.split(',')[7]?.trim().toUpperCase() === "LOCK");
+            const currentIdx = selectEl.value;
+            const sheetLock = allMatchesData[currentIdx] ? allMatchesData[currentIdx][7] === "LOCK" : false;
             
-            if (hasLock || isLocked || isAdminLocked) {
+            if (sheetLock || isLocked || isAdminLocked) {
                 selectEl.disabled = true;
-                if(hasLock) {
+                if(sheetLock) {
                     document.getElementById('btn-admin-manual').innerText = "S-LOCK";
                     document.getElementById('btn-admin-manual').style.background = "var(--blue)";
                 }
@@ -120,17 +127,18 @@
                 selectEl.disabled = false;
             }
             document.getElementById('sync-status').innerText = "✅ Koneksi Stabil";
-        } catch (e) { console.log("Sync error"); }
+        } catch (e) { console.error("Sync error"); }
     }
 
     function populateDropdown() {
         const select = document.getElementById('match-select');
+        select.innerHTML = "";
         allMatchesData.forEach((data, index) => {
             let opt = document.createElement('option');
             opt.value = index; opt.text = data[0]; select.appendChild(opt);
         });
         const savedIdx = localStorage.getItem('saved_match_idx');
-        if (savedIdx !== null) select.value = savedIdx;
+        if (savedIdx !== null && allMatchesData[savedIdx]) select.value = savedIdx;
         updateMatchDetails();
     }
 
@@ -138,11 +146,11 @@
         const idx = document.getElementById('match-select').value;
         if (idx === "" || !allMatchesData[idx]) return;
         const data = allMatchesData[idx];
-        document.getElementById('match-date').value = data[1];
-        document.getElementById('teams').value = data[2];
-        document.getElementById('start-time').value = data[3];
-        document.getElementById('duration').value = data[4];
-        document.getElementById('witness-name').value = data[5];
+        document.getElementById('match-date').value = data[1] || "-";
+        document.getElementById('teams').value = data[2] || "-";
+        document.getElementById('start-time').value = data[3] || "-";
+        document.getElementById('duration').value = data[4] || "-";
+        document.getElementById('witness-name').value = data[5] || "-";
         globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()) : [];
         renderAbsentStatus();
     }
@@ -175,8 +183,8 @@
     }
 
     function lockResult() {
-        if (currentList.length === 0) return alert("Saksi harus klik ACAK dulu!");
-        if (confirm("Buka hasil dan KUNCI permanen?")) {
+        if (currentList.length === 0) return alert("Klik ACAK dulu!");
+        if (confirm("KUNCI HASIL?")) {
             isLocked = true;
             localStorage.setItem('saved_list', JSON.stringify(currentList));
             localStorage.setItem('saved_count', shuffleCount);
@@ -196,20 +204,6 @@
         renderList();
     }
 
-    window.onload = function() {
-        if (localStorage.getItem('manual_admin_lock') === 'true') { isAdminLocked = true; applyAdminLockUI(); }
-        syncData(); setInterval(syncData, 5000);
-        if (localStorage.getItem('is_locked') === 'true') {
-            isLocked = true; currentList = JSON.parse(localStorage.getItem('saved_list'));
-            shuffleCount = localStorage.getItem('saved_count');
-            setTimeout(() => {
-                const sIdx = localStorage.getItem('saved_match_idx');
-                if(sIdx !== null) document.getElementById('match-select').value = sIdx;
-                updateMatchDetails(); applyFinalReveal();
-            }, 1000);
-        }
-    };
-
     function shuffleArray(a) {
         for (let i = a.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -218,32 +212,36 @@
         return a;
     }
 
-    // --- BAGIAN YANG DIPERBAIKI (TEKS WHATSAPP LENGKAP) ---
     function shareToWA() {
-        const matchName = document.getElementById('match-select').options[document.getElementById('match-select').selectedIndex].text;
-        const matchDate = document.getElementById('match-date').value;
-        const startTime = document.getElementById('start-time').value;
-        const teams = document.getElementById('teams').value;
-        const duration = document.getElementById('duration').value;
-        const witness = document.getElementById('witness-name').value;
+        const m = document.getElementById('match-select').options[document.getElementById('match-select').selectedIndex].text;
+        const dt = document.getElementById('match-date').value;
+        const jm = document.getElementById('start-time').value;
+        const tm = document.getElementById('teams').value;
+        const dr = document.getElementById('duration').value;
+        const ws = document.getElementById('witness-name').value;
 
-        let msg = `*${matchName.toUpperCase()}*%0A`;
-        msg += `*${teams}*%0A%0A`;
-        msg += `📅 Tanggal: ${matchDate}%0A`;
-        msg += `🕒 Jam: ${startTime}%0A`;
-        msg += `⌛ Durasi: ${duration}%0A%0A`;
+        let msg = `*${m.toUpperCase()}*%0A*${tm}*%0A%0A`;
+        msg += `📅 Tanggal: ${dt}%0A🕒 Jam: ${jm}%0A⌛ Durasi: ${dr} Menit%0A%0A`;
         msg += `*HASIL DRAWING:*%0A`;
-
-        currentList.forEach((name, i) => {
-            const isAbs = globalAbsent.includes(name);
-            msg += `${i + 1}. ${name.toUpperCase()} ${isAbs ? '(ABSEN)' : ''}%0A`;
-        });
-
-        msg += `%0A⚖️ *Saksi:* ${witness}%0A`;
-        msg += `🎲 *Acakan:* ${shuffleCount}x`;
-
+        currentList.forEach((n, i) => msg += `${i+1}. ${n.toUpperCase()} ${globalAbsent.includes(n) ? '(ABSEN)' : ''}%0A`);
+        msg += `%0A⚖️ *Saksi:* ${ws}%0A🎲 *Acakan:* ${shuffleCount}x`;
         window.open(`https://wa.me/?text=${msg}`, '_blank');
     }
+
+    window.onload = function() {
+        if (localStorage.getItem('manual_admin_lock') === 'true') { isAdminLocked = true; applyAdminLockUI(); }
+        syncData(); setInterval(syncData, 5000);
+        if (localStorage.getItem('is_locked') === 'true') {
+            isLocked = true;
+            currentList = JSON.parse(localStorage.getItem('saved_list')) || [];
+            shuffleCount = localStorage.getItem('saved_count') || 0;
+            setTimeout(() => {
+                const sIdx = localStorage.getItem('saved_match_idx');
+                if(sIdx !== null) document.getElementById('match-select').value = sIdx;
+                updateMatchDetails(); applyFinalReveal();
+            }, 800);
+        }
+    };
 </script>
 </body>
 </html>
