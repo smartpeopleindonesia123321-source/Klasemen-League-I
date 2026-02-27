@@ -83,12 +83,11 @@
             let m = totalMin % 60;
             return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
         };
-        let s = formatTime(matchStartMinutes);
-        let e = formatTime(matchEndMinutes);
-        return { start: s, end: e, display: `(${s}-${e})` };
+        return { start: formatTime(matchStartMinutes), end: formatTime(matchEndMinutes), display: `(${formatTime(matchStartMinutes)}-${formatTime(matchEndMinutes)})` };
     }
 
     async function syncData() {
+        if (isLocked) return; // BERHENTI SYNC KALAU SUDAH LOCK
         try {
             const res = await fetch(`${drawingSheetUrl}&nocache=${new Date().getTime()}`);
             const csv = await res.text();
@@ -101,28 +100,27 @@
                 return;
             }
 
-            // HANYA UPDATE DROPDOWN KALAU BELUM TERKUNCI
-            if (!isLocked) {
-                const selectEl = document.getElementById('match-select');
-                const prevVal = selectEl.value;
-                populateDropdown();
-                if(prevVal !== "") selectEl.value = prevVal;
-            }
+            const selectEl = document.getElementById('match-select');
+            const currentIdx = selectEl.value;
+
+            // Update dropdown tanpa reset pilihan
+            let optionsHTML = "";
+            allMatchesData.forEach((data, index) => {
+                optionsHTML += `<option value="${index}">${data[0]}</option>`;
+            });
             
+            if (selectEl.innerHTML !== optionsHTML) {
+                selectEl.innerHTML = optionsHTML;
+                if (currentIdx !== "" && allMatchesData[currentIdx]) {
+                    selectEl.value = currentIdx;
+                } else if (localStorage.getItem('saved_match_idx')) {
+                    selectEl.value = localStorage.getItem('saved_match_idx');
+                }
+            }
+
+            updateMatchDetails(false); // Update info tanpa ngerusak list yang lagi diacak
             document.getElementById('sync-status').innerText = "✅ Koneksi Stabil";
         } catch (e) { console.error("Sync error"); }
-    }
-
-    function populateDropdown() {
-        const select = document.getElementById('match-select');
-        const currentSelection = select.value;
-        select.innerHTML = "";
-        allMatchesData.forEach((data, index) => {
-            let opt = document.createElement('option');
-            opt.value = index; opt.text = data[0]; select.appendChild(opt);
-        });
-        if (currentSelection !== "") select.value = currentSelection;
-        updateMatchDetails(false); // false artinya jangan reset tampilan list
     }
 
     function checkSavedState() {
@@ -131,8 +129,6 @@
             currentList = JSON.parse(localStorage.getItem('saved_list')) || [];
             shuffleCount = localStorage.getItem('saved_count') || 0;
             document.getElementById('count').innerText = shuffleCount;
-            const sIdx = localStorage.getItem('saved_match_idx');
-            if(sIdx !== null) document.getElementById('match-select').value = sIdx;
             applyFinalReveal();
         }
     }
@@ -141,16 +137,18 @@
         const idx = document.getElementById('match-select').value;
         if (idx === "" || !allMatchesData[idx]) return;
         const data = allMatchesData[idx];
+        
         document.getElementById('match-date').value = data[1] || "-";
         document.getElementById('teams').value = data[2] || "-";
         document.getElementById('start-time').value = data[3] || "-";
         document.getElementById('duration').value = data[4] || "-";
         document.getElementById('witness-name').value = data[5] || "-";
         globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()) : [];
-        renderAbsentStatus();
         
-        // HANYA render list kalau diperintahkan atau kalau sudah lock
-        if(isLocked || shouldRenderList) renderList(); 
+        renderAbsentStatus();
+        if (isLocked || (shouldRenderList && currentList.length > 0)) {
+            renderList();
+        }
     }
 
     function renderAbsentStatus() {
@@ -178,14 +176,8 @@
         document.getElementById('draw-list').innerHTML = currentList.map((name, index) => {
             const isAbs = globalAbsent.includes(name);
             const sched = calculateSchedule(sTime, index, dur);
-            const timeDisplay = isAbs ? "" : sched.display;
             return `<div class="draw-item" style="${isAbs ? 'opacity:0.5; border-left-color:red;' : ''}">
-                <span>
-                    <span class="rank">#${index+1}</span> 
-                    <b>${name.toUpperCase()}</b> 
-                    <span style="color:var(--gold); font-size:12px; margin-left:5px;">${timeDisplay}</span> 
-                    ${isAbs ? '(ABSEN)' : ''}
-                </span>
+                <span><span class="rank">#${index+1}</span><b>${name.toUpperCase()}</b> <span style="color:var(--gold); font-size:12px; margin-left:5px;">${isAbs ? '' : sched.display}</span> ${isAbs ? '(ABSEN)' : ''}</span>
             </div>`;
         }).join('');
     }
@@ -222,32 +214,19 @@
 
     function shareToWA() {
         const sel = document.getElementById('match-select');
-        const m = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : "MATCH";
+        const m = sel.options[sel.selectedIndex].text;
         const dt = document.getElementById('match-date').value;
         const jm = document.getElementById('start-time').value;
         const tm = document.getElementById('teams').value;
         const dr = document.getElementById('duration').value;
         const ws = document.getElementById('witness-name').value;
 
-        let msg = `*${m.toUpperCase()}*%0A`;
-        msg += `*${tm.toUpperCase()}*%0A%0A`;
-        msg += `📅 Tanggal: ${dt}%0A`;
-        msg += `⚖️ Saksi: ${ws}%0A`;
-        msg += `🎲 Acakan: ${shuffleCount}x%0A%0A`;
-        msg += `*HASIL DRAWING & JADWAL:*%0A%0A`;
-        
-        if (currentList.length > 0) {
-            currentList.forEach((name, i) => {
-                const isAbs = globalAbsent.includes(name);
-                const sched = calculateSchedule(jm, i, dr);
-                if (isAbs) {
-                    msg += `${i+1}. ${name.toUpperCase()} (ABSEN)%0A`;
-                } else {
-                    msg += `${i+1}. ${name.toUpperCase()} [${sched.start}-${sched.end}]%0A`;
-                }
-            });
-        }
-        msg += `%0A_Generated by Drawing Center_`;
+        let msg = `*${m.toUpperCase()}*%0A*${tm.toUpperCase()}*%0A%0A📅 Tanggal: ${dt}%0A⚖️ Saksi: ${ws}%0A🎲 Acakan: ${shuffleCount}x%0A%0A*HASIL DRAWING & JADWAL:*%0A`;
+        currentList.forEach((name, i) => {
+            const isAbs = globalAbsent.includes(name);
+            const sched = calculateSchedule(jm, i, dr);
+            msg += isAbs ? `${i+1}. ${name.toUpperCase()} (ABSEN)%0A` : `${i+1}. ${name.toUpperCase()} [${sched.start}-${sched.end}]%0A`;
+        });
         window.open(`https://wa.me/?text=${msg}`, '_blank');
     }
 
@@ -259,6 +238,7 @@
 </script>
 </body>
 </html>
+
 
 
 
