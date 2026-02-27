@@ -14,18 +14,11 @@
         .input-group { display: flex; flex-direction: column; gap: 5px; }
         .input-group label { font-size: 11px; color: var(--gold); font-weight: bold; text-transform: uppercase; }
         input, select { background: #252525; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; font-family: 'Kanit'; font-size: 14px; width: 100%; box-sizing: border-box; }
-        
-        /* State saat Dropdown Terkunci */
         select:disabled { opacity: 0.7; color: var(--gold); border: 1px solid var(--gold); cursor: not-allowed; }
-
         .absen-container { background: #111; padding: 10px; border-radius: 8px; border: 1px solid #333; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; }
         .absen-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #ccc; }
-        
         #draw-list { display: flex; flex-direction: column; gap: 8px; margin: 20px 0; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; min-height: 50px; transition: 0.5s ease; }
-        
-        /* Blind Mode - Tetap Blur sebelum FIX */
         .is-blind { filter: blur(20px) grayscale(1); pointer-events: none; user-select: none; }
-
         .draw-item { background: #252525; padding: 12px 15px; border-radius: 8px; border-left: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; font-size: 14px; text-align: left; }
         .rank { font-weight: 900; color: var(--gold); margin-right: 10px; }
         button { padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; font-family: 'Kanit'; width: 100%; margin-bottom: 10px; }
@@ -33,16 +26,7 @@
         #btn-lock { background: var(--red); color: white; }
         #btn-wa { background: #25d366; color: white; display: none; text-decoration: none; align-items: center; justify-content: center; padding: 15px; border-radius: 8px; font-weight: bold; }
         .status-lock { color: var(--blue); margin-top: 15px; font-weight: bold; display: none; }
-
-        .admin-lock-btn { 
-            background: #444; 
-            color: white; 
-            margin: 0; 
-            padding: 0 15px; 
-            width: auto; 
-            font-size: 12px; 
-            border: 1px solid #555;
-        }
+        .admin-lock-btn { background: #444; color: white; margin: 0; padding: 0 15px; width: auto; font-size: 12px; border: 1px solid #555; }
         .admin-hint { font-size: 10px; color: #444; margin-top: 20px; border-top: 1px dashed #333; padding-top: 10px; }
     </style>
 </head>
@@ -80,10 +64,7 @@
     </div>
 
     <div id="status" class="status-lock">✅ URUTAN SAH & TERKUNCI</div>
-
-    <div class="admin-hint">
-        Admin Control (Sheet2 Kolom H): "LOCK" untuk kunci, "RESET" untuk buka.
-    </div>
+    <div class="admin-hint">Admin Control (Sheet2 Kolom H): "LOCK" untuk kunci, "RESET" untuk buka.</div>
 </div>
 
 <script>
@@ -121,26 +102,13 @@
             const rows = csv.split('\n').slice(1);
             allMatchesData = rows.map(r => r.split(',').map(c => c.trim().replace(/"/g, ''))).filter(r => r[0] !== "");
 
-            // CEK RESET DI SEMUA BARIS KOLOM H
-            const hasReset = rows.some(row => {
-                const cols = row.split(',');
-                return cols[7]?.trim().toUpperCase() === "RESET";
-            });
-            
-            if (hasReset) {
-                localStorage.clear();
-                location.reload();
-                return;
-            }
+            const hasReset = rows.some(row => row.split(',')[7]?.trim().toUpperCase() === "RESET");
+            if (hasReset) { localStorage.clear(); location.reload(); return; }
 
             if (document.getElementById('match-select').options.length === 0) populateDropdown();
             
             const selectEl = document.getElementById('match-select');
-            // CEK LOCK DI SEMUA BARIS KOLOM H
-            const hasLock = rows.some(row => {
-                const cols = row.split(',');
-                return cols[7]?.trim().toUpperCase() === "LOCK";
-            });
+            const hasLock = rows.some(row => row.split(',')[7]?.trim().toUpperCase() === "LOCK");
             
             if (hasLock || isLocked || isAdminLocked) {
                 selectEl.disabled = true;
@@ -151,7 +119,6 @@
             } else {
                 selectEl.disabled = false;
             }
-
             document.getElementById('sync-status').innerText = "✅ Koneksi Stabil";
         } catch (e) { console.log("Sync error"); }
     }
@@ -160,15 +127,10 @@
         const select = document.getElementById('match-select');
         allMatchesData.forEach((data, index) => {
             let opt = document.createElement('option');
-            opt.value = index;
-            opt.text = data[0];
-            select.appendChild(opt);
+            opt.value = index; opt.text = data[0]; select.appendChild(opt);
         });
-        
         const savedIdx = localStorage.getItem('saved_match_idx');
-        if (savedIdx !== null) {
-            select.value = savedIdx;
-        }
+        if (savedIdx !== null) select.value = savedIdx;
         updateMatchDetails();
     }
 
@@ -235,23 +197,15 @@
     }
 
     window.onload = function() {
-        if (localStorage.getItem('manual_admin_lock') === 'true') {
-            isAdminLocked = true;
-            applyAdminLockUI();
-        }
-        
-        syncData();
-        setInterval(syncData, 5000);
-
+        if (localStorage.getItem('manual_admin_lock') === 'true') { isAdminLocked = true; applyAdminLockUI(); }
+        syncData(); setInterval(syncData, 5000);
         if (localStorage.getItem('is_locked') === 'true') {
-            isLocked = true;
-            currentList = JSON.parse(localStorage.getItem('saved_list'));
+            isLocked = true; currentList = JSON.parse(localStorage.getItem('saved_list'));
             shuffleCount = localStorage.getItem('saved_count');
             setTimeout(() => {
                 const sIdx = localStorage.getItem('saved_match_idx');
                 if(sIdx !== null) document.getElementById('match-select').value = sIdx;
-                updateMatchDetails();
-                applyFinalReveal();
+                updateMatchDetails(); applyFinalReveal();
             }, 1000);
         }
     };
@@ -264,12 +218,30 @@
         return a;
     }
 
+    // --- BAGIAN YANG DIPERBAIKI (TEKS WHATSAPP LENGKAP) ---
     function shareToWA() {
-        const m = document.getElementById('match-select').options[document.getElementById('match-select').selectedIndex].text;
-        const t = document.getElementById('teams').value;
-        let msg = `*${m}* %0A*${t}* %0A%0A*HASIL DRAWING:* %0A`;
-        currentList.forEach((n, i) => msg += `${i+1}. *${n.toUpperCase()}* %0A`);
-        msg += `%0A🎲 Acakan: ${shuffleCount}x`;
+        const matchName = document.getElementById('match-select').options[document.getElementById('match-select').selectedIndex].text;
+        const matchDate = document.getElementById('match-date').value;
+        const startTime = document.getElementById('start-time').value;
+        const teams = document.getElementById('teams').value;
+        const duration = document.getElementById('duration').value;
+        const witness = document.getElementById('witness-name').value;
+
+        let msg = `*${matchName.toUpperCase()}*%0A`;
+        msg += `*${teams}*%0A%0A`;
+        msg += `📅 Tanggal: ${matchDate}%0A`;
+        msg += `🕒 Jam: ${startTime}%0A`;
+        msg += `⌛ Durasi: ${duration}%0A%0A`;
+        msg += `*HASIL DRAWING:*%0A`;
+
+        currentList.forEach((name, i) => {
+            const isAbs = globalAbsent.includes(name);
+            msg += `${i + 1}. ${name.toUpperCase()} ${isAbs ? '(ABSEN)' : ''}%0A`;
+        });
+
+        msg += `%0A⚖️ *Saksi:* ${witness}%0A`;
+        msg += `🎲 *Acakan:* ${shuffleCount}x`;
+
         window.open(`https://wa.me/?text=${msg}`, '_blank');
     }
 </script>
