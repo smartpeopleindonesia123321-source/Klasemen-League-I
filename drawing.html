@@ -90,25 +90,35 @@
     }
 
     async function syncData() {
-        try {
-            const res = await fetch(`${drawingSheetUrl}&nocache=${new Date().getTime()}`);
-            const csv = await res.text();
-            const rows = csv.split('\n').slice(1).map(r => r.split(',').map(c => c.trim().replace(/"/g, '')));
-            
-            if (rows.some(row => row[7] === "RESET")) {
+    try {
+        // Tambahin random number biar gak kena cache data RESET yang lama
+        const res = await fetch(`${drawingSheetUrl}&nocache=${new Date().getTime()}&v=${Math.random()}`);
+        const csv = await res.text();
+        const rows = csv.split('\n').slice(1).map(r => r.split(',').map(c => c.trim().replace(/"/g, '')));
+        
+        // CEK RESET: Hanya jalanin kalau barisnya beneran ada isinya
+        const resetFound = rows.some(row => row[7] && row[7].toUpperCase() === "RESET");
+        
+        if (resetFound) {
+            // Cek biar gak alert terus-terusan kalau udah bersih
+            if (localStorage.getItem('is_locked') === 'true' || currentList.length > 0) {
                 hardReset();
-                return;
             }
-
-            if (isLocked) return; 
-
-            allMatchesData = rows.filter(r => r[0] !== "");
-            renderDropdown();
-            document.getElementById('sync-status').innerText = "✅ Koneksi Stabil";
-        } catch (e) { 
-            document.getElementById('sync-status').innerText = "⚠️ Koneksi Terganggu";
+            return;
         }
+
+        if (isLocked) {
+            document.getElementById('sync-status').innerText = "🔒 Status: Terkunci (Selesai)";
+            return; 
+        }
+
+        allMatchesData = rows.filter(r => r[0] !== "");
+        renderDropdown();
+        document.getElementById('sync-status').innerText = "✅ Koneksi Stabil";
+    } catch (e) { 
+        document.getElementById('sync-status').innerText = "⚠️ Koneksi Terganggu";
     }
+}
 
     function renderDropdown() {
         const select = document.getElementById('match-select');
@@ -253,6 +263,7 @@
 </script>
 </body>
 </html>
+
 
 
 
