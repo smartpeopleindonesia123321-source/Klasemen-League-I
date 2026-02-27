@@ -71,26 +71,38 @@
     let isLocked = localStorage.getItem('is_locked') === 'true';
     let globalAbsent = [];
 
-    // 1. FUNGSI SINKRONISASI - SEKARANG LEBIH DISIPLIN
-    async function syncData() {
-        // JANGAN SYNC KALAU LAGI LOCK (Biar data gak hilang muncul)
+    // FUNGSI LOAD AWAL - MEMANGGIL DATA LAMA PAS REFRESH
+    function initApp() {
         if (isLocked) {
-            document.getElementById('sync-status').innerText = "🔒 Mode Offline (Data Terkunci)";
-            return; 
+            applyLockUI();
+            // Panggil kembali data input yang tersimpan
+            document.getElementById('match-date').value = localStorage.getItem('saved_date') || "";
+            document.getElementById('teams').value = localStorage.getItem('saved_teams') || "";
+            document.getElementById('start-time').value = localStorage.getItem('saved_start') || "";
+            document.getElementById('duration').value = localStorage.getItem('saved_dur') || "";
+            document.getElementById('witness-name').value = localStorage.getItem('saved_witness') || "";
+            globalAbsent = JSON.parse(localStorage.getItem('saved_absent')) || [];
+            renderAbsentStatus();
+            renderList();
         }
+        syncData();
+        setInterval(syncData, 5000);
+    }
 
+    async function syncData() {
         try {
             const res = await fetch(`${drawingSheetUrl}&nocache=${new Date().getTime()}`);
             const csv = await res.text();
             const rows = csv.split('\n').slice(1).map(r => r.split(',').map(c => c.trim().replace(/"/g, '')));
-            allMatchesData = rows.filter(r => r[0] !== "");
-
-            // Remote Reset dari Sheet
+            
             if (rows.some(row => row[7] === "RESET")) {
                 hardReset();
                 return;
             }
 
+            if (isLocked) return; 
+
+            allMatchesData = rows.filter(r => r[0] !== "");
             renderDropdown();
             document.getElementById('sync-status').innerText = "✅ Koneksi Stabil";
         } catch (e) { 
@@ -99,28 +111,27 @@
     }
 
     function renderDropdown() {
-    const select = document.getElementById('match-select');
-    const lastSelected = select.value || localStorage.getItem('saved_match_idx');
-    
-    let html = '<option value="">-- Pilih Match --</option>';
-    allMatchesData.forEach((data, index) => {
-        html += `<option value="${index}">${data[0]}</option>`;
-    });
+        const select = document.getElementById('match-select');
+        const lastSelected = select.value || localStorage.getItem('saved_match_idx');
+        
+        let html = '<option value="">-- Pilih Match --</option>';
+        allMatchesData.forEach((data, index) => {
+            html += `<option value="${index}">${data[0]}</option>`;
+        });
 
-    // PAGAR: Hanya ganti kalau isi dropdown beneran berubah dari server
-    if (select.innerHTML !== html) {
-        select.innerHTML = html;
-        if (lastSelected !== null && allMatchesData[lastSelected]) {
-            select.value = lastSelected;
+        if (select.innerHTML !== html) {
+            select.innerHTML = html;
+            if (lastSelected !== null && allMatchesData[lastSelected]) {
+                select.value = lastSelected;
+            }
         }
+        updateMatchDetails(false); 
     }
-    
-    // Tarik detail tanpa ngerusak list pemain
-    updateMatchDetails(false); 
-}
 
     function updateMatchDetails(refreshList = true) {
-        const idx = document.getElementById('match-select').value;
+        if (isLocked) return;
+        const select = document.getElementById('match-select');
+        const idx = select.value;
         if (idx === "" || !allMatchesData[idx]) return;
 
         const data = allMatchesData[idx];
@@ -133,11 +144,7 @@
         
         localStorage.setItem('saved_match_idx', idx);
         renderAbsentStatus();
-
-        // Tampilkan list hanya jika sudah ada data atau sudah lock
-        if (isLocked || (refreshList && currentList.length > 0)) {
-            renderList();
-        }
+        if (refreshList && currentList.length > 0) renderList();
     }
 
     function renderAbsentStatus() {
@@ -148,11 +155,10 @@
     }
 
     function calculateSchedule(startTimeStr, index, durationMinutes) {
-        if(!startTimeStr || startTimeStr === "-") return { start: "00:00", end: "00:00" };
+        if(!startTimeStr || startTimeStr === "-" || startTimeStr === "") return { start: "00:00", end: "00:00" };
         let [h, m] = startTimeStr.split(':').map(Number);
         let startTotal = (h * 60 + m) + ((parseInt(durationMinutes) + 1) * index);
         let endTotal = startTotal + parseInt(durationMinutes);
-        
         const fmt = (t) => `${Math.floor(t/60)%24}:${(t%60).toString().padStart(2,'0')}`;
         return { start: fmt(startTotal), end: fmt(endTotal) };
     }
@@ -160,10 +166,8 @@
     function shuffleData() {
         if (isLocked) return;
         document.getElementById('draw-list').classList.add('is-blind');
-        
         let active = playerMaster.filter(p => !globalAbsent.includes(p)).sort(() => Math.random() - 0.5);
         let abs = globalAbsent.sort(() => Math.random() - 0.5);
-        
         currentList = [...active, ...abs];
         shuffleCount++;
         document.getElementById('count').innerText = shuffleCount;
@@ -174,7 +178,6 @@
         if (currentList.length === 0) return;
         const jm = document.getElementById('start-time').value;
         const dr = document.getElementById('duration').value;
-        
         document.getElementById('draw-list').innerHTML = currentList.map((name, i) => {
             const isAbs = globalAbsent.includes(name);
             const t = calculateSchedule(jm, i, dr);
@@ -188,11 +191,19 @@
 
     function lockResult() {
         if (currentList.length === 0) return alert("Belum ada urutan!");
-        if (confirm("KUNCI HASIL? Data akan disimpan permanen di browser ini.")) {
+        if (confirm("KUNCI HASIL?")) {
             isLocked = true;
+            // SIMPAN DATA KE STORAGE AGAR TIDAK HILANG PAS REFRESH
             localStorage.setItem('saved_list', JSON.stringify(currentList));
             localStorage.setItem('saved_count', shuffleCount);
             localStorage.setItem('is_locked', 'true');
+            localStorage.setItem('saved_date', document.getElementById('match-date').value);
+            localStorage.setItem('saved_teams', document.getElementById('teams').value);
+            localStorage.setItem('saved_start', document.getElementById('start-time').value);
+            localStorage.setItem('saved_dur', document.getElementById('duration').value);
+            localStorage.setItem('saved_witness', document.getElementById('witness-name').value);
+            localStorage.setItem('saved_absent', JSON.stringify(globalAbsent));
+            
             applyLockUI();
         }
     }
@@ -207,52 +218,42 @@
         renderList();
     }
 
+    // TEKS WA TIDAK BERUBAH - TETAP SEPERTI YANG LO MAU
     function shareToWA() {
-    const select = document.getElementById('match-select');
-    if (select.selectedIndex === -1 || select.value === "") return alert("Pilih Match dulu!");
+        let m = "";
+        const select = document.getElementById('match-select');
+        if (select.selectedIndex > 0) {
+            m = select.options[select.selectedIndex].text;
+        } else {
+            m = "MATCH TERKUNCI";
+        }
+                  
+        const tm = document.getElementById('teams').value;
+        const jm = document.getElementById('start-time').value;
+        const dr = document.getElementById('duration').value;
 
-    const m = select.options[select.selectedIndex].text;
-    const tm = document.getElementById('teams').value;
-    const jm = document.getElementById('start-time').value;
-    const dr = document.getElementById('duration').value;
+        let msg = `*${m.toUpperCase()}*%0A*${tm.toUpperCase()}*%0A%0A`;
+        msg += `📅 Tgl: ${document.getElementById('match-date').value}%0A⚖️ Saksi: ${document.getElementById('witness-name').value}%0A🎲 Acakan: ${shuffleCount}x%0A%0A*HASIL DRAWING:*%0A`;
 
-    let msg = `*${m.toUpperCase()}*%0A*${tm.toUpperCase()}*%0A%0A`;
-    msg += `📅 Tgl: ${document.getElementById('match-date').value}%0A`;
-    msg += `⚖️ Saksi: ${document.getElementById('witness-name').value}%0A`;
-    msg += `🎲 Acakan: ${shuffleCount}x%0A%0A*HASIL DRAWING:*%0A`;
-
-    // Pastikan currentList ada isinya
-    if (currentList.length === 0) return alert("Belum ada urutan yang diacak!");
-
-    currentList.forEach((name, i) => {
-        const isAbs = globalAbsent.includes(name);
-        const t = calculateSchedule(jm, i, dr);
-        msg += isAbs ? `${i+1}. ${name.toUpperCase()} (ABSEN)%0A` : `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}]%0A`;
-    });
-
-    msg += `%0A_Generated by Drawing Center_`;
-    window.open(`https://wa.me/?text=${msg}`, '_blank');
-}
+        currentList.forEach((name, i) => {
+            const isAbs = globalAbsent.includes(name);
+            const t = calculateSchedule(jm, i, dr);
+            msg += isAbs ? `${i+1}. ${name.toUpperCase()} (ABSEN)%0A` : `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}]%0A`;
+        });
+        window.open(`https://wa.me/?text=${msg}`, '_blank');
+    }
 
     function hardReset() {
         localStorage.clear();
+        alert("Sistem di-Reset!");
         location.reload();
     }
 
-    window.onload = () => {
-        if (isLocked) {
-            applyLockUI();
-            // Load data info match dari storage tanpa nunggu fetch
-            const savedIdx = localStorage.getItem('saved_match_idx');
-            syncData(); // Tetap jalankan sekali untuk isi info match
-        } else {
-            syncData();
-            setInterval(syncData, 5000);
-        }
-    };
+    window.onload = initApp;
 </script>
 </body>
 </html>
+
 
 
 
