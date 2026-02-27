@@ -75,20 +75,16 @@
         if(!startTimeStr || startTimeStr === "-" || startTimeStr === "") return { start: "", end: "", display: "" };
         let [hours, minutes] = startTimeStr.split(':').map(Number);
         let startTotalMinutes = hours * 60 + minutes;
-        
         let offset = (parseInt(durationMinutes) + 1) * index;
         let matchStartMinutes = startTotalMinutes + offset;
         let matchEndMinutes = matchStartMinutes + parseInt(durationMinutes);
-
         const formatTime = (totalMin) => {
             let h = Math.floor(totalMin / 60) % 24;
             let m = totalMin % 60;
             return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
         };
-
         let s = formatTime(matchStartMinutes);
         let e = formatTime(matchEndMinutes);
-
         return { start: s, end: e, display: `(${s}-${e})` };
     }
 
@@ -105,34 +101,28 @@
                 return;
             }
 
-            if (document.getElementById('match-select').options.length === 0) {
+            // HANYA UPDATE DROPDOWN KALAU BELUM TERKUNCI
+            if (!isLocked) {
+                const selectEl = document.getElementById('match-select');
+                const prevVal = selectEl.value;
                 populateDropdown();
-                checkSavedState();
+                if(prevVal !== "") selectEl.value = prevVal;
             }
             
-            const selectEl = document.getElementById('match-select');
-            const currentIdx = selectEl.value;
-            const sheetLock = allMatchesData[currentIdx] ? allMatchesData[currentIdx][7] === "LOCK" : false;
-            
-            if (sheetLock || isLocked) {
-                selectEl.disabled = true;
-            } else {
-                selectEl.disabled = false;
-            }
             document.getElementById('sync-status').innerText = "✅ Koneksi Stabil";
         } catch (e) { console.error("Sync error"); }
     }
 
     function populateDropdown() {
         const select = document.getElementById('match-select');
+        const currentSelection = select.value;
         select.innerHTML = "";
         allMatchesData.forEach((data, index) => {
             let opt = document.createElement('option');
             opt.value = index; opt.text = data[0]; select.appendChild(opt);
         });
-        const savedIdx = localStorage.getItem('saved_match_idx');
-        if (savedIdx !== null && allMatchesData[savedIdx]) select.value = savedIdx;
-        updateMatchDetails();
+        if (currentSelection !== "") select.value = currentSelection;
+        updateMatchDetails(false); // false artinya jangan reset tampilan list
     }
 
     function checkSavedState() {
@@ -143,12 +133,11 @@
             document.getElementById('count').innerText = shuffleCount;
             const sIdx = localStorage.getItem('saved_match_idx');
             if(sIdx !== null) document.getElementById('match-select').value = sIdx;
-            updateMatchDetails();
             applyFinalReveal();
         }
     }
 
-    function updateMatchDetails() {
+    function updateMatchDetails(shouldRenderList = true) {
         const idx = document.getElementById('match-select').value;
         if (idx === "" || !allMatchesData[idx]) return;
         const data = allMatchesData[idx];
@@ -159,7 +148,9 @@
         document.getElementById('witness-name').value = data[5] || "-";
         globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()) : [];
         renderAbsentStatus();
-        if(isLocked) renderList(); 
+        
+        // HANYA render list kalau diperintahkan atau kalau sudah lock
+        if(isLocked || shouldRenderList) renderList(); 
     }
 
     function renderAbsentStatus() {
@@ -230,54 +221,45 @@
     }
 
     function shareToWA() {
-    const sel = document.getElementById('match-select');
-    const m = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : "MATCH";
-    const dt = document.getElementById('match-date').value;
-    const jm = document.getElementById('start-time').value;
-    const tm = document.getElementById('teams').value;
-    const dr = document.getElementById('duration').value;
-    const ws = document.getElementById('witness-name').value;
+        const sel = document.getElementById('match-select');
+        const m = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : "MATCH";
+        const dt = document.getElementById('match-date').value;
+        const jm = document.getElementById('start-time').value;
+        const tm = document.getElementById('teams').value;
+        const dr = document.getElementById('duration').value;
+        const ws = document.getElementById('witness-name').value;
 
-    let msg = `*${m.toUpperCase()}*%0A`;
-    msg += `*${tm.toUpperCase()}*%0A%0A`;
-    msg += `📅 Tanggal: ${dt}%0A`;
-    msg += `⚖️ Saksi: ${ws}%0A`;
-    msg += `🎲 Acakan: ${shuffleCount}x%0A%0A`;
-    msg += `*HASIL DRAWING & JADWAL:*%0A`;
-    
-    // AMBIL DATA DARI VARIABEL currentList (SUMBER ASLI)
-    if (currentList && currentList.length > 0) {
-        currentList.forEach((name, i) => {
-            const isAbs = globalAbsent.includes(name);
-            const sched = calculateSchedule(jm, i, dr);
-            
-            if (isAbs) {
-                // Format: No. NAMA [Tab] ABSEN [Tab] :
-                msg += `${i+1}. ${name.toUpperCase()}	ABSEN	: %0A`;
-            } else {
-                // Format: No. NAMA [Tab] JamMulai [Tab] JamSelesai [Tab] :
-                // Kita ambil sched.start dan sched.end dari fungsi calculateSchedule
-                msg += `${i+1}. ${name.toUpperCase()}	${sched.start}	${sched.end}	: %0A`;
-            }
-        });
-    } else {
-        msg += `(Data Kosong - Silakan Acak Terlebih Dahulu)%0A`;
+        let msg = `*${m.toUpperCase()}*%0A`;
+        msg += `*${tm.toUpperCase()}*%0A%0A`;
+        msg += `📅 Tanggal: ${dt}%0A`;
+        msg += `⚖️ Saksi: ${ws}%0A`;
+        msg += `🎲 Acakan: ${shuffleCount}x%0A%0A`;
+        msg += `*HASIL DRAWING & JADWAL:*%0A%0A`;
+        
+        if (currentList.length > 0) {
+            currentList.forEach((name, i) => {
+                const isAbs = globalAbsent.includes(name);
+                const sched = calculateSchedule(jm, i, dr);
+                if (isAbs) {
+                    msg += `${i+1}. ${name.toUpperCase()} (ABSEN)%0A`;
+                } else {
+                    msg += `${i+1}. ${name.toUpperCase()} [${sched.start}-${sched.end}]%0A`;
+                }
+            });
+        }
+        msg += `%0A_Generated by Drawing Center_`;
+        window.open(`https://wa.me/?text=${msg}`, '_blank');
     }
-    
-    msg += `%0A_Generated by Drawing Center_`;
-    
-    // Buka WhatsApp
-    const waUrl = `https://wa.me/?text=${msg}`;
-    window.open(waUrl, '_blank');
-}
 
     window.onload = function() {
+        checkSavedState();
         syncData(); 
         setInterval(syncData, 5000);
     };
 </script>
 </body>
 </html>
+
 
 
 
