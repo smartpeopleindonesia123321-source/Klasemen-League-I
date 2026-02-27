@@ -33,6 +33,17 @@
         #btn-lock { background: var(--red); color: white; }
         #btn-wa { background: #25d366; color: white; display: none; text-decoration: none; align-items: center; justify-content: center; padding: 15px; border-radius: 8px; font-weight: bold; }
         .status-lock { color: var(--blue); margin-top: 15px; font-weight: bold; display: none; }
+
+        /* Style Tambahan untuk Tombol Admin Lock */
+        .admin-lock-btn { 
+            background: #444; 
+            color: white; 
+            margin: 0; 
+            padding: 0 15px; 
+            width: auto; 
+            font-size: 12px; 
+            border: 1px solid #555;
+        }
     </style>
 </head>
 <body>
@@ -44,7 +55,10 @@
     <div class="input-grid">
         <div class="input-group full-col">
             <label>Pilih Match</label>
-            <select id="match-select" onchange="updateMatchDetails()"></select>
+            <div style="display: flex; gap: 5px;">
+                <select id="match-select" onchange="updateMatchDetails()"></select>
+                <button id="btn-admin-manual" class="admin-lock-btn" onclick="adminManualLock()">LOCK</button>
+            </div>
         </div>
         <div class="input-group"><label>Tanggal</label><input type="text" id="match-date" readonly></div>
         <div class="input-group"><label>Jam</label><input type="text" id="start-time" readonly></div>
@@ -76,7 +90,26 @@
     let shuffleCount = 0;
     let currentList = [];
     let isLocked = false;
+    let isAdminLocked = false; // Kunci dari Admin di Web
     let globalAbsent = [];
+
+    // FUNGSI BARU: Klik Lock Manual di Tampilan
+    function adminManualLock() {
+        if (document.getElementById('match-select').value === "") return;
+        if (confirm("Kunci Match ini? Saksi tidak bisa ubah sampai di-RESET.")) {
+            isAdminLocked = true;
+            localStorage.setItem('manual_admin_lock', 'true');
+            localStorage.setItem('saved_match_idx', document.getElementById('match-select').value);
+            applyAdminLockUI();
+        }
+    }
+
+    function applyAdminLockUI() {
+        const btn = document.getElementById('btn-admin-manual');
+        document.getElementById('match-select').disabled = true;
+        btn.innerText = "LOCKED";
+        btn.style.background = "var(--red)";
+    }
 
     async function syncData() {
         try {
@@ -85,18 +118,27 @@
             const rows = csv.split('\n').slice(1);
             allMatchesData = rows.map(r => r.split(',').map(c => c.trim().replace(/"/g, ''))).filter(r => r[0] !== "");
 
-            // FITUR REMOTE RESET: Jika Kolom H (Index 7) berisi "RESET"
-            if (allMatchesData[0][7] === "RESET") {
+            // FITUR REMOTE RESET GLOBAL (Cek semua baris di kolom H)
+            const hasReset = rows.some(row => row.split(',')[7]?.trim() === "RESET");
+            
+            if (hasReset || allMatchesData[0][7] === "RESET") {
                 localStorage.clear();
                 location.reload();
+                return;
             }
 
             if (document.getElementById('match-select').options.length === 0) populateDropdown();
             
-            // KUNCI 1 (ADMIN): Cek jika Kolom H berisi "LOCK"
+            // Logika Kunci
             const selectEl = document.getElementById('match-select');
-            if (allMatchesData[0][7] === "LOCK" || isLocked) {
+            const sheetLock = allMatchesData[0][7] === "LOCK";
+            
+            if (sheetLock || isLocked || isAdminLocked) {
                 selectEl.disabled = true;
+                if(sheetLock) {
+                    document.getElementById('btn-admin-manual').innerText = "S-LOCK";
+                    document.getElementById('btn-admin-manual').style.background = "var(--blue)";
+                }
             } else {
                 selectEl.disabled = false;
             }
@@ -113,12 +155,18 @@
             opt.text = data[0];
             select.appendChild(opt);
         });
+        
+        // Restore Match yang tersimpan jika ada lock
+        const savedIdx = localStorage.getItem('saved_match_idx');
+        if (savedIdx !== null) {
+            select.value = savedIdx;
+        }
         updateMatchDetails();
     }
 
     function updateMatchDetails() {
         const idx = document.getElementById('match-select').value;
-        if (idx === "") return;
+        if (idx === "" || !allMatchesData[idx]) return;
         const data = allMatchesData[idx];
         document.getElementById('match-date').value = data[1];
         document.getElementById('teams').value = data[2];
@@ -169,24 +217,31 @@
     }
 
     function applyFinalReveal() {
-        document.getElementById('draw-list').classList.remove('is-blind'); // Tirai Terbuka
+        document.getElementById('draw-list').classList.remove('is-blind');
         document.getElementById('btn-shuffle').style.display = "none";
         document.getElementById('btn-lock').style.display = "none";
-        document.getElementById('match-select').disabled = true; // Dropdown Terkunci Permanen
+        document.getElementById('match-select').disabled = true;
         document.getElementById('status').style.display = "block";
         document.getElementById('btn-wa').style.display = "flex";
         renderList();
     }
 
     window.onload = function() {
+        if (localStorage.getItem('manual_admin_lock') === 'true') {
+            isAdminLocked = true;
+            applyAdminLockUI();
+        }
+        
         syncData();
-        setInterval(syncData, 5000); // Cek Remote Control tiap 5 detik
+        setInterval(syncData, 5000);
+
         if (localStorage.getItem('is_locked') === 'true') {
             isLocked = true;
             currentList = JSON.parse(localStorage.getItem('saved_list'));
             shuffleCount = localStorage.getItem('saved_count');
             setTimeout(() => {
-                document.getElementById('match-select').value = localStorage.getItem('saved_match_idx');
+                const sIdx = localStorage.getItem('saved_match_idx');
+                if(sIdx !== null) document.getElementById('match-select').value = sIdx;
                 updateMatchDetails();
                 applyFinalReveal();
             }, 1000);
