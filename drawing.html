@@ -16,7 +16,7 @@
         input, select { background: #252525; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; font-family: 'Kanit'; font-size: 14px; width: 100%; box-sizing: border-box; }
         .absen-container { background: #111; padding: 10px; border-radius: 8px; border: 1px solid #333; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; }
         .absen-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #ccc; }
-        #draw-list { display: flex; flex-direction: column; gap: 8px; margin: 20px 0; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; min-height: 50px; }
+        #draw-list { display: flex; flex-direction: column; gap: 8px; margin: 20px 0; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; min-height: 50px; transition: all 0.2s ease; }
         .draw-item { background: #252525; padding: 12px 15px; border-radius: 8px; border-left: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; font-size: 14px; text-align: left; }
         .draw-item.absent-mode { border-left-color: var(--red); opacity: 0.6; }
         .rank { font-weight: 900; color: var(--gold); margin-right: 10px; }
@@ -27,6 +27,13 @@
         #btn-wa { background: #25d366; color: white; display: none; text-decoration: none; align-items: center; justify-content: center; }
         .status-lock { color: var(--blue); margin-top: 15px; font-weight: bold; display: none; }
         .sync-indicator { font-size: 10px; color: #555; margin-bottom: 10px; }
+
+        /* --- TAMBAHAN EFEK BLUR --- */
+        .blur-active {
+            filter: blur(10px);
+            opacity: 0.4;
+            transform: scale(0.98);
+        }
     </style>
 </head>
 <body>
@@ -117,15 +124,28 @@
         return array;
     }
 
+    // --- MODIFIKASI FUNGSI SHUFFLE DENGAN DELAY & BLUR ---
     function shuffleData() {
         if (isLocked) return;
-        let activePlayers = playerMaster.filter(p => !globalAbsent.includes(p));
-        let shuffledActive = shuffleArray([...activePlayers]);
-        let shuffledAbsent = shuffleArray([...globalAbsent]);
-        currentList = [...shuffledActive, ...shuffledAbsent];
-        shuffleCount++;
-        document.getElementById('count').innerText = shuffleCount;
-        renderList();
+        
+        const listContainer = document.getElementById('draw-list');
+        
+        // Tambahkan class blur
+        listContainer.classList.add('blur-active');
+
+        // Beri delay 250ms supaya mata bisa melihat efek blurnya sebelum angka berubah
+        setTimeout(() => {
+            let activePlayers = playerMaster.filter(p => !globalAbsent.includes(p));
+            let shuffledActive = shuffleArray([...activePlayers]);
+            let shuffledAbsent = shuffleArray([...globalAbsent]);
+            currentList = [...shuffledActive, ...shuffledAbsent];
+            shuffleCount++;
+            document.getElementById('count').innerText = shuffleCount;
+            renderList();
+            
+            // Hilangkan class blur
+            listContainer.classList.remove('blur-active');
+        }, 250);
     }
 
     function renderList() {
