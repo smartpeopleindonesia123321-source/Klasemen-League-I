@@ -3,175 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DRAWING CENTER | FOOTBALL LEAGUE-I</title>
+    <title>DRAWING CENTER | REMOTE ADMIN</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #d4af37; --dark: #0a0a0a; --white: #ffffff; --blue: #00f2ff; --red: #ff4d4d; }
         body { background: #111; font-family: 'Kanit', sans-serif; margin: 0; color: var(--white); padding: 10px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
-        .container { width: 100%; max-width: 500px; background: #1a1a1a; padding: 20px; border-radius: 20px; border: 3px solid var(--gold); box-shadow: 0 0 30px rgba(212, 175, 55, 0.3); text-align: center; box-sizing: border-box; }
+        .container { width: 100%; max-width: 500px; background: #1a1a1a; padding: 20px; border-radius: 20px; border: 3px solid var(--gold); box-shadow: 0 0 30px rgba(212, 175, 55, 0.3); text-align: center; box-sizing: border-box; position: relative; }
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; text-align: left; }
         .full-col { grid-column: span 2; }
         .input-group { display: flex; flex-direction: column; gap: 5px; }
         .input-group label { font-size: 11px; color: var(--gold); font-weight: bold; text-transform: uppercase; }
         input, select { background: #252525; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; font-family: 'Kanit'; font-size: 14px; width: 100%; box-sizing: border-box; }
-        /* Style khusus dropdown agar terlihat bisa dipilih */
-        select { border: 1px solid var(--gold); cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 10px center; background-size: 20px; appearance: none; }
-        
+        select:disabled { opacity: 0.8; color: var(--gold); border: 1px solid var(--gold); font-weight: bold; }
         .absen-container { background: #111; padding: 10px; border-radius: 8px; border: 1px solid #333; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; }
         .absen-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #ccc; }
         #draw-list { display: flex; flex-direction: column; gap: 8px; margin: 20px 0; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; min-height: 50px; transition: all 0.2s ease; }
-        .draw-item { background: #252525; padding: 12px 15px; border-radius: 8px; border-left: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; font-size: 14px; text-align: left; }
+        .draw-item { background: #252525; padding: 12px 15px; border-radius: 8px; border-left: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
         .draw-item.absent-mode { border-left-color: var(--red); opacity: 0.6; }
         .rank { font-weight: 900; color: var(--gold); margin-right: 10px; }
         .btn-group { display: flex; flex-direction: column; gap: 10px; }
         button { padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; font-family: 'Kanit'; width: 100%; }
-        #btn-shuffle { background: var(--gold); color: black; margin-top: 10px; }
+        #btn-shuffle { background: var(--gold); color: black; }
         #btn-lock { background: var(--red); color: white; }
         #btn-wa { background: #25d366; color: white; display: none; text-decoration: none; align-items: center; justify-content: center; }
         .status-lock { color: var(--blue); margin-top: 15px; font-weight: bold; display: none; }
         .sync-indicator { font-size: 10px; color: #555; margin-bottom: 10px; }
         .blur-active { filter: blur(10px); opacity: 0.4; transform: scale(0.98); }
+        .admin-notif { font-size: 12px; color: var(--red); margin-bottom: 10px; font-weight: bold; display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1 style="color: var(--gold); margin: 0 0 5px 0; font-size: 24px;">🎰 DRAWING CENTER</h1>
-    <div class="sync-indicator" id="sync-status">Memuat jadwal pertandingan...</div>
+    <div class="sync-indicator" id="sync-status">Mencoba terhubung...</div>
+    <div id="admin-notif" class="admin-notif">⚠️ ADMIN MENGUNCI PERTANDINGAN INI</div>
 
     <div class="input-grid">
         <div class="input-group full-col">
-            <label>Pilih Match</label>
+            <label>Pertandingan (Ditentukan Admin)</label>
             <select id="match-select" onchange="updateMatchDetails()">
-                <option value="">-- Pilih Pertandingan --</option>
+                <option value="">-- Menunggu Admin --</option>
             </select>
         </div>
-        <div class="input-group"><label>Tanggal Main</label><input type="text" id="match-date" readonly></div>
-        <div class="input-group"><label>Jam Mulai</label><input type="text" id="start-time" readonly></div>
+        <div class="input-group"><label>Tanggal</label><input type="text" id="match-date" readonly></div>
+        <div class="input-group"><label>Jam</label><input type="text" id="start-time" readonly></div>
         <div class="input-group full-col"><label>Tim Bertanding</label><input type="text" id="teams" readonly></div>
-        <div class="input-group"><label>Durasi (Mnt)</label><input type="text" id="duration" readonly></div>
-        <div class="input-group"><label>Saksi Terpilih</label><input type="text" id="witness-name" readonly></div>
+        <div class="input-group"><label>Durasi</label><input type="text" id="duration" readonly></div>
+        <div class="input-group"><label>Saksi</label><input type="text" id="witness-name" readonly></div>
         <div class="input-group full-col">
-            <label>Daftar Pemain (Merah = Absen)</label>
+            <label>Pemain Absen</label>
             <div class="absen-container" id="absen-list-display"></div>
         </div>
     </div>
 
     <div id="draw-list"></div>
 
-    <div class="btn-group">
+    <div class="btn-group" id="saksi-controls">
         <button id="btn-shuffle" onclick="shuffleData()">🔄 SAKSI: ACAK URUTAN (<span id="count">0</span>)</button>
         <button id="btn-lock" onclick="lockResult()">🔒 FIX & LOCK HASIL</button>
         <a id="btn-wa" href="#" onclick="shareToWA()">📲 KIRIM KE WHATSAPP</a>
     </div>
 
-    <div id="status" class="status-lock">✅ URUTAN SAH & DIKUNCI!</div>
-    <div style="margin-top: 30px;">
-        <button onclick="resetAdmin()" style="background:none; color:#444; font-size:10px; border:none; cursor:pointer;">⚙️ Reset Lokal (PIN Required)</button>
-    </div>
+    <div id="status" class="status-lock">✅ HASIL SAH & DIKUNCI SAKSI</div>
 </div>
 
 <script>
     const drawingSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=353274036&single=true&output=csv';
     const playerMaster = ["Dandi", "Asep", "Rizal", "Aries", "Ikmal", "Regi", "Yanti", "Erni", "Dicky", "Maya"];
     
-    let allMatchesData = []; // Simpan semua baris dari Excel
+    let allMatchesData = [];
     let shuffleCount = 0;
     let currentList = [];
-    let isLocked = false;
+    let isWitnessLocked = false;
     let globalAbsent = [];
 
-    // 1. Fungsi ambil SEMUA data dari Sheet
-    async function fetchAllData() {
+    async function syncSystem() {
         try {
             const res = await fetch(`${drawingSheetUrl}&nocache=${new Date().getTime()}`);
             const csv = await res.text();
-            const rows = csv.split('\n').slice(1); // Lewati header
+            const rows = csv.split('\n').slice(1);
+            allMatchesData = rows.map(row => row.split(',').map(c => c.trim().replace(/"/g, ''))).filter(r => r[0] !== "");
 
-            allMatchesData = rows.map(row => {
-                return row.split(',').map(c => c.trim().replace(/"/g, ''));
-            }).filter(row => row[0] !== ""); // Buang baris kosong
+            // CEK STATUS REMOTE RESET DARI SPREADSHEET (Kolom H / Index 7)
+            // Kita ambil baris pertama untuk cek status global
+            if (allMatchesData[0][7] === "RESET") {
+                localStorage.clear(); // Hapus paksa semua lock saksi
+                isWitnessLocked = false;
+            }
 
             populateDropdown();
-            document.getElementById('sync-status').innerText = "✅ Jadwal Berhasil Disinkron";
-        } catch (e) {
-            document.getElementById('sync-status').innerText = "⚠️ Gagal Sinkron Jadwal.";
+            checkAdminLock();
+        } catch (e) { console.log("Sync Error"); }
+    }
+
+    function populateDropdown() {
+        const select = document.getElementById('match-select');
+        const currentVal = select.value;
+        select.innerHTML = '<option value="">-- Pilih Pertandingan --</option>';
+        allMatchesData.forEach((data, index) => {
+            let option = document.createElement('option');
+            option.value = index;
+            option.text = data[0];
+            select.appendChild(option);
+        });
+        if (currentVal !== "") select.value = currentVal;
+    }
+
+    function checkAdminLock() {
+        // Logika: Jika di kolom H ada tulisan "LOCK", saksi nggak bisa pilih match
+        // Kita cek baris yang sedang dipilih atau baris pertama sebagai kontrol
+        const adminCommand = allMatchesData[0][7]; 
+        
+        if (adminCommand === "LOCK") {
+            document.getElementById('match-select').disabled = true;
+            document.getElementById('admin-notif').style.display = "block";
+            // Admin menentukan match dengan mengisi baris tertentu, misalnya baris pertama yang "ON"
+            // Untuk demo ini, kita asumsikan admin minta saksi standby di pilihan yang ada
+        } else {
+            document.getElementById('match-select').disabled = false;
+            document.getElementById('admin-notif').style.display = "none";
         }
     }
 
-    // 2. Isi Dropdown dengan pilihan Match
-    function populateDropdown() {
-        const select = document.getElementById('match-select');
-        allMatchesData.forEach((data, index) => {
-            let option = document.createElement('option');
-            option.value = index; // Simpan index baris
-            option.text = data[0]; // Nama Match (misal: Match 1)
-            select.appendChild(option);
-        });
-    }
-
-    // 3. Update otomatis kolom lain pas Match dipilih
     function updateMatchDetails() {
-        const selectedIndex = document.getElementById('match-select').value;
-        if (selectedIndex === "") return;
-
-        const data = allMatchesData[selectedIndex];
-
+        const idx = document.getElementById('match-select').value;
+        if (idx === "") return;
+        const data = allMatchesData[idx];
         document.getElementById('match-date').value = data[1] || "-";
         document.getElementById('teams').value = data[2] || "-";
         document.getElementById('start-time').value = data[3] || "00:00";
         document.getElementById('duration').value = data[4] || "5";
         document.getElementById('witness-name').value = data[5] || "-";
-
         globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()) : [];
         renderAbsentStatus();
-        
-        // Reset drawing kalau ganti match
-        if (!isLocked) {
-            currentList = [];
-            shuffleCount = 0;
-            document.getElementById('count').innerText = "0";
-            document.getElementById('draw-list').innerHTML = "";
-        }
     }
 
     function renderAbsentStatus() {
-        const container = document.getElementById('absen-list-display');
-        container.innerHTML = playerMaster.map(p => {
+        document.getElementById('absen-list-display').innerHTML = playerMaster.map(p => {
             const isAbs = globalAbsent.includes(p);
-            return `<div class="absen-item" style="color:${isAbs ? '#ff4d4d' : '#00ff88'}">
-                ${isAbs ? '❌' : '✅'} ${p}
-            </div>`;
+            return `<div class="absen-item" style="color:${isAbs ? '#ff4d4d' : '#00ff88'}">${isAbs ? '❌' : '✅'} ${p}</div>`;
         }).join('');
     }
 
-    window.onload = function() {
-        fetchAllData();
-        if (localStorage.getItem('drawingLocked') === 'true') { loadLockedData(); }
-    };
-
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-
     function shuffleData() {
-        if (isLocked || document.getElementById('match-select').value === "") {
-            if (!isLocked) alert("Pilih Match dulu Bro!");
-            return;
-        }
-        
+        if (isWitnessLocked || document.getElementById('match-select').value === "") return;
         const listContainer = document.getElementById('draw-list');
         listContainer.classList.add('blur-active');
-
         setTimeout(() => {
-            let activePlayers = playerMaster.filter(p => !globalAbsent.includes(p));
-            let shuffledActive = shuffleArray([...activePlayers]);
-            let shuffledAbsent = shuffleArray([...globalAbsent]);
-            currentList = [...shuffledActive, ...shuffledAbsent];
+            let active = shuffleArray(playerMaster.filter(p => !globalAbsent.includes(p)));
+            let abs = shuffleArray([...globalAbsent]);
+            currentList = [...active, ...abs];
             shuffleCount++;
             document.getElementById('count').innerText = shuffleCount;
             renderList();
@@ -180,80 +162,66 @@
     }
 
     function renderList() {
-        const listContainer = document.getElementById('draw-list');
-        listContainer.innerHTML = currentList.map((name, index) => {
+        document.getElementById('draw-list').innerHTML = currentList.map((name, index) => {
             const isAbs = globalAbsent.includes(name);
-            return `<div class="draw-item ${isAbs ? 'absent-mode' : ''}">
-                <span><span class="rank">#${index + 1}</span> <b>${name.toUpperCase()}</b> ${isAbs ? '(ABSEN)' : ''}</span>
+            return `<div class="draw-item" style="${isAbs ? 'opacity:0.5; border-left-color:red;' : ''}">
+                <span><span class="rank">#${index+1}</span> <b>${name.toUpperCase()}</b> ${isAbs ? '(ABS)' : ''}</span>
             </div>`;
         }).join('');
     }
 
     function lockResult() {
-        if (currentList.length === 0) return alert("Saksi harus klik ACAK dulu!");
-        if (confirm("Kunci Hasil ini secara Permanen?")) {
-            isLocked = true;
-            localStorage.setItem('drawingLocked', 'true');
-            localStorage.setItem('tempList', JSON.stringify(currentList));
-            localStorage.setItem('tempCount', shuffleCount);
-            localStorage.setItem('tempMatchIndex', document.getElementById('match-select').value);
-            applyFinalLockUI();
+        if (currentList.length === 0) return;
+        if (confirm("Kunci urutan ini?")) {
+            isWitnessLocked = true;
+            localStorage.setItem('witnessLocked', 'true');
+            localStorage.setItem('saveList', JSON.stringify(currentList));
+            localStorage.setItem('saveCount', shuffleCount);
+            localStorage.setItem('saveMatch', document.getElementById('match-select').value);
+            applyLockUI();
         }
     }
 
-    function applyFinalLockUI() {
+    function applyLockUI() {
         document.getElementById('btn-shuffle').style.display = "none";
         document.getElementById('btn-lock').style.display = "none";
-        document.getElementById('match-select').disabled = true; // Kunci dropdown
         document.getElementById('status').style.display = "block";
         document.getElementById('btn-wa').style.display = "flex";
+        document.getElementById('match-select').disabled = true;
         renderList();
     }
 
-    function loadLockedData() {
-        isLocked = true;
-        currentList = JSON.parse(localStorage.getItem('tempList'));
-        shuffleCount = localStorage.getItem('tempCount');
-        document.getElementById('count').innerText = shuffleCount;
-        
-        // Tunggu data fetch selesai baru set dropdown
-        setTimeout(() => {
-            document.getElementById('match-select').value = localStorage.getItem('tempMatchIndex');
-            updateMatchDetails();
-            applyFinalLockUI();
-        }, 1000);
-    }
+    window.onload = function() {
+        syncSystem();
+        setInterval(syncSystem, 5000); // Cek spreadsheet tiap 5 detik untuk Remote Reset
+        if (localStorage.getItem('witnessLocked') === 'true') {
+            isWitnessLocked = true;
+            currentList = JSON.parse(localStorage.getItem('saveList'));
+            shuffleCount = localStorage.getItem('saveCount');
+            setTimeout(() => {
+                document.getElementById('match-select').value = localStorage.getItem('saveMatch');
+                updateMatchDetails();
+                applyLockUI();
+            }, 1000);
+        }
+    };
 
-    function resetAdmin() {
-        if (prompt("PIN ADMIN:") === "1234") { localStorage.clear(); location.reload(); }
-    }
-
-    function calculateTime(baseTime, addedMinutes) {
-        let [hours, minutes] = baseTime.split(':').map(Number);
-        if(isNaN(hours)) return "00:00";
-        let totalMinutes = hours * 60 + minutes + addedMinutes;
-        let newHours = Math.floor(totalMinutes / 60) % 24;
-        let newMinutes = totalMinutes % 60;
-        return `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}`;
+    function shuffleArray(a) {
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
     }
 
     function shareToWA() {
-        const matchName = document.getElementById('match-select').options[document.getElementById('match-select').selectedIndex].text;
-        const teams = document.getElementById('teams').value;
-        const witness = document.getElementById('witness-name').value;
-        const startTime = document.getElementById('start-time').value;
-        const duration = parseInt(document.getElementById('duration').value) || 5;
-
-        let message = `*${matchName.toUpperCase()}* %0A*${teams.toUpperCase()}* %0A%0A*URUTAN TEBAK SKOR:* %0A`;
-        let currentMinutes = 0;
-        currentList.forEach((name, index) => {
-            let timeIn = calculateTime(startTime, currentMinutes);
-            let timeOut = calculateTime(startTime, currentMinutes + duration);
-            message += `${index + 1}. *${name.toUpperCase()}* (${timeIn}-${timeOut}) %0A`;
-            currentMinutes += (duration + 1); 
-        });
-        message += `%0A⚖️ Saksi: ${witness} %0A🎲 Acakan: ${shuffleCount}x %0A*FOOTBALL LEAGUE-I* ⚽🔥`;
-        window.open(`https://wa.me/?text=${message}`, '_blank');
+        const m = document.getElementById('match-select').options[document.getElementById('match-select').selectedIndex].text;
+        const t = document.getElementById('teams').value;
+        const w = document.getElementById('witness-name').value;
+        let msg = `*${m}* %0A*${t}* %0A%0A*URUTAN:* %0A`;
+        currentList.forEach((n, i) => msg += `${i+1}. *${n.toUpperCase()}* %0A`);
+        msg += `%0A⚖️ Saksi: ${w} %0A🎲 Acakan: ${shuffleCount}x`;
+        window.open(`https://wa.me/?text=${msg}`, '_blank');
     }
 </script>
 </body>
