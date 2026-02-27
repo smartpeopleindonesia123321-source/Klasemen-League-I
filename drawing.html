@@ -71,6 +71,26 @@
     let isLocked = false;
     let globalAbsent = [];
 
+    // FUNGSI PENAMBAH JADWAL OTOMATIS
+    function calculateSchedule(startTimeStr, index, durationMinutes) {
+        if(!startTimeStr || startTimeStr === "-") return "";
+        let [hours, minutes] = startTimeStr.split(':').map(Number);
+        let startTotalMinutes = hours * 60 + minutes;
+        
+        // Jeda 1 menit antar pemain: (durasi + 1) * index
+        let offset = (parseInt(durationMinutes) + 1) * index;
+        let matchStartMinutes = startTotalMinutes + offset;
+        let matchEndMinutes = matchStartMinutes + parseInt(durationMinutes);
+
+        const formatTime = (totalMin) => {
+            let h = Math.floor(totalMin / 60) % 24;
+            let m = totalMin % 60;
+            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+        };
+
+        return `(${formatTime(matchStartMinutes)}-${formatTime(matchEndMinutes)})`;
+    }
+
     async function syncData() {
         try {
             const res = await fetch(`${drawingSheetUrl}&nocache=${new Date().getTime()}`);
@@ -86,7 +106,6 @@
 
             if (document.getElementById('match-select').options.length === 0) {
                 populateDropdown();
-                // CRITICAL: Cek apakah ada data tersimpan SETELAH dropdown terisi
                 checkSavedState();
             }
             
@@ -141,7 +160,7 @@
         document.getElementById('witness-name').value = data[5] || "-";
         globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()) : [];
         renderAbsentStatus();
-        if(isLocked) renderList(); // Pastikan list ngerender kalo posisi kekunci
+        if(isLocked) renderList(); 
     }
 
     function renderAbsentStatus() {
@@ -164,10 +183,14 @@
 
     function renderList() {
         if (currentList.length === 0) return;
+        const sTime = document.getElementById('start-time').value;
+        const dur = document.getElementById('duration').value;
+
         document.getElementById('draw-list').innerHTML = currentList.map((name, index) => {
             const isAbs = globalAbsent.includes(name);
+            const timeRange = isAbs ? "" : calculateSchedule(sTime, index, dur);
             return `<div class="draw-item" style="${isAbs ? 'opacity:0.5; border-left-color:red;' : ''}">
-                <span><span class="rank">#${index+1}</span> <b>${name.toUpperCase()}</b> ${isAbs ? '(ABSEN)' : ''}</span>
+                <span><span class="rank">#${index+1}</span> <b>${name.toUpperCase()}</b> <span style="color:var(--gold); font-size:12px; margin-left:5px;">${timeRange}</span> ${isAbs ? '(ABSEN)' : ''}</span>
             </div>`;
         }).join('');
     }
@@ -212,9 +235,15 @@
         const ws = document.getElementById('witness-name').value;
 
         let msg = `*${m.toUpperCase()}*%0A*${tm}*%0A%0A`;
-        msg += `📅 Tanggal: ${dt}%0A🕒 Jam: ${jm}%0A⌛ Durasi: ${dr} Menit%0A%0A`;
-        msg += `*HASIL DRAWING:*%0A`;
-        currentList.forEach((n, i) => msg += `${i+1}. ${n.toUpperCase()} ${globalAbsent.includes(n) ? '(ABSEN)' : ''}%0A`);
+        msg += `📅 Tanggal: ${dt}%0A🕒 Jam Mulai: ${jm}%0A⌛ Durasi: ${dr} Menit%0A%0A`;
+        msg += `*HASIL DRAWING & JADWAL:*%0A`;
+        
+        currentList.forEach((n, i) => {
+            const isAbs = globalAbsent.includes(n);
+            const tRange = isAbs ? "" : calculateSchedule(jm, i, dr);
+            msg += `${i+1}. ${n.toUpperCase()} ${tRange} ${isAbs ? '(ABSEN)' : ''}%0A`;
+        });
+        
         msg += `%0A⚖️ *Saksi:* ${ws}%0A🎲 *Acakan:* ${shuffleCount}x`;
         window.open(`https://wa.me/?text=${msg}`, '_blank');
     }
