@@ -34,7 +34,6 @@
         #btn-wa { background: #25d366; color: white; display: none; text-decoration: none; align-items: center; justify-content: center; padding: 15px; border-radius: 8px; font-weight: bold; }
         .status-lock { color: var(--blue); margin-top: 15px; font-weight: bold; display: none; }
 
-        /* Style Tambahan untuk Tombol Admin Lock */
         .admin-lock-btn { 
             background: #444; 
             color: white; 
@@ -44,6 +43,7 @@
             font-size: 12px; 
             border: 1px solid #555;
         }
+        .admin-hint { font-size: 10px; color: #444; margin-top: 20px; border-top: 1px dashed #333; padding-top: 10px; }
     </style>
 </head>
 <body>
@@ -80,6 +80,10 @@
     </div>
 
     <div id="status" class="status-lock">✅ URUTAN SAH & TERKUNCI</div>
+
+    <div class="admin-hint">
+        Admin Control (Sheet2 Kolom H): "LOCK" untuk kunci, "RESET" untuk buka.
+    </div>
 </div>
 
 <script>
@@ -90,13 +94,12 @@
     let shuffleCount = 0;
     let currentList = [];
     let isLocked = false;
-    let isAdminLocked = false; // Kunci dari Admin di Web
+    let isAdminLocked = false; 
     let globalAbsent = [];
 
-    // FUNGSI BARU: Klik Lock Manual di Tampilan
     function adminManualLock() {
         if (document.getElementById('match-select').value === "") return;
-        if (confirm("Kunci Match ini? Saksi tidak bisa ubah sampai di-RESET.")) {
+        if (confirm("Kunci Match ini untuk browser ini?")) {
             isAdminLocked = true;
             localStorage.setItem('manual_admin_lock', 'true');
             localStorage.setItem('saved_match_idx', document.getElementById('match-select').value);
@@ -118,10 +121,13 @@
             const rows = csv.split('\n').slice(1);
             allMatchesData = rows.map(r => r.split(',').map(c => c.trim().replace(/"/g, ''))).filter(r => r[0] !== "");
 
-            // FITUR REMOTE RESET GLOBAL (Cek semua baris di kolom H)
-            const hasReset = rows.some(row => row.split(',')[7]?.trim() === "RESET");
+            // CEK RESET DI SEMUA BARIS KOLOM H
+            const hasReset = rows.some(row => {
+                const cols = row.split(',');
+                return cols[7]?.trim().toUpperCase() === "RESET";
+            });
             
-            if (hasReset || allMatchesData[0][7] === "RESET") {
+            if (hasReset) {
                 localStorage.clear();
                 location.reload();
                 return;
@@ -129,13 +135,16 @@
 
             if (document.getElementById('match-select').options.length === 0) populateDropdown();
             
-            // Logika Kunci
             const selectEl = document.getElementById('match-select');
-            const sheetLock = allMatchesData[0][7] === "LOCK";
+            // CEK LOCK DI SEMUA BARIS KOLOM H
+            const hasLock = rows.some(row => {
+                const cols = row.split(',');
+                return cols[7]?.trim().toUpperCase() === "LOCK";
+            });
             
-            if (sheetLock || isLocked || isAdminLocked) {
+            if (hasLock || isLocked || isAdminLocked) {
                 selectEl.disabled = true;
-                if(sheetLock) {
+                if(hasLock) {
                     document.getElementById('btn-admin-manual').innerText = "S-LOCK";
                     document.getElementById('btn-admin-manual').style.background = "var(--blue)";
                 }
@@ -156,7 +165,6 @@
             select.appendChild(opt);
         });
         
-        // Restore Match yang tersimpan jika ada lock
         const savedIdx = localStorage.getItem('saved_match_idx');
         if (savedIdx !== null) {
             select.value = savedIdx;
