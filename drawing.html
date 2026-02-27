@@ -3,69 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DRAWING CENTER | REMOTE ADMIN</title>
+    <title>DRAWING CENTER | BLIND MODE</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #d4af37; --dark: #0a0a0a; --white: #ffffff; --blue: #00f2ff; --red: #ff4d4d; }
         body { background: #111; font-family: 'Kanit', sans-serif; margin: 0; color: var(--white); padding: 10px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
-        .container { width: 100%; max-width: 500px; background: #1a1a1a; padding: 20px; border-radius: 20px; border: 3px solid var(--gold); box-shadow: 0 0 30px rgba(212, 175, 55, 0.3); text-align: center; box-sizing: border-box; position: relative; }
+        .container { width: 100%; max-width: 500px; background: #1a1a1a; padding: 20px; border-radius: 20px; border: 3px solid var(--gold); box-shadow: 0 0 30px rgba(212, 175, 55, 0.3); text-align: center; box-sizing: border-box; }
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; text-align: left; }
         .full-col { grid-column: span 2; }
         .input-group { display: flex; flex-direction: column; gap: 5px; }
         .input-group label { font-size: 11px; color: var(--gold); font-weight: bold; text-transform: uppercase; }
         input, select { background: #252525; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; font-family: 'Kanit'; font-size: 14px; width: 100%; box-sizing: border-box; }
-        select:disabled { opacity: 0.8; color: var(--gold); border: 1px solid var(--gold); font-weight: bold; }
+        select:disabled { opacity: 0.8; color: var(--gold); }
         .absen-container { background: #111; padding: 10px; border-radius: 8px; border: 1px solid #333; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; }
         .absen-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #ccc; }
-        #draw-list { display: flex; flex-direction: column; gap: 8px; margin: 20px 0; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; min-height: 50px; transition: all 0.2s ease; }
-        .draw-item { background: #252525; padding: 12px 15px; border-radius: 8px; border-left: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
-        .draw-item.absent-mode { border-left-color: var(--red); opacity: 0.6; }
+        
+        /* --- LOGIKA BLUR --- */
+        #draw-list { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+            margin: 20px 0; 
+            background: rgba(0,0,0,0.2); 
+            padding: 15px; 
+            border-radius: 15px; 
+            min-height: 50px; 
+            transition: filter 0.5s ease; /* Transisi saat buka kunci */
+        }
+        
+        /* Kondisi Awal: Hasil Selalu Blur */
+        .is-blind { 
+            filter: blur(15px) grayscale(1); 
+            pointer-events: none; /* Biar gak bisa di-copy saat blur */
+            user-select: none;
+        }
+
+        .draw-item { background: #252525; padding: 12px 15px; border-radius: 8px; border-left: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; font-size: 14px; text-align: left; }
         .rank { font-weight: 900; color: var(--gold); margin-right: 10px; }
-        .btn-group { display: flex; flex-direction: column; gap: 10px; }
-        button { padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; font-family: 'Kanit'; width: 100%; }
+        button { padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; font-family: 'Kanit'; width: 100%; margin-bottom: 10px; }
         #btn-shuffle { background: var(--gold); color: black; }
         #btn-lock { background: var(--red); color: white; }
-        #btn-wa { background: #25d366; color: white; display: none; text-decoration: none; align-items: center; justify-content: center; }
+        #btn-wa { background: #25d366; color: white; display: none; text-decoration: none; align-items: center; justify-content: center; padding: 15px; border-radius: 8px; font-weight: bold; }
         .status-lock { color: var(--blue); margin-top: 15px; font-weight: bold; display: none; }
         .sync-indicator { font-size: 10px; color: #555; margin-bottom: 10px; }
-        .blur-active { filter: blur(10px); opacity: 0.4; transform: scale(0.98); }
-        .admin-notif { font-size: 12px; color: var(--red); margin-bottom: 10px; font-weight: bold; display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1 style="color: var(--gold); margin: 0 0 5px 0; font-size: 24px;">🎰 DRAWING CENTER</h1>
-    <div class="sync-indicator" id="sync-status">Mencoba terhubung...</div>
-    <div id="admin-notif" class="admin-notif">⚠️ ADMIN MENGUNCI PERTANDINGAN INI</div>
+    <div class="sync-indicator" id="sync-status">Menghubungkan ke Server...</div>
 
     <div class="input-grid">
         <div class="input-group full-col">
-            <label>Pertandingan (Ditentukan Admin)</label>
-            <select id="match-select" onchange="updateMatchDetails()">
-                <option value="">-- Menunggu Admin --</option>
-            </select>
+            <label>Pilih Match</label>
+            <select id="match-select" onchange="updateMatchDetails()"></select>
         </div>
         <div class="input-group"><label>Tanggal</label><input type="text" id="match-date" readonly></div>
         <div class="input-group"><label>Jam</label><input type="text" id="start-time" readonly></div>
-        <div class="input-group full-col"><label>Tim Bertanding</label><input type="text" id="teams" readonly></div>
+        <div class="input-group full-col"><label>Tim</label><input type="text" id="teams" readonly></div>
         <div class="input-group"><label>Durasi</label><input type="text" id="duration" readonly></div>
         <div class="input-group"><label>Saksi</label><input type="text" id="witness-name" readonly></div>
         <div class="input-group full-col">
-            <label>Pemain Absen</label>
+            <label>Status Pemain</label>
             <div class="absen-container" id="absen-list-display"></div>
         </div>
     </div>
 
-    <div id="draw-list"></div>
+    <div id="draw-list" class="is-blind"></div>
 
-    <div class="btn-group" id="saksi-controls">
-        <button id="btn-shuffle" onclick="shuffleData()">🔄 SAKSI: ACAK URUTAN (<span id="count">0</span>)</button>
-        <button id="btn-lock" onclick="lockResult()">🔒 FIX & LOCK HASIL</button>
-        <a id="btn-wa" href="#" onclick="shareToWA()">📲 KIRIM KE WHATSAPP</a>
+    <div id="controls">
+        <button id="btn-shuffle" onclick="shuffleData()">🔄 ACAK URUTAN (Saksi: <span id="count">0</span>)</button>
+        <button id="btn-lock" onclick="lockResult()">🔒 FIX & BUKA HASIL</button>
+        <a id="btn-wa" href="#" onclick="shareToWA()">📲 KIRIM HASIL KE WHATSAPP</a>
     </div>
 
-    <div id="status" class="status-lock">✅ HASIL SAH & DIKUNCI SAKSI</div>
+    <div id="status" class="status-lock">✅ HASIL TERBUKA & DIKUNCI!</div>
 </div>
 
 <script>
@@ -75,54 +88,44 @@
     let allMatchesData = [];
     let shuffleCount = 0;
     let currentList = [];
-    let isWitnessLocked = false;
+    let isLocked = false;
     let globalAbsent = [];
 
-    async function syncSystem() {
+    async function syncData() {
         try {
             const res = await fetch(`${drawingSheetUrl}&nocache=${new Date().getTime()}`);
             const csv = await res.text();
             const rows = csv.split('\n').slice(1);
-            allMatchesData = rows.map(row => row.split(',').map(c => c.trim().replace(/"/g, ''))).filter(r => r[0] !== "");
+            allMatchesData = rows.map(r => r.split(',').map(c => c.trim().replace(/"/g, ''))).filter(r => r[0] !== "");
 
-            // CEK STATUS REMOTE RESET DARI SPREADSHEET (Kolom H / Index 7)
-            // Kita ambil baris pertama untuk cek status global
+            // Cek Remote Reset (Kolom H / Index 7)
             if (allMatchesData[0][7] === "RESET") {
-                localStorage.clear(); // Hapus paksa semua lock saksi
-                isWitnessLocked = false;
+                localStorage.clear();
+                location.reload();
             }
 
             populateDropdown();
             checkAdminLock();
-        } catch (e) { console.log("Sync Error"); }
+        } catch (e) { console.log("Sync error"); }
     }
 
     function populateDropdown() {
         const select = document.getElementById('match-select');
-        const currentVal = select.value;
-        select.innerHTML = '<option value="">-- Pilih Pertandingan --</option>';
+        if (select.options.length > 0) return;
         allMatchesData.forEach((data, index) => {
-            let option = document.createElement('option');
-            option.value = index;
-            option.text = data[0];
-            select.appendChild(option);
+            let opt = document.createElement('option');
+            opt.value = index;
+            opt.text = data[0];
+            select.appendChild(opt);
         });
-        if (currentVal !== "") select.value = currentVal;
+        document.getElementById('sync-status').innerText = "✅ Server Terkoneksi";
     }
 
     function checkAdminLock() {
-        // Logika: Jika di kolom H ada tulisan "LOCK", saksi nggak bisa pilih match
-        // Kita cek baris yang sedang dipilih atau baris pertama sebagai kontrol
-        const adminCommand = allMatchesData[0][7]; 
-        
-        if (adminCommand === "LOCK") {
+        if (allMatchesData[0][7] === "LOCK") {
             document.getElementById('match-select').disabled = true;
-            document.getElementById('admin-notif').style.display = "block";
-            // Admin menentukan match dengan mengisi baris tertentu, misalnya baris pertama yang "ON"
-            // Untuk demo ini, kita asumsikan admin minta saksi standby di pilihan yang ada
         } else {
             document.getElementById('match-select').disabled = false;
-            document.getElementById('admin-notif').style.display = "none";
         }
     }
 
@@ -130,11 +133,11 @@
         const idx = document.getElementById('match-select').value;
         if (idx === "") return;
         const data = allMatchesData[idx];
-        document.getElementById('match-date').value = data[1] || "-";
-        document.getElementById('teams').value = data[2] || "-";
-        document.getElementById('start-time').value = data[3] || "00:00";
-        document.getElementById('duration').value = data[4] || "5";
-        document.getElementById('witness-name').value = data[5] || "-";
+        document.getElementById('match-date').value = data[1];
+        document.getElementById('teams').value = data[2];
+        document.getElementById('start-time').value = data[3];
+        document.getElementById('duration').value = data[4];
+        document.getElementById('witness-name').value = data[5];
         globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()) : [];
         renderAbsentStatus();
     }
@@ -147,44 +150,50 @@
     }
 
     function shuffleData() {
-        if (isWitnessLocked || document.getElementById('match-select').value === "") return;
-        const listContainer = document.getElementById('draw-list');
-        listContainer.classList.add('blur-active');
-        setTimeout(() => {
-            let active = shuffleArray(playerMaster.filter(p => !globalAbsent.includes(p)));
-            let abs = shuffleArray([...globalAbsent]);
-            currentList = [...active, ...abs];
-            shuffleCount++;
-            document.getElementById('count').innerText = shuffleCount;
-            renderList();
-            listContainer.classList.remove('blur-active');
-        }, 250);
+        if (isLocked || document.getElementById('match-select').value === "") return;
+        
+        // Tetap paksa blur saat mengacak
+        document.getElementById('draw-list').classList.add('is-blind');
+
+        let active = shuffleArray(playerMaster.filter(p => !globalAbsent.includes(p)));
+        let abs = shuffleArray([...globalAbsent]);
+        currentList = [...active, ...abs];
+        
+        shuffleCount++;
+        document.getElementById('count').innerText = shuffleCount;
+        renderList();
     }
 
     function renderList() {
         document.getElementById('draw-list').innerHTML = currentList.map((name, index) => {
             const isAbs = globalAbsent.includes(name);
             return `<div class="draw-item" style="${isAbs ? 'opacity:0.5; border-left-color:red;' : ''}">
-                <span><span class="rank">#${index+1}</span> <b>${name.toUpperCase()}</b> ${isAbs ? '(ABS)' : ''}</span>
+                <span><span class="rank">#${index+1}</span> <b>${name.toUpperCase()}</b> ${isAbs ? '(ABSEN)' : ''}</span>
             </div>`;
         }).join('');
     }
 
     function lockResult() {
-        if (currentList.length === 0) return;
-        if (confirm("Kunci urutan ini?")) {
-            isWitnessLocked = true;
-            localStorage.setItem('witnessLocked', 'true');
-            localStorage.setItem('saveList', JSON.stringify(currentList));
-            localStorage.setItem('saveCount', shuffleCount);
-            localStorage.setItem('saveMatch', document.getElementById('match-select').value);
-            applyLockUI();
+        if (currentList.length === 0) return alert("Saksi harus klik ACAK dulu!");
+        if (confirm("Buka hasil sekarang dan kunci urutan?")) {
+            isLocked = true;
+            localStorage.setItem('blindLocked', 'true');
+            localStorage.setItem('savedList', JSON.stringify(currentList));
+            localStorage.setItem('savedCount', shuffleCount);
+            localStorage.setItem('savedMatch', document.getElementById('match-select').value);
+            applyFinalReveal();
         }
     }
 
-    function applyLockUI() {
+    function applyFinalReveal() {
+        // 1. Hapus efek blur (Buka hasil)
+        document.getElementById('draw-list').classList.remove('is-blind');
+        
+        // 2. Sembunyikan tombol acak & lock
         document.getElementById('btn-shuffle').style.display = "none";
         document.getElementById('btn-lock').style.display = "none";
+        
+        // 3. Munculkan WA & Status
         document.getElementById('status').style.display = "block";
         document.getElementById('btn-wa').style.display = "flex";
         document.getElementById('match-select').disabled = true;
@@ -192,16 +201,16 @@
     }
 
     window.onload = function() {
-        syncSystem();
-        setInterval(syncSystem, 5000); // Cek spreadsheet tiap 5 detik untuk Remote Reset
-        if (localStorage.getItem('witnessLocked') === 'true') {
-            isWitnessLocked = true;
-            currentList = JSON.parse(localStorage.getItem('saveList'));
-            shuffleCount = localStorage.getItem('saveCount');
+        syncData();
+        setInterval(syncData, 5000);
+        if (localStorage.getItem('blindLocked') === 'true') {
+            isLocked = true;
+            currentList = JSON.parse(localStorage.getItem('savedList'));
+            shuffleCount = localStorage.getItem('savedCount');
             setTimeout(() => {
-                document.getElementById('match-select').value = localStorage.getItem('saveMatch');
+                document.getElementById('match-select').value = localStorage.getItem('savedMatch');
                 updateMatchDetails();
-                applyLockUI();
+                applyFinalReveal();
             }, 1000);
         }
     };
@@ -218,7 +227,7 @@
         const m = document.getElementById('match-select').options[document.getElementById('match-select').selectedIndex].text;
         const t = document.getElementById('teams').value;
         const w = document.getElementById('witness-name').value;
-        let msg = `*${m}* %0A*${t}* %0A%0A*URUTAN:* %0A`;
+        let msg = `*${m}* %0A*${t}* %0A%0A*HASIL DRAWING:* %0A`;
         currentList.forEach((n, i) => msg += `${i+1}. *${n.toUpperCase()}* %0A`);
         msg += `%0A⚖️ Saksi: ${w} %0A🎲 Acakan: ${shuffleCount}x`;
         window.open(`https://wa.me/?text=${msg}`, '_blank');
