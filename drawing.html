@@ -14,6 +14,9 @@
         .input-group { display: flex; flex-direction: column; gap: 5px; }
         .input-group label { font-size: 11px; color: var(--gold); font-weight: bold; text-transform: uppercase; }
         input, select { background: #252525; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; font-family: 'Kanit'; font-size: 14px; width: 100%; box-sizing: border-box; }
+        /* Style khusus dropdown agar terlihat bisa dipilih */
+        select { border: 1px solid var(--gold); cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 10px center; background-size: 20px; appearance: none; }
+        
         .absen-container { background: #111; padding: 10px; border-radius: 8px; border: 1px solid #333; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; }
         .absen-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #ccc; }
         #draw-list { display: flex; flex-direction: column; gap: 8px; margin: 20px 0; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; min-height: 50px; transition: all 0.2s ease; }
@@ -27,28 +30,27 @@
         #btn-wa { background: #25d366; color: white; display: none; text-decoration: none; align-items: center; justify-content: center; }
         .status-lock { color: var(--blue); margin-top: 15px; font-weight: bold; display: none; }
         .sync-indicator { font-size: 10px; color: #555; margin-bottom: 10px; }
-
-        /* --- TAMBAHAN EFEK BLUR --- */
-        .blur-active {
-            filter: blur(10px);
-            opacity: 0.4;
-            transform: scale(0.98);
-        }
+        .blur-active { filter: blur(10px); opacity: 0.4; transform: scale(0.98); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1 style="color: var(--gold); margin: 0 0 5px 0; font-size: 24px;">🎰 DRAWING CENTER</h1>
-    <div class="sync-indicator" id="sync-status">Mencoba sinkronisasi data...</div>
+    <div class="sync-indicator" id="sync-status">Memuat jadwal pertandingan...</div>
 
     <div class="input-grid">
-        <div class="input-group"><label>Match Ke-</label><input type="text" id="match-no" readonly></div>
+        <div class="input-group full-col">
+            <label>Pilih Match</label>
+            <select id="match-select" onchange="updateMatchDetails()">
+                <option value="">-- Pilih Pertandingan --</option>
+            </select>
+        </div>
         <div class="input-group"><label>Tanggal Main</label><input type="text" id="match-date" readonly></div>
-        <div class="input-group full-col"><label>Tim Bertanding</label><input type="text" id="teams" readonly></div>
         <div class="input-group"><label>Jam Mulai</label><input type="text" id="start-time" readonly></div>
+        <div class="input-group full-col"><label>Tim Bertanding</label><input type="text" id="teams" readonly></div>
         <div class="input-group"><label>Durasi (Mnt)</label><input type="text" id="duration" readonly></div>
-        <div class="input-group full-col"><label>Saksi Terpilih</label><input type="text" id="witness-name" readonly></div>
+        <div class="input-group"><label>Saksi Terpilih</label><input type="text" id="witness-name" readonly></div>
         <div class="input-group full-col">
             <label>Daftar Pemain (Merah = Absen)</label>
             <div class="absen-container" id="absen-list-display"></div>
@@ -72,32 +74,64 @@
 <script>
     const drawingSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=353274036&single=true&output=csv';
     const playerMaster = ["Dandi", "Asep", "Rizal", "Aries", "Ikmal", "Regi", "Yanti", "Erni", "Dicky", "Maya"];
+    
+    let allMatchesData = []; // Simpan semua baris dari Excel
     let shuffleCount = 0;
     let currentList = [];
     let isLocked = false;
     let globalAbsent = [];
 
-    async function syncData() {
+    // 1. Fungsi ambil SEMUA data dari Sheet
+    async function fetchAllData() {
         try {
             const res = await fetch(`${drawingSheetUrl}&nocache=${new Date().getTime()}`);
             const csv = await res.text();
-            const rows = csv.split('\n');
-            if (rows.length < 2) return;
+            const rows = csv.split('\n').slice(1); // Lewati header
 
-            const data = rows[1].split(',').map(c => c.trim().replace(/"/g, ''));
-            
-            document.getElementById('match-no').value = data[0];
-            document.getElementById('match-date').value = data[1];
-            document.getElementById('teams').value = data[2];
-            document.getElementById('start-time').value = data[3];
-            document.getElementById('duration').value = data[4];
-            document.getElementById('witness-name').value = data[5];
+            allMatchesData = rows.map(row => {
+                return row.split(',').map(c => c.trim().replace(/"/g, ''));
+            }).filter(row => row[0] !== ""); // Buang baris kosong
 
-            globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()) : [];
-            renderAbsentStatus();
-            document.getElementById('sync-status').innerText = "✅ Data Sinkron dengan Google Sheets";
+            populateDropdown();
+            document.getElementById('sync-status').innerText = "✅ Jadwal Berhasil Disinkron";
         } catch (e) {
-            document.getElementById('sync-status').innerText = "⚠️ Gagal Sinkron. Periksa internet.";
+            document.getElementById('sync-status').innerText = "⚠️ Gagal Sinkron Jadwal.";
+        }
+    }
+
+    // 2. Isi Dropdown dengan pilihan Match
+    function populateDropdown() {
+        const select = document.getElementById('match-select');
+        allMatchesData.forEach((data, index) => {
+            let option = document.createElement('option');
+            option.value = index; // Simpan index baris
+            option.text = data[0]; // Nama Match (misal: Match 1)
+            select.appendChild(option);
+        });
+    }
+
+    // 3. Update otomatis kolom lain pas Match dipilih
+    function updateMatchDetails() {
+        const selectedIndex = document.getElementById('match-select').value;
+        if (selectedIndex === "") return;
+
+        const data = allMatchesData[selectedIndex];
+
+        document.getElementById('match-date').value = data[1] || "-";
+        document.getElementById('teams').value = data[2] || "-";
+        document.getElementById('start-time').value = data[3] || "00:00";
+        document.getElementById('duration').value = data[4] || "5";
+        document.getElementById('witness-name').value = data[5] || "-";
+
+        globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()) : [];
+        renderAbsentStatus();
+        
+        // Reset drawing kalau ganti match
+        if (!isLocked) {
+            currentList = [];
+            shuffleCount = 0;
+            document.getElementById('count').innerText = "0";
+            document.getElementById('draw-list').innerHTML = "";
         }
     }
 
@@ -112,7 +146,7 @@
     }
 
     window.onload = function() {
-        syncData();
+        fetchAllData();
         if (localStorage.getItem('drawingLocked') === 'true') { loadLockedData(); }
     };
 
@@ -124,16 +158,15 @@
         return array;
     }
 
-    // --- MODIFIKASI FUNGSI SHUFFLE DENGAN DELAY & BLUR ---
     function shuffleData() {
-        if (isLocked) return;
+        if (isLocked || document.getElementById('match-select').value === "") {
+            if (!isLocked) alert("Pilih Match dulu Bro!");
+            return;
+        }
         
         const listContainer = document.getElementById('draw-list');
-        
-        // Tambahkan class blur
         listContainer.classList.add('blur-active');
 
-        // Beri delay 250ms supaya mata bisa melihat efek blurnya sebelum angka berubah
         setTimeout(() => {
             let activePlayers = playerMaster.filter(p => !globalAbsent.includes(p));
             let shuffledActive = shuffleArray([...activePlayers]);
@@ -142,8 +175,6 @@
             shuffleCount++;
             document.getElementById('count').innerText = shuffleCount;
             renderList();
-            
-            // Hilangkan class blur
             listContainer.classList.remove('blur-active');
         }, 250);
     }
@@ -165,6 +196,7 @@
             localStorage.setItem('drawingLocked', 'true');
             localStorage.setItem('tempList', JSON.stringify(currentList));
             localStorage.setItem('tempCount', shuffleCount);
+            localStorage.setItem('tempMatchIndex', document.getElementById('match-select').value);
             applyFinalLockUI();
         }
     }
@@ -172,6 +204,7 @@
     function applyFinalLockUI() {
         document.getElementById('btn-shuffle').style.display = "none";
         document.getElementById('btn-lock').style.display = "none";
+        document.getElementById('match-select').disabled = true; // Kunci dropdown
         document.getElementById('status').style.display = "block";
         document.getElementById('btn-wa').style.display = "flex";
         renderList();
@@ -182,7 +215,13 @@
         currentList = JSON.parse(localStorage.getItem('tempList'));
         shuffleCount = localStorage.getItem('tempCount');
         document.getElementById('count').innerText = shuffleCount;
-        applyFinalLockUI();
+        
+        // Tunggu data fetch selesai baru set dropdown
+        setTimeout(() => {
+            document.getElementById('match-select').value = localStorage.getItem('tempMatchIndex');
+            updateMatchDetails();
+            applyFinalLockUI();
+        }, 1000);
     }
 
     function resetAdmin() {
@@ -199,13 +238,13 @@
     }
 
     function shareToWA() {
-        const matchNo = document.getElementById('match-no').value;
+        const matchName = document.getElementById('match-select').options[document.getElementById('match-select').selectedIndex].text;
         const teams = document.getElementById('teams').value;
         const witness = document.getElementById('witness-name').value;
         const startTime = document.getElementById('start-time').value;
         const duration = parseInt(document.getElementById('duration').value) || 5;
 
-        let message = `*${matchNo.toUpperCase()}* %0A*${teams.toUpperCase()}* %0A%0A*URUTAN TEBAK SKOR:* %0A`;
+        let message = `*${matchName.toUpperCase()}* %0A*${teams.toUpperCase()}* %0A%0A*URUTAN TEBAK SKOR:* %0A`;
         let currentMinutes = 0;
         currentList.forEach((name, index) => {
             let timeIn = calculateTime(startTime, currentMinutes);
