@@ -32,7 +32,10 @@
 
 <div class="container">
     <h1 style="color: var(--gold); margin: 0 0 5px 0; font-size: 24px;">🎰 DRAWING CENTER</h1>
-    <div id="sync-status" style="font-size: 10px; color: #555; margin-bottom: 10px;">Menghubungkan...</div>
+   <div style="display: flex; flex-direction: column; align-items: center; gap: 5px; margin-bottom: 10px;">
+    <div id="sync-status" style="font-size: 10px; color: #555;">Menghubungkan...</div>
+    <button onclick="manualSync()" style="width: auto; padding: 4px 12px; font-size: 10px; background: transparent; color: var(--gold); border: 1px solid var(--gold); border-radius: 4px; cursor: pointer; font-family: 'Kanit';">🚀 CEK DATA SEKARANG</button>
+</div>
 
     <div class="input-grid">
         <div class="input-group full-col">
@@ -260,9 +263,32 @@
     }
 
     window.onload = initApp;
+    // FUNGSI CEK DATA MANUAL (HANYA MEMANGGIL SYNC DATA BAWAAN)
+async function manualSync() {
+    if (isLocked) {
+        alert("Status Terkunci! Tidak bisa sinkronisasi ulang.");
+        return;
+    }
+    
+    const btn = event.target;
+    const originalText = btn.innerText;
+    
+    btn.innerText = "⏳ SEDANG CEK...";
+    btn.disabled = true;
+
+    // Memanggil fungsi syncData yang sudah ada di script lo
+    await syncData();
+    
+    setTimeout(() => {
+        btn.innerText = originalText;
+        btn.disabled = false;
+        alert("Cek data selesai! Jika belum berubah, tunggu 1-5 menit proses dari Google.");
+    }, 1000);
+}
 </script>
 </body>
 </html>
+
 
 
 
