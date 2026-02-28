@@ -264,6 +264,7 @@
 
     window.onload = initApp;
     // FUNGSI CEK DATA MANUAL (HANYA MEMANGGIL SYNC DATA BAWAAN)
+// FUNGSI CEK DATA MANUAL (VERSI FIX RESET)
 async function manualSync() {
     if (isLocked) {
         alert("Status Terkunci! Tidak bisa sinkronisasi ulang.");
@@ -276,18 +277,39 @@ async function manualSync() {
     btn.innerText = "⏳ SEDANG CEK...";
     btn.disabled = true;
 
-    // Memanggil fungsi syncData yang sudah ada di script lo
-    await syncData();
-    
-    setTimeout(() => {
+    try {
+        // 1. Paksa tarik data terbaru dengan bypass cache
+        const freshUrl = `${drawingSheetUrl}&t=${new Date().getTime()}`;
+        const res = await fetch(freshUrl);
+        const csv = await res.text();
+        const rows = csv.split('\n').slice(1).map(r => r.split(',').map(c => c.trim().replace(/"/g, '')));
+
+        // 2. CEK KHUSUS RESET SAAT TOMBOL DIKLIK
+        const resetFound = rows.some(row => row[7] && row[7].toUpperCase() === "RESET");
+        
+        if (resetFound) {
+            btn.innerText = "💥 RESETTING...";
+            hardReset(); // Langsung hapus memori dan reload
+            return;
+        }
+
+        // 3. Jika bukan reset, jalankan syncData normal
+        await syncData();
+        
         btn.innerText = originalText;
         btn.disabled = false;
-        alert("Cek data selesai! Jika belum berubah, tunggu 1-5 menit proses dari Google.");
-    }, 1000);
+        alert("Cek data selesai! Data match sudah terbaru.");
+
+    } catch (e) {
+        btn.innerText = originalText;
+        btn.disabled = false;
+        alert("Gagal koneksi. Coba lagi.");
+    }
 }
 </script>
 </body>
 </html>
+
 
 
 
