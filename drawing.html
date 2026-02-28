@@ -233,28 +233,35 @@
 
     // TEKS WA TIDAK BERUBAH - TETAP SEPERTI YANG LO MAU
     function shareToWA() {
-        let m = "";
-        const select = document.getElementById('match-select');
-        if (select.selectedIndex > 0) {
-            m = select.options[select.selectedIndex].text;
-        } else {
-            m = "MATCH TERKUNCI";
-        }
-                  
-        const tm = document.getElementById('teams').value;
-        const jm = document.getElementById('start-time').value;
-        const dr = document.getElementById('duration').value;
-
-        let msg = `*${m.toUpperCase()}*%0A*${tm.toUpperCase()}*%0A%0A`;
-        msg += `📅 Tgl: ${document.getElementById('match-date').value}%0A⚖️ Saksi: ${document.getElementById('witness-name').value}%0A🎲 Acakan: ${shuffleCount}x%0A%0A*HASIL DRAWING:*%0A`;
-
-        currentList.forEach((name, i) => {
-            const isAbs = globalAbsent.includes(name);
-            const t = calculateSchedule(jm, i, dr);
-            msg += isAbs ? `${i+1}. ${name.toUpperCase()} (ABSEN)%0A` : `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}]%0A`;
-        });
-        window.open(`https://wa.me/?text=${msg}`, '_blank');
+    let m = "";
+    const select = document.getElementById('match-select');
+    if (select.selectedIndex > 0) {
+        m = select.options[select.selectedIndex].text;
+    } else {
+        m = "MATCH TERKUNCI";
     }
+                  
+    const tm = document.getElementById('teams').value;
+    const tg = document.getElementById('match-date').value; // Ambil tanggal
+    const jm = document.getElementById('start-time').value;
+    const dr = document.getElementById('duration').value;
+
+    // Header: Nama Match, Tim, dan Tanggal (Semua Bold & UpperCase)
+    let msg = `*${m.toUpperCase()}*%0A*${tm.toUpperCase()}*%0A*${tg.toUpperCase()}*%0A%0A`;
+    
+    // Info Saksi & Acakan + Spasi Baru
+    msg += `⚖️ Saksi: ${document.getElementById('witness-name').value}%0A🎲 Acakan: ${shuffleCount}x%0A%0A`;
+    
+    // List Nama
+    msg += `*HASIL DRAWING:*%0A`;
+    currentList.forEach((name, i) => {
+        const isAbs = globalAbsent.includes(name);
+        const t = calculateSchedule(jm, i, dr);
+        msg += isAbs ? `${i+1}. ${name.toUpperCase()} (ABSEN)%0A` : `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}]%0A`;
+    });
+    
+    window.open(`https://wa.me/?text=${msg}`, '_blank');
+}
 
     function hardReset() {
         localStorage.clear();
@@ -309,6 +316,7 @@ async function manualSync() {
 </script>
 </body>
 </html>
+
 
 
 
