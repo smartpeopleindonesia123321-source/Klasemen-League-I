@@ -257,7 +257,7 @@
     currentList.forEach((name, i) => {
         const isAbs = globalAbsent.includes(name);
         const t = calculateSchedule(jm, i, dr);
-        msg += isAbs ? `${i+1}. ${name.toUpperCase()} (ABSEN)%0A` : `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}]%0A`;
+        msg += isAbs ? `${i+1}. ${name.toUpperCase()} (ABSEN)%0A` : `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}] : %0A`;
     });
     
     window.open(`https://wa.me/?text=${msg}`, '_blank');
@@ -316,6 +316,7 @@ async function manualSync() {
 </script>
 </body>
 </html>
+
 
 
 
