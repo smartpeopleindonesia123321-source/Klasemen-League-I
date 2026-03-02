@@ -14,7 +14,7 @@
         .input-group { display: flex; flex-direction: column; gap: 5px; }
         .input-group label { font-size: 11px; color: var(--gold); font-weight: bold; text-transform: uppercase; }
         input, select { background: #252525; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; font-family: 'Kanit'; font-size: 14px; width: 100%; box-sizing: border-box; }
-        select:disabled { opacity: 0.7; color: var(--gold); border: 1px solid var(--gold); cursor: not-allowed; }
+        select:disabled { opacity: 1; color: var(--gold); border: 1px solid var(--gold); cursor: not-allowed; background: #1a1a1a; }
         .absen-container { background: #111; padding: 10px; border-radius: 8px; border: 1px solid #333; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; }
         .absen-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #ccc; }
         #draw-list { display: flex; flex-direction: column; gap: 8px; margin: 20px 0; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; min-height: 50px; transition: 0.5s ease; }
@@ -32,10 +32,10 @@
 
 <div class="container">
     <h1 style="color: var(--gold); margin: 0 0 5px 0; font-size: 24px;">🎰 DRAWING CENTER</h1>
-   <div style="display: flex; flex-direction: column; align-items: center; gap: 5px; margin-bottom: 10px;">
-    <div id="sync-status" style="font-size: 10px; color: #555;">Menghubungkan...</div>
-    <button onclick="manualSync()" style="width: auto; padding: 4px 12px; font-size: 10px; background: transparent; color: var(--gold); border: 1px solid var(--gold); border-radius: 4px; cursor: pointer; font-family: 'Kanit';">REFRESH</button>
-</div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 5px; margin-bottom: 10px;">
+        <div id="sync-status" style="font-size: 10px; color: #555;">Menghubungkan...</div>
+        <button onclick="manualSync()" style="width: auto; padding: 4px 12px; font-size: 10px; background: transparent; color: var(--gold); border: 1px solid var(--gold); border-radius: 4px; cursor: pointer; font-family: 'Kanit';">REFRESH</button>
+    </div>
 
     <div class="input-grid">
         <div class="input-group full-col">
@@ -69,63 +69,39 @@
     const playerMaster = ["Dandi", "Asep", "Rizal", "Aries", "Ikmal", "Regi", "Yanti", "Erni", "Dicky", "Maya"];
     
     let allMatchesData = [];
-    let shuffleCount = parseInt(localStorage.getItem('saved_count')) || 0;
-    let currentList = JSON.parse(localStorage.getItem('saved_list')) || [];
-    let isLocked = localStorage.getItem('is_locked') === 'true';
+    let shuffleCount = 0;
+    let currentList = [];
+    let isLocked = false;
     let globalAbsent = [];
 
-    // FUNGSI LOAD AWAL - MEMANGGIL DATA LAMA PAS REFRESH
     function initApp() {
-        if (isLocked) {
-            applyLockUI();
-            // Panggil kembali data input yang tersimpan
-            document.getElementById('match-date').value = localStorage.getItem('saved_date') || "";
-            document.getElementById('teams').value = localStorage.getItem('saved_teams') || "";
-            document.getElementById('start-time').value = localStorage.getItem('saved_start') || "";
-            document.getElementById('duration').value = localStorage.getItem('saved_dur') || "";
-            document.getElementById('witness-name').value = localStorage.getItem('saved_witness') || "";
-            globalAbsent = JSON.parse(localStorage.getItem('saved_absent')) || [];
-            renderAbsentStatus();
-            renderList();
-        }
         syncData();
         setInterval(syncData, 5000);
     }
 
     async function syncData() {
-    try {
-        // Tambahin random number biar gak kena cache data RESET yang lama
-        const res = await fetch(`${drawingSheetUrl}&nocache=${new Date().getTime()}&v=${Math.random()}`);
-        const csv = await res.text();
-        const rows = csv.split('\n').slice(1).map(r => r.split(',').map(c => c.trim().replace(/"/g, '')));
-        
-        // CEK RESET: Hanya jalanin kalau barisnya beneran ada isinya
-        const resetFound = rows.some(row => row[7] && row[7].toUpperCase() === "RESET");
-        
-        if (resetFound) {
-            // Cek biar gak alert terus-terusan kalau udah bersih
-            if (localStorage.getItem('is_locked') === 'true' || currentList.length > 0) {
+        try {
+            const res = await fetch(`${drawingSheetUrl}&nocache=${new Date().getTime()}`);
+            const csv = await res.text();
+            const rows = csv.split('\n').slice(1).map(r => r.split(',').map(c => c.trim().replace(/"/g, '')));
+            
+            const resetFound = rows.some(row => row[7] && row[7].toUpperCase() === "RESET");
+            if (resetFound) {
                 hardReset();
+                return;
             }
-            return;
-        }
 
-        if (isLocked) {
-            document.getElementById('sync-status').innerText = "🔒 Status: Terkunci (Selesai)";
-            return; 
+            allMatchesData = rows.filter(r => r[0] !== "");
+            renderDropdown();
+            document.getElementById('sync-status').innerText = "✅ Koneksi Stabil";
+        } catch (e) { 
+            document.getElementById('sync-status').innerText = "⚠️ Koneksi Terganggu";
         }
-
-        allMatchesData = rows.filter(r => r[0] !== "");
-        renderDropdown();
-        document.getElementById('sync-status').innerText = "✅ Koneksi Stabil";
-    } catch (e) { 
-        document.getElementById('sync-status').innerText = "⚠️ Koneksi Terganggu";
     }
-}
 
     function renderDropdown() {
         const select = document.getElementById('match-select');
-        const lastSelected = select.value || localStorage.getItem('saved_match_idx');
+        const currentVal = select.value;
         
         let html = '<option value="">-- Pilih Match --</option>';
         allMatchesData.forEach((data, index) => {
@@ -134,18 +110,20 @@
 
         if (select.innerHTML !== html) {
             select.innerHTML = html;
-            if (lastSelected !== null && allMatchesData[lastSelected]) {
-                select.value = lastSelected;
+            if (currentVal !== "" && allMatchesData[currentVal]) {
+                select.value = currentVal;
             }
         }
-        updateMatchDetails(false); 
     }
 
-    function updateMatchDetails(refreshList = true) {
-        if (isLocked) return;
+    function updateMatchDetails() {
         const select = document.getElementById('match-select');
         const idx = select.value;
-        if (idx === "" || !allMatchesData[idx]) return;
+        
+        if (idx === "" || !allMatchesData[idx]) {
+            resetUIForNewMatch();
+            return;
+        }
 
         const data = allMatchesData[idx];
         document.getElementById('match-date').value = data[1];
@@ -155,9 +133,25 @@
         document.getElementById('witness-name').value = data[5];
         globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()) : [];
         
-        localStorage.setItem('saved_match_idx', idx);
+        // CEK MEMORI PER MATCH
+        const savedData = localStorage.getItem('match_lock_' + idx);
+        
+        if (savedData) {
+            const parsed = JSON.parse(savedData);
+            currentList = parsed.list;
+            shuffleCount = parsed.count;
+            isLocked = true;
+            applyLockUI();
+        } else {
+            isLocked = false;
+            currentList = [];
+            shuffleCount = 0;
+            resetUIForNewMatch();
+        }
+
         renderAbsentStatus();
-        if (refreshList && currentList.length > 0) renderList();
+        renderList();
+        document.getElementById('count').innerText = shuffleCount;
     }
 
     function renderAbsentStatus() {
@@ -188,7 +182,10 @@
     }
 
     function renderList() {
-        if (currentList.length === 0) return;
+        if (currentList.length === 0) {
+            document.getElementById('draw-list').innerHTML = "";
+            return;
+        }
         const jm = document.getElementById('start-time').value;
         const dr = document.getElementById('duration').value;
         document.getElementById('draw-list').innerHTML = currentList.map((name, i) => {
@@ -203,20 +200,17 @@
     }
 
     function lockResult() {
+        const idx = document.getElementById('match-select').value;
+        if (idx === "") return alert("Pilih match dulu!");
         if (currentList.length === 0) return alert("Belum ada urutan!");
-        if (confirm("KUNCI HASIL?")) {
+        
+        if (confirm("KUNCI HASIL MATCH INI?")) {
             isLocked = true;
-            // SIMPAN DATA KE STORAGE AGAR TIDAK HILANG PAS REFRESH
-            localStorage.setItem('saved_list', JSON.stringify(currentList));
-            localStorage.setItem('saved_count', shuffleCount);
-            localStorage.setItem('is_locked', 'true');
-            localStorage.setItem('saved_date', document.getElementById('match-date').value);
-            localStorage.setItem('saved_teams', document.getElementById('teams').value);
-            localStorage.setItem('saved_start', document.getElementById('start-time').value);
-            localStorage.setItem('saved_dur', document.getElementById('duration').value);
-            localStorage.setItem('saved_witness', document.getElementById('witness-name').value);
-            localStorage.setItem('saved_absent', JSON.stringify(globalAbsent));
-            
+            const dataToSave = {
+                list: currentList,
+                count: shuffleCount
+            };
+            localStorage.setItem('match_lock_' + idx, JSON.stringify(dataToSave));
             applyLockUI();
         }
     }
@@ -231,108 +225,62 @@
         renderList();
     }
 
-    // TEKS WA TIDAK BERUBAH - TETAP SEPERTI YANG LO MAU
-    function shareToWA() {
-    let m = "";
-    const select = document.getElementById('match-select');
-    if (select.selectedIndex > 0) {
-        m = select.options[select.selectedIndex].text;
-    } else {
-        m = "MATCH TERKUNCI";
+    function resetUIForNewMatch() {
+        isLocked = false;
+        document.getElementById('draw-list').classList.add('is-blind');
+        document.getElementById('btn-shuffle').style.display = "block";
+        document.getElementById('btn-lock').style.display = "block";
+        document.getElementById('match-select').disabled = false;
+        document.getElementById('status').style.display = "none";
+        document.getElementById('btn-wa').style.display = "none";
     }
-                  
-    const tm = document.getElementById('teams').value;
-    const tg = document.getElementById('match-date').value; // Ambil tanggal
-    const jm = document.getElementById('start-time').value;
-    const dr = document.getElementById('duration').value;
 
-    // Header: Nama Match, Tim, dan Tanggal (Semua Bold & UpperCase)
-    let msg = `*${m.toUpperCase()}*%0A*${tm.toUpperCase()}*%0A*${tg.toUpperCase()}*%0A%0A`;
-    
-    // Info Saksi & Acakan + Spasi Baru
-    msg += `⚖️ Saksi: ${document.getElementById('witness-name').value}%0A🎲 Acakan: ${shuffleCount}x%0A%0A`;
-    
-    // List Nama
-    msg += `*HASIL DRAWING:*%0A`;
-    currentList.forEach((name, i) => {
-        const isAbs = globalAbsent.includes(name);
-        const t = calculateSchedule(jm, i, dr);
-        msg += isAbs ? `${i+1}. ${name.toUpperCase()} (ABSEN)%0A` : `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}] : %0A`;
-    });
-    
-    window.open(`https://wa.me/?text=${msg}`, '_blank');
-}
+    function shareToWA() {
+        let m = "";
+        const select = document.getElementById('match-select');
+        if (select.selectedIndex > 0) {
+            m = select.options[select.selectedIndex].text;
+        } else {
+            m = "MATCH TERKUNCI";
+        }
+                  
+        const tm = document.getElementById('teams').value;
+        const tg = document.getElementById('match-date').value; 
+        const jm = document.getElementById('start-time').value;
+        const dr = document.getElementById('duration').value;
+
+        let msg = `*${m.toUpperCase()}*%0A*${tm.toUpperCase()}*%0A*${tg.toUpperCase()}*%0A%0A`;
+        msg += `⚖️ Saksi: ${document.getElementById('witness-name').value}%0A🎲 Acakan: ${shuffleCount}x%0A%0A`;
+        msg += `*HASIL DRAWING:*%0A`;
+        
+        currentList.forEach((name, i) => {
+            const isAbs = globalAbsent.includes(name);
+            const t = calculateSchedule(jm, i, dr);
+            msg += isAbs ? `${i+1}. ${name.toUpperCase()} (ABSEN)%0A` : `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}] : %0A`;
+        });
+        
+        window.open(`https://wa.me/?text=${msg}`, '_blank');
+    }
 
     function hardReset() {
         localStorage.clear();
-        alert("Sistem di-Reset!");
+        alert("Sistem di-Reset Admin!");
         location.reload();
     }
 
-    window.onload = initApp;
-    // FUNGSI CEK DATA MANUAL (HANYA MEMANGGIL SYNC DATA BAWAAN)
-// FUNGSI CEK DATA MANUAL (VERSI FIX RESET)
-async function manualSync() {
-    if (isLocked) {
-        alert("Status Terkunci! Tidak bisa sinkronisasi ulang.");
-        return;
-    }
-    
-    const btn = event.target;
-    const originalText = btn.innerText;
-    
-    btn.innerText = "⏳ SEDANG CEK...";
-    btn.disabled = true;
-
-    try {
-        // 1. Paksa tarik data terbaru dengan bypass cache
-        const freshUrl = `${drawingSheetUrl}&t=${new Date().getTime()}`;
-        const res = await fetch(freshUrl);
-        const csv = await res.text();
-        const rows = csv.split('\n').slice(1).map(r => r.split(',').map(c => c.trim().replace(/"/g, '')));
-
-        // 2. CEK KHUSUS RESET SAAT TOMBOL DIKLIK
-        const resetFound = rows.some(row => row[7] && row[7].toUpperCase() === "RESET");
-        
-        if (resetFound) {
-            btn.innerText = "💥 RESETTING...";
-            hardReset(); // Langsung hapus memori dan reload
-            return;
-        }
-
-        // 3. Jika bukan reset, jalankan syncData normal
+    async function manualSync() {
+        const btn = event.target;
+        const originalText = btn.innerText;
+        btn.innerText = "⏳...";
+        btn.disabled = true;
         await syncData();
-        
-        btn.innerText = originalText;
-        btn.disabled = false;
-        alert("Cek data selesai! Data match sudah terbaru.");
-
-    } catch (e) {
-        btn.innerText = originalText;
-        btn.disabled = false;
-        alert("Gagal koneksi. Coba lagi.");
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }, 1000);
     }
-}
+
+    window.onload = initApp;
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
