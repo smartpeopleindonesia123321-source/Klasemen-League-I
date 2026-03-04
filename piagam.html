@@ -2,12 +2,14 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PIAGAM PENGHARGAAN | FOOTBALL LEAGUE-I</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&family=Playfair+Display:wght@700;900&family=Libre+Baskerville:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
             --gold: #d4af37; --silver: #aaa9ad; --bronze: #cd7f32;
             --dark: #0a0a0a; --white: #ffffff;
+            --afc-purple: #4a148c; /* Warna nuansa AFC Elite */
         }
         body { background: #222; font-family: 'Kanit', sans-serif; display: flex; flex-direction: column; align-items: center; gap: 50px; padding: 50px 0; }
         
@@ -96,6 +98,16 @@
         .cert-witness .award-title { color: #546e7a; } .cert-witness .corner { border-color: #546e7a; }
         .cert-fairplay .award-title { color: #2e7d32; } .cert-fairplay .corner { border-color: #2e7d32; }
 
+        /* NUANSA UNGU UNTUK AFC ELITE */
+        .cert-afc .award-title { color: var(--afc-purple); }
+        .cert-afc .corner { border-color: var(--afc-purple); }
+        .cert-afc .league-name { color: var(--afc-purple); }
+        .cert-afc::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at top right, rgba(74, 20, 140, 0.05), transparent);
+            pointer-events: none;
+        }
+
         .btn-print {
             position: fixed; top: 20px; left: 20px; padding: 12px 25px;
             background: #00f2ff; border: none; font-weight: bold; cursor: pointer;
@@ -119,7 +131,8 @@
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=0&single=true&output=csv';
 
     const NAMA_SAKSI_TERBAIK = "No Valuable Name"; 
-    const NAMA_FAIR_PLAY = "No Valuable Name";    
+    const NAMA_FAIR_PLAY = "No Valuable Name";
+    const NAMA_AFC_ELITE = "No Valuable Name"; // Tentukan nama pemenang AFC di sini
 
     const assets = {
         piala: 'assets/piala.png',
@@ -130,6 +143,7 @@
         bola: 'assets/bola.png',
         saksi: 'assets/saksi.png',
         fairplay: 'assets/fairplay.png',
+        afc: 'assets/afc.png', // Logo AFC baru lo
         ttdRegi: 'assets/ttdregi.png',
         ttdRizal: 'assets/ttdrizal.png',
         cap: 'assets/cap.png'
@@ -197,6 +211,15 @@
                 desc: 'Penghargaan ini diberikan kepada individu yang menunjukkan perilaku sportif, disiplin tinggi, menghormati lawan, serta mematuhi peraturan permainan.'
             });
 
+            // TAMBAHAN PIAGAM AFC 2 ELITE TROPHY
+            renderCard(container, {
+                type: 'cert-afc',
+                imgs: [assets.afc],
+                title: 'AFC 2 ELITE TROPHY',
+                name: NAMA_AFC_ELITE,
+                desc: 'Penghargaan bergengsi atas pencapaian luar biasa dan dominasi teknis dalam turnamen kasta elit AFC tingkat kedua.'
+            });
+
         } catch (e) { 
             console.error("Error:", e); 
             document.getElementById('loading').innerText = "❌ GAGAL MEMUAT DATA!";
@@ -251,7 +274,3 @@
     </script>
 </body>
 </html>
-
-
-
-
