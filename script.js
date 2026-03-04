@@ -70,7 +70,8 @@ async function fetchData() {
                 logo: row[3],
                 potw: row[4] || "",
                 potw_winner: parseInt(row[5]) || 0, 
-                rate: row[6] || "0"
+                rate: row[6] || "0",
+                yellowCards: parseInt(row[7]) || 0
             };
         }).filter(p => p.nama);
 
@@ -244,14 +245,20 @@ function renderTable(players) {
         else if(currentRank === 2) tr.className = "rank-2";
         else if(currentRank === 3) tr.className = "rank-3";
         else if(currentRank === players.length) tr.className = "degradasi";
-
+        // --- DISINI TARUH FOR LOOP-NYA ---
+        let yellowCardsHTML = "";
+        for (let j = 0; j < Math.min(p.yellowCards, 3); j++) {
+            yellowCardsHTML += `<span style="display:inline-block; width:10px; height:14px; background:#facc15; border-radius:2px; margin-left:5px; border:1px solid rgba(0,0,0,0.2); vertical-align: middle;" title="Pelanggaran Internal"></span>`;
+        }
+        
         // 7. INJECT HTML KE BARIS TABEL
+        // (Pastikan baris let yellowCardsHTML = ... sudah lo taruh di atasnya ya)
         tr.innerHTML = `
             <td>${currentRank}</td>
             <td style="text-align:left">
                 <div class="team-wrapper">
                     <img src="${p.logo}" class="team-logo" onclick="openModal('${p.nama}', '${p.logo}')">
-                    <span class="team-name">${p.nama}</span>
+                    <span class="team-name">${p.nama}${yellowCardsHTML}</span>
                 </div>
             </td>
             <td><strong>${p.point}</strong></td>
@@ -510,6 +517,7 @@ closeModal = function() {
         mainTrack.play();
     }
 };
+
 
 
 
