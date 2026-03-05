@@ -108,6 +108,16 @@
             pointer-events: none;
         }
 
+        /* NUANSA EMAS AMBER UNTUK STAFF KHUSUS */
+        .cert-staff .award-title { color: #ffbf00; }
+        .cert-staff .corner { border-color: #ffbf00; }
+        .cert-staff .league-name { color: #ffbf00; }
+        .cert-staff::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at bottom left, rgba(255, 191, 0, 0.05), transparent);
+            pointer-events: none;
+        }
+
         .btn-print {
             position: fixed; top: 20px; left: 20px; padding: 12px 25px;
             background: #00f2ff; border: none; font-weight: bold; cursor: pointer;
@@ -133,6 +143,7 @@
     const NAMA_SAKSI_TERBAIK = "No Valuable Name"; 
     const NAMA_FAIR_PLAY = "No Valuable Name";
     const NAMA_AFC_ELITE = "MAYA"; // Tentukan nama pemenang AFC di sini
+    const NAMA_STAFF_TERBAIK = "No Valuable Name"; // Tentukan nama Staff Khusus di sini
 
     const assets = {
         piala: 'assets/piala.png',
@@ -143,7 +154,8 @@
         bola: 'assets/bola.png',
         saksi: 'assets/saksi.png',
         fairplay: 'assets/fairplay.png',
-        afc: 'assets/afc.png', // Logo AFC baru lo
+        afc: 'assets/afc.png',
+        admin: 'assets/admin.png',
         ttdRegi: 'assets/ttdregi.png',
         ttdRizal: 'assets/ttdrizal.png',
         cap: 'assets/cap.png'
@@ -220,6 +232,15 @@
                 desc: 'Penghargaan bergengsi atas pencapaian luar biasa dan dominasi teknis dalam turnamen kasta elit AFC tingkat kedua.'
             });
 
+            // TAMBAHAN PIAGAM STAFF KHUSUS TERBAIK
+            renderCard(container, {
+                type: 'cert-staff',
+                imgs: [assets.admin],
+                title: 'BEST SPECIAL STAFF AWARD',
+                name: NAMA_STAFF_TERBAIK,
+                desc: 'Penghargaan atas loyalitas, dedikasi tinggi, dan kontribusi teknis luar biasa dalam menyukseskan operasional Football League-I musim ini.'
+            });
+
         } catch (e) { 
             console.error("Error:", e); 
             document.getElementById('loading').innerText = "❌ GAGAL MEMUAT DATA!";
@@ -274,4 +295,3 @@
     </script>
 </body>
 </html>
-
