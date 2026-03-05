@@ -9,135 +9,99 @@
         :root {
             --gold: #d4af37; --silver: #aaa9ad; --bronze: #cd7f32;
             --dark: #0a0a0a; --white: #ffffff;
-            --afc-purple: #4a148c; /* Warna nuansa AFC Elite */
+            --afc-purple: #4a148c;
         }
-        body { background: #222; font-family: 'Kanit', sans-serif; display: flex; flex-direction: column; align-items: center; gap: 50px; padding: 50px 0; }
+        body { background: #222; font-family: 'Kanit', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px 0; }
         
-        /* UKURAN DISESUAIKAN UNTUK A4 LANDSCAPE */
         .certificate {
             width: 277mm; height: 190mm; background: var(--white);
             position: relative; border: 20px solid var(--dark);
             display: flex; flex-direction: column; align-items: center;
             box-shadow: 0 0 50px rgba(0,0,0,0.5); overflow: hidden; color: var(--dark);
-            margin-bottom: 50px;
+            margin-bottom: 50px; padding: 30px; box-sizing: border-box;
         }
 
-        .inner-border { position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border: 2px solid var(--dark); pointer-events: none; }
-        .corner { position: absolute; width: 100px; height: 100px; border: 8px solid var(--gold); }
+        .inner-border { position: absolute; top: 12px; left: 12px; right: 12px; bottom: 12px; border: 2px solid var(--dark); pointer-events: none; }
+        .corner { position: absolute; width: 120px; height: 120px; border: 10px solid var(--gold); z-index: 10; }
         .top-left { top: 0; left: 0; border-right: none; border-bottom: none; }
         .top-right { top: 0; right: 0; border-left: none; border-bottom: none; }
         .bottom-left { bottom: 0; left: 0; border-right: none; border-top: none; }
         .bottom-right { bottom: 0; right: 0; border-left: none; border-top: none; }
 
-        .trophy-container { height: 250px; margin-top: 5px; display: flex; gap: 15px; align-items: center; justify-content: center; z-index: 5; }
-        .trophy-container img {
-            height: 100%;
-            width: auto;
-            object-fit: contain;
-            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
-            mix-blend-mode: multiply; 
-        }
+        .header { margin-top: 25px; text-transform: uppercase; letter-spacing: 6px; font-weight: 400; font-size: 14px; opacity: 0.8; }
+        
+        /* JUDUL DIPERTEGAS */
+        .award-title { font-family: 'Playfair Display', serif; font-size: 48px; margin: 10px 0; color: var(--gold); text-transform: uppercase; text-align: center; width: 90%; line-height: 1; font-weight: 900; letter-spacing: 1px; }
+        
+        /* LOGO/PIALA LEBIH BESAR & PROPORSIONAL */
+        .trophy-container { height: 210px; margin: 15px 0; display: flex; gap: 20px; align-items: center; justify-content: center; z-index: 5; }
+        .trophy-container img { height: 100%; width: auto; object-fit: contain; filter: drop-shadow(4px 8px 12px rgba(0,0,0,0.15)); mix-blend-mode: multiply; }
 
-        .header { margin-top: 35px; text-transform: uppercase; letter-spacing: 5px; font-weight: 400; font-size: 13px; }
-        .award-title { font-family: 'Playfair Display', serif; font-size: 34px; margin: 5px 0; color: var(--gold); text-transform: uppercase; text-align: center; width: 85%; line-height: 1.1; font-weight: 900; }
+        .presented-to { margin-top: 25px; font-size: 24px; font-style: italic; font-family: 'Libre Baskerville', serif; color: #555; }
         
-        .presented-to { margin-top: 60px; font-size: 22px; font-style: italic; font-family: 'Libre Baskerville', serif; }
-        
+        /* NAMA PEMENANG SANGAT MENONJOL */
         .winner-name { 
             font-family: 'Libre Baskerville', serif; 
-            font-size: 42px; 
+            font-size: 68px; 
             font-weight: 700; 
-            margin: 15px 0; 
+            margin: 5px 0; 
             text-transform: uppercase; 
             color: #111; 
             text-align: center;
-            letter-spacing: 2px;
-            border-bottom: 2px solid #ddd;
+            letter-spacing: 3px;
+            border-bottom: 3px solid #eee;
             padding-bottom: 5px;
-            min-width: 60%;
+            min-width: 75%;
         }
 
-        .ballon-text {
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            font-style: italic;
-            color: var(--gold);
-            font-size: 18px;
-            margin-top: -5px;
-            letter-spacing: 1px;
-        }
+        .ballon-text { font-family: 'Playfair Display', serif; font-weight: 700; font-style: italic; color: var(--gold); font-size: 20px; margin-top: 5px; }
 
-        .league-name { font-weight: 900; color: #1e40af; margin-top: 8px; font-size: 20px; letter-spacing: 1px; }
-        .description { width: 80%; text-align: center; font-size: 14px; margin-top: 10px; line-height: 1.4; color: #444; }
+        .league-name { font-weight: 900; color: #1e40af; margin-top: 15px; font-size: 28px; letter-spacing: 2px; }
+        .description { width: 70%; text-align: center; font-size: 16px; margin-top: 10px; line-height: 1.5; color: #333; }
 
-        /* FOOTER SETTINGS */
-        .footer { margin-top: auto; margin-bottom: 20px; display: flex; justify-content: space-around; width: 100%; position: relative; }
-        .sig-box { text-align: center; width: 220px; position: relative; display: flex; flex-direction: column; align-items: center; }
+        /* FOOTER SETTINGS - TTD DIPERBESAR PROFESIONAL */
+        .footer { margin-top: auto; margin-bottom: 25px; display: flex; justify-content: space-around; width: 100%; position: relative; }
+        .sig-box { text-align: center; width: 300px; position: relative; display: flex; flex-direction: column; align-items: center; }
         
-        /* TTD diperbesar */
-        .sig-img { height: 150px; width: auto; margin-bottom: -25px; z-index: 2; mix-blend-mode: multiply; }
+        .sig-img { height: 140px; width: auto; margin-bottom: -45px; z-index: 2; mix-blend-mode: multiply; filter: contrast(1.1); }
         
-        /* Cap diperkecil & digeser ke atas */
         .stamp-img { 
             position: absolute; 
-            width: 75px; 
+            width: 100px; 
             height: auto; 
-            bottom: 45px; /* Naik ke atas */
-            left: 60%; /* Geser ke samping */
+            bottom: 40px; 
+            left: 65%; 
             z-index: 1; 
-            opacity: 0.8; 
+            opacity: 0.85; 
             mix-blend-mode: multiply;
         }
 
-        .sig-line { border-top: 2px solid var(--dark); width: 100%; padding-top: 5px; font-weight: bold; font-size: 14px; text-transform: uppercase; z-index: 3; }
-        .sig-role { font-size: 11px; color: #444; text-transform: none; margin-top: 2px; font-weight: normal; }
+        .sig-line { border-top: 2.5px solid var(--dark); width: 100%; padding-top: 8px; font-weight: bold; font-size: 18px; text-transform: uppercase; z-index: 3; letter-spacing: 1px; }
+        .sig-role { font-size: 13px; color: #444; margin-top: 3px; font-weight: 400; }
         
+        /* VARIAN WARNA */
         .cert-juara2 .award-title { color: var(--silver); } .cert-juara2 .corner { border-color: var(--silver); }
         .cert-juara3 .award-title { color: var(--bronze); } .cert-juara3 .corner { border-color: var(--bronze); }
         .cert-topscorer .award-title { color: #cc0000; } .cert-topscorer .corner { border-color: #cc0000; }
         .cert-poty .award-title { color: #1e40af; } .cert-poty .corner { border-color: #1e40af; }
         .cert-witness .award-title { color: #546e7a; } .cert-witness .corner { border-color: #546e7a; }
         .cert-fairplay .award-title { color: #2e7d32; } .cert-fairplay .corner { border-color: #2e7d32; }
-
-        /* NUANSA UNGU UNTUK AFC ELITE */
-        .cert-afc .award-title { color: var(--afc-purple); }
-        .cert-afc .corner { border-color: var(--afc-purple); }
-        .cert-afc .league-name { color: var(--afc-purple); }
-        .cert-afc::before {
-            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at top right, rgba(74, 20, 140, 0.05), transparent);
-            pointer-events: none;
-        }
-
-        /* NUANSA EMAS AMBER UNTUK STAFF KHUSUS */
-        .cert-staff .award-title { color: #ffbf00; }
-        .cert-staff .corner { border-color: #ffbf00; }
-        .cert-staff .league-name { color: #ffbf00; }
-        .cert-staff::before {
-            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at bottom left, rgba(255, 191, 0, 0.05), transparent);
-            pointer-events: none;
-        }
+        .cert-afc .award-title { color: var(--afc-purple); } .cert-afc .corner { border-color: var(--afc-purple); }
+        .cert-staff .award-title { color: #ffbf00; } .cert-staff .corner { border-color: #ffbf00; }
 
         .btn-print {
-            position: fixed; top: 20px; left: 20px; padding: 12px 25px;
+            position: fixed; top: 20px; left: 20px; padding: 15px 30px;
             background: #00f2ff; border: none; font-weight: bold; cursor: pointer;
-            border-radius: 5px; z-index: 100; font-family: 'Kanit'; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border-radius: 5px; z-index: 100; font-family: 'Kanit'; font-size: 16px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
         @media print { 
-            @page {
-                size: A4 landscape;
-                margin: 0;
-            }
-            body { background: none; padding: 0; gap: 0; margin: 0; } 
+            @page { size: A4 landscape; margin: 0; }
+            body { background: none; padding: 0; margin: 0; } 
             .certificate { 
-                box-shadow: none; 
-                page-break-after: always; 
-                margin: 0; 
+                box-shadow: none; page-break-after: always; margin: 0; 
                 border: 15px solid var(--dark); 
-                width: 297mm; 
-                height: 210mm;
+                width: 297mm; height: 210mm;
             } 
             .btn-print { display: none; } 
         }
@@ -146,7 +110,7 @@
 <body>
 
     <button class="btn-print" onclick="window.print()">📥 SIMPAN PIAGAM (PDF)</button>
-    <div id="loading" style="color: white; margin-top: 100px;">🔄 MEMPROSES DATA...</div>
+    <div id="loading" style="color: white; margin-top: 100px;">🔄 MEMPROSES PIAGAM PROFESIONAL...</div>
     <div id="certificates-container"></div>
 
     <script>
@@ -154,23 +118,14 @@
 
     const NAMA_SAKSI_TERBAIK = "No Valuable Name"; 
     const NAMA_FAIR_PLAY = "No Valuable Name";
-    const NAMA_AFC_ELITE = "MAYA"; // Tentukan nama pemenang AFC di sini
-    const NAMA_STAFF_TERBAIK = "REGI"; // Tentukan nama Staff Khusus di sini
+    const NAMA_AFC_ELITE = "MAYA"; 
+    const NAMA_STAFF_TERBAIK = "REGI"; 
 
     const assets = {
-        piala: 'assets/piala.png',
-        emas: 'assets/emas.png',
-        perak: 'assets/perak.png',
-        perunggu: 'assets/perunggu.png',
-        sepatu: 'assets/sepatu.png',
-        bola: 'assets/bola.png',
-        saksi: 'assets/saksi.png',
-        fairplay: 'assets/fairplay.png',
-        afc: 'assets/afc.png',
-        admin: 'assets/admin.png',
-        ttdRegi: 'assets/ttdregi.png',
-        ttdRizal: 'assets/ttdrizal.png',
-        cap: 'assets/cap.png'
+        piala: 'assets/piala.png', emas: 'assets/emas.png', perak: 'assets/perak.png',
+        perunggu: 'assets/perunggu.png', sepatu: 'assets/sepatu.png', bola: 'assets/bola.png',
+        saksi: 'assets/saksi.png', fairplay: 'assets/fairplay.png', afc: 'assets/afc.png',
+        admin: 'assets/admin.png', ttdRegi: 'assets/ttdregi.png', ttdRizal: 'assets/ttdrizal.png', cap: 'assets/cap.png'
     };
 
     async function generateCertificates() {
@@ -181,12 +136,7 @@
             
             let players = csv.split('\n').slice(1).map(line => {
                 const row = line.split(',').map(c => c.trim().replace(/"/g, ''));
-                return { 
-                    nama: row[0], 
-                    point: parseInt(row[1]) || 0, 
-                    goals: parseInt(row[2]) || 0,
-                    potw_winner: parseInt(row[5]) || 0 
-                };
+                return { nama: row[0], point: parseInt(row[1]) || 0, goals: parseInt(row[2]) || 0, potw_winner: parseInt(row[5]) || 0 };
             }).filter(p => p.nama);
 
             const container = document.getElementById('certificates-container');
@@ -195,7 +145,6 @@
 
             const rankWinners = [...players].sort((a, b) => b.point - a.point || b.goals - a.goals);
             const scorerWinners = [...players].sort((a, b) => b.goals - a.goals);
-
             const maxPotwValue = Math.max(...players.map(p => p.potw_winner));
             const topPotyWinners = players.filter(p => p.potw_winner === maxPotwValue && maxPotwValue > 0);
 
@@ -207,63 +156,22 @@
             ];
 
             awards.forEach(data => renderCard(container, data));
-
             topPotyWinners.forEach(winner => {
-                renderCard(container, {
-                    type: 'cert-poty',
-                    imgs: [assets.bola],
-                    title: 'PLAYER OF THE YEAR',
-                    name: winner.nama,
-                    isBallon: true,
-                    desc: `Penghargaan tertinggi  individu  sebagai pemain terbaik sepanjang musim bergulir.`
-                });
+                renderCard(container, { type: 'cert-poty', imgs: [assets.bola], title: 'PLAYER OF THE YEAR', name: winner.nama, isBallon: true, desc: `Penghargaan tertinggi individu sebagai pemain terbaik sepanjang musim bergulir.` });
             });
 
-            renderCard(container, {
-                type: 'cert-witness',
-                imgs: [assets.saksi],
-                title: 'BEST WITNESS',
-                name: NAMA_SAKSI_TERBAIK,
-                desc: 'Penghargaan atas dedikasi dan integritas dalam menyaksikan serta mengawasi setiap prosedur kompetisi agar berjalan sesuai regulasi.'
-            });
-
-            renderCard(container, {
-                type: 'cert-fairplay',
-                imgs: [assets.fairplay],
-                title: 'FAIR PLAY TROPHY',
-                name: NAMA_FAIR_PLAY,
-                desc: 'Penghargaan ini diberikan kepada individu yang menunjukkan perilaku sportif, disiplin tinggi, menghormati lawan, serta mematuhi peraturan permainan.'
-            });
-
-            // TAMBAHAN PIAGAM AFC 2 ELITE TROPHY
-            renderCard(container, {
-                type: 'cert-afc',
-                imgs: [assets.afc],
-                title: 'AFC 2 ELITE TROPHY',
-                name: NAMA_AFC_ELITE,
-                desc: 'Penghargaan bergengsi atas pencapaian luar biasa dan dominasi teknis dalam turnamen kasta elit AFC tingkat kedua.'
-            });
-
-            // TAMBAHAN PIAGAM STAFF KHUSUS TERBAIK
-            renderCard(container, {
-                type: 'cert-staff',
-                imgs: [assets.admin],
-                title: 'BEST SPECIAL STAFF AWARD',
-                name: NAMA_STAFF_TERBAIK,
-                desc: 'Penghargaan atas loyalitas, dedikasi tinggi, dan kontribusi teknis luar biasa dalam menyukseskan operasional Football League-I musim ini.'
-            });
+            renderCard(container, { type: 'cert-witness', imgs: [assets.saksi], title: 'BEST WITNESS', name: NAMA_SAKSI_TERBAIK, desc: 'Penghargaan atas dedikasi dan integritas dalam menyaksikan serta mengawasi setiap prosedur kompetisi agar berjalan sesuai regulasi.' });
+            renderCard(container, { type: 'cert-fairplay', imgs: [assets.fairplay], title: 'FAIR PLAY TROPHY', name: NAMA_FAIR_PLAY, desc: 'Penghargaan ini diberikan kepada individu yang menunjukkan perilaku sportif, disiplin tinggi, menghormati lawan, serta mematuhi peraturan permainan.' });
+            renderCard(container, { type: 'cert-afc', imgs: [assets.afc], title: 'AFC 2 ELITE TROPHY', name: NAMA_AFC_ELITE, desc: 'Penghargaan bergengsi atas pencapaian luar biasa dan dominasi teknis dalam turnamen kasta elit AFC tingkat kedua.' });
+            renderCard(container, { type: 'cert-staff', imgs: [assets.admin], title: 'BEST SPECIAL STAFF AWARD', name: NAMA_STAFF_TERBAIK, desc: 'Penghargaan atas loyalitas, dedikasi tinggi, dan kontribusi teknis luar biasa dalam menyukseskan operasional Football League-I musim ini.' });
 
         } catch (e) { 
-            console.error("Error:", e); 
             document.getElementById('loading').innerText = "❌ GAGAL MEMUAT DATA!";
         }
     }
 
     function renderCard(container, data) {
-        let imagesHTML = data.imgs && data.imgs.length > 0 
-            ? data.imgs.map(url => `<img src="${url}" alt="award">`).join('') 
-            : `<div style="font-size: 80px; margin-bottom: 10px; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));">${data.customIcon || '🏆'}</div>`;
-            
+        let imagesHTML = data.imgs.map(url => `<img src="${url}" alt="award">`).join('');
         let extraText = data.isBallon ? `<div class="ballon-text">🏆 Ballon d'Or Winner 🏆</div>` : '';
 
         container.innerHTML += `
@@ -275,9 +183,7 @@
                 <div class="header">Official Achievement</div>
                 <div class="award-title">${data.title}</div>
                 
-                <div class="trophy-container">
-                    ${imagesHTML}
-                </div>
+                <div class="trophy-container">${imagesHTML}</div>
 
                 <div class="presented-to">Diberikan Kepada:</div>
                 <div class="winner-name">${data.name}</div>
@@ -307,10 +213,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
