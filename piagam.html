@@ -13,8 +13,9 @@
         }
         body { background: #222; font-family: 'Kanit', sans-serif; display: flex; flex-direction: column; align-items: center; gap: 50px; padding: 50px 0; }
         
+        /* UKURAN DISESUAIKAN UNTUK A4 LANDSCAPE */
         .certificate {
-            width: 800px; height: 560px; background: var(--white);
+            width: 277mm; height: 190mm; background: var(--white);
             position: relative; border: 20px solid var(--dark);
             display: flex; flex-direction: column; align-items: center;
             box-shadow: 0 0 50px rgba(0,0,0,0.5); overflow: hidden; color: var(--dark);
@@ -125,8 +126,19 @@
         }
 
         @media print { 
-            body { background: none; padding: 0; gap: 0; } 
-            .certificate { box-shadow: none; page-break-after: always; margin: 0; border: 15px solid var(--dark); } 
+            @page {
+                size: A4 landscape;
+                margin: 0;
+            }
+            body { background: none; padding: 0; gap: 0; margin: 0; } 
+            .certificate { 
+                box-shadow: none; 
+                page-break-after: always; 
+                margin: 0; 
+                border: 15px solid var(--dark); 
+                width: 297mm; 
+                height: 210mm;
+            } 
             .btn-print { display: none; } 
         }
     </style>
@@ -295,4 +307,3 @@
     </script>
 </body>
 </html>
-
