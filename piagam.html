@@ -128,6 +128,26 @@
             } 
             .btn-print, #loading { display: none; } 
         }
+        /* TAMBAHAN BIAR FIT DI HP */
+@media screen and (max-width: 768px) {
+    body { 
+        padding: 20px 10px; 
+        gap: 20px; 
+    }
+    .certificate {
+        width: 95vw; /* Lebar sertifikat jadi 95% lebar layar HP */
+        height: auto; /* Tinggi menyesuaikan proporsi */
+        min-height: 250px;
+        border-width: 10px; /* Border dikecilkan dikit buat HP */
+        margin-bottom: 20px;
+    }
+    .award-title { font-size: 1.2rem; }
+    .winner-name { font-size: 1.5rem; }
+    .trophy-container { height: 60px; margin-top: 30px; }
+    .sig-img { height: 60px; }
+    .sig-line { font-size: 10px; }
+    .description { font-size: 10px; }
+}
     </style>
 </head>
 <body>
@@ -291,6 +311,7 @@
     </script>
 </body>
 </html>
+
 
 
 
