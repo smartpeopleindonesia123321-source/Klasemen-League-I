@@ -133,17 +133,37 @@
         document.getElementById('start-time').value = data[3];
         document.getElementById('duration').value = data[4];
         document.getElementById('witness-name').value = data[5];
+
+        // 1. Ambil data absen TERBARU dari Google Sheets
+        const sheetAbsentRaw = data[6] ? data[6].split(';').map(n => n.trim()).filter(n => n !== "").sort().join(';') : "";
         globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()) : [];
         
         const savedData = localStorage.getItem('match_lock_' + idx);
         
         if (savedData) {
             const parsed = JSON.parse(savedData);
-            currentList = parsed.list;
-            shuffleCount = parsed.count;
-            isLocked = true;
-            applyLockUI();
+            
+            // 2. Cek data absen yang tersimpan di HP (kalau ada)
+            // Kita bikin pembanding biar kalau lo ubah absen di Sheets, HP otomatis ngereset
+            const localAbsentRaw = parsed.absentSnapshot || "";
+
+            if (sheetAbsentRaw !== localAbsentRaw) {
+                // JIKA ABSEN BERUBAH: Paksa reset khusus untuk match ini
+                localStorage.removeItem('match_lock_' + idx);
+                isLocked = false;
+                currentList = [];
+                shuffleCount = 0;
+                resetUIForNewMatch();
+                console.log("Data absen berubah, sistem otomatis unlock match ini.");
+            } else {
+                // JIKA ABSEN SAMA: Pakai data yang sudah terkunci
+                currentList = parsed.list;
+                shuffleCount = parsed.count;
+                isLocked = true;
+                applyLockUI();
+            }
         } else {
+            // BELUM ADA DATA TERKUNCI
             isLocked = false;
             currentList = [];
             shuffleCount = 0;
@@ -209,7 +229,9 @@
             isLocked = true;
             const dataToSave = {
                 list: currentList,
-                count: shuffleCount
+                count: shuffleCount,
+                // SIMPAN STATUS ABSEN SAAT INI SEBAGAI PENANDA
+                absentSnapshot: globalAbsent.sort().join(';') 
             };
             localStorage.setItem('match_lock_' + idx, JSON.stringify(dataToSave));
             applyLockUI();
@@ -286,4 +308,5 @@
 </script>
 </body>
 </html>
+
 
