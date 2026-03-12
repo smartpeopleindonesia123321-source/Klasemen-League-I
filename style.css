@@ -647,9 +647,9 @@ body.light-mode .rank-1 .team-name {
     width: 180px;
     flex-shrink: 0;
     position: sticky;
-    top: 10px; /* <--- Ubah ini agar sama dengan padding container atau margin tabel */
+    top: 20px;       /* Jarak dari atas layar pas di-scroll */
     z-index: 100;
-    margin-top: 10px; /* <--- Tambahkan ini untuk nurunin posisi chat box-nya */
+    margin-top: 55px; /* <--- KUNCI DI SINI: Kita tambah margin biar sejajar header tabel */
 }
 
 /* Box Chat Style */
@@ -765,6 +765,7 @@ html, body {
     max-width: 100%;
     overflow-x: hidden;
 }
+
 
 
 
