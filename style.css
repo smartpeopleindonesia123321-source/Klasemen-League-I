@@ -769,18 +769,48 @@ body.light-mode .rank-1 .team-name {
     text-transform: uppercase;
 }
 
-/* --- RESPONSIVE MOBILE (Pindah ke bawah hanya di layar sangat sempit) --- */
+/* --- OPTIMASI CHAT & LAYOUT KHUSUS HP --- */
 @media (max-width: 800px) {
     .main-layout {
-        flex-direction: column;
-        flex-wrap: wrap;
+        flex-direction: column; /* Chat pindah ke bawah tabel */
+        gap: 20px;
+        padding: 10px;
     }
+
     .right-side {
-        width: 100%;
-        position: static;
+        width: 100% !important; /* Chat jadi lebar penuh di HP */
+        position: static;        /* Gak usah sticky biar gak ganggu scroll */
+        margin-top: 20px;
     }
+
     .chat-container {
-        height: 300px;
+        height: 500px;           /* Lebih tinggi biar enak liat history chat */
+        border-radius: 15px;
+        border: 2px solid var(--accent); /* Biar lebih tegas batasnya */
+    }
+
+    /* Bikin area ngetik jadi lega buat jempol */
+    .chat-header {
+        font-size: 12px;
+        padding: 10px;
+    }
+
+    #userName, #userComment {
+        font-size: 14px !important; /* Ukuran font input standar HP biar gak auto-zoom */
+        padding: 12px !important;
+        margin-bottom: 8px;
+        border-radius: 8px;
+    }
+
+    #userComment {
+        height: 60px; /* Lebih tinggi biar teks kelihatan pas ngetik panjang */
+    }
+
+    #btnSendComment {
+        padding: 12px;
+        font-size: 14px;
+        border-radius: 8px;
+        letter-spacing: 1px;
     }
 }
 
@@ -813,6 +843,7 @@ html, body {
         width: 100% !important;
     }
 }
+
 
 
 
