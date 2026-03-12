@@ -518,6 +518,76 @@ closeModal = function() {
     }
 };
 
+// PASTE URL dari Google Apps Script tadi di sini
+const CHAT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyf6o6U3vAceeTdKM1Rb8WGWKcTScj4wHFiUytK4yLbp7FYs16dHMQVVWZVdPfzaYv3Dw/exec";
+
+async function loadComments() {
+    try {
+        const response = await fetch(CHAT_SCRIPT_URL);
+        const comments = await response.json();
+        const display = document.getElementById('commentDisplay');
+        
+        if (comments.length === 0) {
+            display.innerHTML = '<p style="text-align:center; color:#555; font-size:12px;">Belum ada komentar. Jadilah yang pertama!</p>';
+            return;
+        }
+
+        display.innerHTML = comments.map(c => `
+            <div class="chat-msg-item">
+                <b>${c.nama} <span style="font-size:10px; color:#555; float:right;">${c.waktu}</span></b>
+                <p>${c.pesan}</p>
+            </div>
+        `).join('');
+        
+        // Auto-scroll ke paling bawah tiap ada pesan baru
+        display.scrollTop = display.scrollHeight;
+    } catch (error) {
+        console.error("Gagal memuat chat:", error);
+    }
+}
+
+async function sendComment() {
+    const nameInput = document.getElementById('userName');
+    const commentInput = document.getElementById('userComment');
+    const sendBtn = document.getElementById('btnSendComment');
+
+    const nama = nameInput.value.trim();
+    const pesan = commentInput.value.trim();
+
+    if (!nama || !pesan) {
+        alert("Nama dan pesan jangan kosong bro!");
+        return;
+    }
+
+    // Lock tombol biar gak spam klik
+    sendBtn.disabled = true;
+    sendBtn.innerText = "MENGIRIM...";
+
+    try {
+        await fetch(CHAT_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', // Penting untuk Google Apps Script
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nama, pesan })
+        });
+
+        // Bersihkan input pesan saja, nama biarkan tetap ada biar gak ngetik ulang
+        commentInput.value = "";
+        
+        // Refresh chat
+        setTimeout(loadComments, 1000); 
+    } catch (error) {
+        alert("Gagal kirim pesan. Coba lagi!");
+    } finally {
+        sendBtn.disabled = false;
+        sendBtn.innerText = "KIRIM 🚀";
+    }
+}
+
+// Jalankan fungsi muat chat secara berkala (tiap 5 detik)
+setInterval(loadComments, 5000);
+// Muat chat pertama kali saat web dibuka
+document.addEventListener('DOMContentLoaded', loadComments);
 
 
 
