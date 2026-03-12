@@ -647,9 +647,19 @@ body.light-mode .rank-1 .team-name {
     width: 180px;
     flex-shrink: 0;
     position: sticky;
-    top: 20px;       /* Jarak dari atas layar pas di-scroll */
+    top: 20px;
     z-index: 100;
-    margin-top: 55px; /* <--- KUNCI DI SINI: Kita tambah margin biar sejajar header tabel */
+    /* Ganti margin-top ini agar sejajar dengan baris pertama tabel */
+    margin-top: 85px; 
+}
+
+/* Responsif: Balikin margin ke normal pas di HP biar nggak ada celah kosong */
+@media (max-width: 800px) {
+    .right-side {
+        margin-top: 15px;
+        width: 100%;
+        position: static;
+    }
 }
 
 /* Box Chat Style */
@@ -765,6 +775,7 @@ html, body {
     max-width: 100%;
     overflow-x: hidden;
 }
+
 
 
 
