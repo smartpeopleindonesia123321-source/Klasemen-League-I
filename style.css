@@ -641,111 +641,53 @@ body.light-mode .rank-1 .team-name {
     min-width: 0;             /* Biar tabel bisa fleksibel */
 }
 
-/* Kolom Kanan (Chat) - DIBUAT LEBIH RAMPING */
+/* --- PENGATURAN LEBAR KOLOM CHAT --- */
 .right-side {
-    width: 270px;             /* Gue kecilin dari 330px ke 270px */
-    flex-shrink: 0;           /* Chat box nggak boleh gepeng */
+    width: 240px;             /* <--- GANTI ANGKA INI kalau mau lebih kecil lagi (misal: 220px) */
+    flex-shrink: 0;           
     position: sticky;
     top: 10px;
     z-index: 100;
 }
 
-/* Memastikan Tabel punya scroll internal jika kolom meluber */
-.table-container {
-    width: 100%;
-    overflow-x: auto;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-/* --- BOX CHAT STYLE RAMPING --- */
+/* --- OPTIMASI ISI CHAT AGAR TETAP RAPI SAAT SEMPIT --- */
 .chat-container {
-    background: #111;
-    border: 2px solid #333;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    height: 500px;            /* Tinggi dikurangi dikit biar proporsional */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    overflow: hidden;
+    height: 480px;            /* Gue pendekin dikit biar pas */
+    background: #0a0a0a;
+    border: 1px solid #333;   /* Border lebih tipis biar gak makan space */
 }
 
 .chat-header {
-    background: #222;
-    padding: 10px;            /* Padding dipersempit */
-    color: #facc15;
-    font-weight: bold;
-    text-align: center;
-    border-bottom: 1px solid #333;
-    text-transform: uppercase;
-    font-size: 13px;          /* Font header dikecilkan */
+    font-size: 11px;          /* Font header lebih kecil */
+    padding: 8px;
 }
 
-.chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px;             /* Padding dipersempit */
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-/* Item chat per orang */
 .chat-msg-item {
-    background: rgba(255,255,255,0.05);
-    padding: 6px 8px;
-    border-radius: 6px;
-    border-left: 3px solid #00f2ff;
+    padding: 5px 8px;         /* Padding dalam chat lebih rapat */
 }
 
 .chat-msg-item b {
-    color: #facc15;
-    font-size: 11px;          /* Font nama dikecilkan */
-    display: block;
+    font-size: 10px;          /* Font nama user lebih kecil */
 }
 
 .chat-msg-item p {
-    margin: 2px 0 0 0;
-    font-size: 12px;          /* Font isi chat dikecilkan */
-    color: #ddd;
-    line-height: 1.3;
+    font-size: 11px;          /* Font isi komentar lebih kecil */
 }
 
-/* Area Input */
-.chat-input-area {
-    padding: 10px;
-    background: #1a1a1a;
-    border-top: 1px solid #333;
-}
-
+/* --- AREA INPUT YANG LEBIH RINGKAS --- */
 #userName, #userComment {
-    width: 100%;
-    background: #000;
-    border: 1px solid #444;
-    color: white;
-    margin-bottom: 5px;
-    padding: 6px 8px;
-    border-radius: 4px;
-    font-family: 'Kanit';
-    font-size: 12px;          /* Font input dikecilkan */
-    box-sizing: border-box;
+    font-size: 11px;
+    padding: 5px;             /* Padding input lebih tipis */
+    margin-bottom: 4px;
 }
 
 #userComment {
-    height: 45px;             /* Input komentar lebih pendek */
-    resize: none;
+    height: 35px;             /* Box komentar dibuat pendek */
 }
 
 #btnSendComment {
-    width: 100%;
-    background: linear-gradient(135deg, #00f2ff 0%, #0061ff 100%);
-    color: #000;
-    border: none;
-    padding: 8px;
-    font-weight: bold;
-    font-size: 12px;
-    border-radius: 4px;
-    cursor: pointer;
+    padding: 6px;
+    font-size: 11px;
 }
 
 /* --- RESPONSIVE MOBILE (Hanya di HP) --- */
@@ -769,6 +711,7 @@ html, body {
     max-width: 100%;
     overflow-x: hidden;
 }
+
 
 
 
