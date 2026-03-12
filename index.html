@@ -12,19 +12,21 @@
 
     <div class="container">
         <h1>FOOTBALL LEAGUE-I</h1>
-        <div id="status">MENGHUBUNGKAN...</div>
+<div id="status">MENGHUBUNGKAN...</div>
 
-        <div class="ticker-container">
-            <div class="ticker-text" id="newsTicker">
-                ⚽ MEMUAT BERITA TERBARU... JANGAN LUPA CEK JADWAL MATCHDAY MINGGU INI! ⚽
-            </div>
-        </div>
-        
+<div class="ticker-container">
+    <div class="ticker-text" id="newsTicker">
+        ⚽ MEMUAT BERITA TERBARU... JANGAN LUPA CEK JADWAL MATCHDAY MINGGU INI! ⚽
+    </div>
+</div>
+
+<div class="main-layout">
+    
+    <div class="left-side">
         <div class="table-container">
             <div class="info-banner">
                 💡 <strong>Tips:</strong> Klik foto tim untuk detail ID Card!
             </div>
-
             <table id="mainTable">
                 <thead>
                     <tr>
@@ -41,6 +43,22 @@
                 <tbody></tbody>
             </table>
         </div>
+    </div>
+
+    <div class="right-side">
+        <div class="chat-container">
+            <div class="chat-header">LIVE DISKUSI 💬</div>
+            <div id="commentDisplay" class="chat-messages">
+                <p style="text-align:center; color:#555; font-size: 12px; margin-top: 20px;">Memuat komentar...</p>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="userName" placeholder="Nama..." maxlength="12">
+                <textarea id="userComment" placeholder="Komentar..." maxlength="80"></textarea>
+                <button id="btnSendComment" onclick="sendComment()">KIRIM 🚀</button>
+            </div>
+        </div>
+    </div>
+</div>
 
         <div class="top-scorer-container">
                 <div class="top-scorer-container" style="background: rgba(250, 204, 21, 0.1); border-color: rgba(250, 204, 21, 0.3); max-width: 600px;">
@@ -136,3 +154,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
