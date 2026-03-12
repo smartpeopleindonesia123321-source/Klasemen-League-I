@@ -795,9 +795,9 @@ html, body {
     /* Kita hilangkan berdasarkan urutan yang pasti di tabel lo */
     /* Kolom 4 (TREND), Kolom 5 (+/-), Kolom 6 (POTW) */
     
-    #mainTable th:nth-child(4), #mainTable td:nth-child(4),
     #mainTable th:nth-child(5), #mainTable td:nth-child(5),
-    #mainTable th:nth-child(6), #mainTable td:nth-child(6) {
+    #mainTable th:nth-child(6), #mainTable td:nth-child(6),
+    #mainTable th:nth-child(7), #mainTable td:nth-child(7) {
         display: none !important;
     }
 
@@ -814,6 +814,7 @@ html, body {
         table-layout: auto !important;
     }
 }
+
 
 
 
