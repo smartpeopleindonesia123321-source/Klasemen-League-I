@@ -790,11 +790,23 @@ html, body {
     overflow-x: hidden;
 }
 
-@media screen and (max-width: 480px) {
-    /* Sembunyikan kolom ke-4 (TREND) atau ke-5 (+/-) */
-    #mainTable th:nth-child(4), 
-    #mainTable td:nth-child(4) {
-        display: none;
+/*menghilangkan agg dan trend di hp*/
+/* --- SEMBUNYIKAN KOLOM TREND DI HP --- */
+@media screen and (max-width: 600px) {
+    /* Sembunyikan Header TREND (Kolom ke-4) */
+    #mainTable thead th:nth-child(4) {
+        display: none !important;
+    }
+    
+    /* Sembunyikan Isi TREND (Kolom ke-4) */
+    #mainTable tbody td:nth-child(4) {
+        display: none !important;
+    }
+
+    /* Opsional: Sembunyikan juga kolom +/- (Kolom ke-5) biar makin lega */
+    #mainTable thead th:nth-child(5),
+    #mainTable tbody td:nth-child(5) {
+        display: none !important;
     }
 }
 
