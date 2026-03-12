@@ -616,25 +616,23 @@ body.light-mode .rank-1 .team-name {
     object-fit: cover;
 }
 
-/* Container Utama Layout */
+/* Container Utama Layout - Tambahkan flex-wrap */
 .main-layout {
     display: flex;
-    gap: 15px; /* Jarak antara tabel dan chat */
-    margin: 20px 0;
+    flex-wrap: wrap; /* INI KUNCINYA: Biar kalau gak muat, chat turun ke bawah */
+    gap: 15px; 
+    margin: 20px auto;
     align-items: flex-start;
+    justify-content: center; /* Biar posisi di tengah */
+    width: 100%;
 }
 
-/* Kolom Kiri (Tabel) */
-.left-side {
-    flex: 2.5; /* Tabel lebih lebar */
-    min-width: 0;
-}
-
-/* Kolom Kanan (Chat) */
+/* Kolom Kanan (Chat) - Kasih min-width biar gak gepeng */
 .right-side {
-    flex: 1; /* Chat lebih ramping */
+    flex: 1;
+    min-width: 300px; /* Biar chat gak kekecilan saat sejajar */
     position: sticky;
-    top: 10px; /* Chat nempel pas di-scroll */
+    top: 10px;
 }
 
 /* Box Chat Style */
@@ -737,6 +735,7 @@ body.light-mode .rank-1 .team-name {
         height: 400px;
     }
 }
+
 
 
 
