@@ -617,40 +617,40 @@ body.light-mode .rank-1 .team-name {
 }
 
 /* ==========================================
-    LAYOUT FIX: FORCE CHAT TO THE RIGHT
+    LAYOUT FIX: RAMPINGKAN CHAT DI KANAN
    ========================================== */
 
 /* Container Utama */
 .main-layout {
     display: flex;
-    flex-direction: row;      /* Paksa sejajar horizontal */
-    flex-wrap: nowrap;        /* ANTI-TURUN: Mencegah chat pindah ke bawah di PC */
-    gap: 20px;
+    flex-direction: row;
+    flex-wrap: nowrap;        /* Paksa sejajar terus di PC */
+    gap: 12px;                /* Jarak antar elemen dipersempit */
     margin: 20px auto;
     align-items: flex-start;
     justify-content: center;
     width: 100%;
-    max-width: 1400px;        /* Diperlebar agar muat tabel + chat */
-    padding: 0 15px;
+    max-width: 1350px;
+    padding: 0 10px;
     box-sizing: border-box;
 }
 
 /* Kolom Kiri (Tabel) */
 .left-side {
-    flex: 1;                  /* Mengambil sisa ruang yang tersedia */
-    min-width: 0;             /* Mencegah tabel mendorong chat keluar layar */
+    flex: 1;
+    min-width: 0;             /* Biar tabel bisa fleksibel */
 }
 
-/* Kolom Kanan (Chat) */
+/* Kolom Kanan (Chat) - DIBUAT LEBIH RAMPING */
 .right-side {
-    width: 330px;             /* Lebar chat box dikunci */
-    flex-shrink: 0;           /* Chat box tidak boleh gepeng/mengecil */
-    position: sticky;         /* Chat tetap terlihat saat scroll tabel */
+    width: 270px;             /* Gue kecilin dari 330px ke 270px */
+    flex-shrink: 0;           /* Chat box nggak boleh gepeng */
+    position: sticky;
     top: 10px;
     z-index: 100;
 }
 
-/* Memastikan Tabel punya scroll internal jika kolom terlalu banyak */
+/* Memastikan Tabel punya scroll internal jika kolom meluber */
 .table-container {
     width: 100%;
     overflow-x: auto;
@@ -658,56 +658,57 @@ body.light-mode .rank-1 .team-name {
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* --- BOX CHAT STYLE --- */
+/* --- BOX CHAT STYLE RAMPING --- */
 .chat-container {
     background: #111;
     border: 2px solid #333;
     border-radius: 12px;
     display: flex;
     flex-direction: column;
-    height: 550px;            /* Tinggi kotak chat */
+    height: 500px;            /* Tinggi dikurangi dikit biar proporsional */
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     overflow: hidden;
 }
 
 .chat-header {
     background: #222;
-    padding: 12px;
+    padding: 10px;            /* Padding dipersempit */
     color: #facc15;
     font-weight: bold;
     text-align: center;
     border-bottom: 1px solid #333;
     text-transform: uppercase;
+    font-size: 13px;          /* Font header dikecilkan */
 }
 
 .chat-messages {
     flex: 1;
     overflow-y: auto;
-    padding: 10px;
+    padding: 8px;             /* Padding dipersempit */
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 /* Item chat per orang */
 .chat-msg-item {
     background: rgba(255,255,255,0.05);
-    padding: 8px 10px;
-    border-radius: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
     border-left: 3px solid #00f2ff;
 }
 
 .chat-msg-item b {
     color: #facc15;
-    font-size: 12px;
+    font-size: 11px;          /* Font nama dikecilkan */
     display: block;
 }
 
 .chat-msg-item p {
-    margin: 4px 0 0 0;
-    font-size: 13px;
+    margin: 2px 0 0 0;
+    font-size: 12px;          /* Font isi chat dikecilkan */
     color: #ddd;
-    line-height: 1.4;
+    line-height: 1.3;
 }
 
 /* Area Input */
@@ -722,15 +723,16 @@ body.light-mode .rank-1 .team-name {
     background: #000;
     border: 1px solid #444;
     color: white;
-    margin-bottom: 6px;
-    padding: 8px;
+    margin-bottom: 5px;
+    padding: 6px 8px;
     border-radius: 4px;
     font-family: 'Kanit';
+    font-size: 12px;          /* Font input dikecilkan */
     box-sizing: border-box;
 }
 
 #userComment {
-    height: 50px;
+    height: 45px;             /* Input komentar lebih pendek */
     resize: none;
 }
 
@@ -739,32 +741,35 @@ body.light-mode .rank-1 .team-name {
     background: linear-gradient(135deg, #00f2ff 0%, #0061ff 100%);
     color: #000;
     border: none;
-    padding: 10px;
+    padding: 8px;
     font-weight: bold;
+    font-size: 12px;
     border-radius: 4px;
     cursor: pointer;
 }
 
-/* --- RESPONSIVE MOBILE (Turun ke bawah hanya di HP) --- */
+/* --- RESPONSIVE MOBILE (Hanya di HP) --- */
 @media (max-width: 900px) {
     .main-layout {
-        flex-direction: column; /* Tabel di atas, chat di bawah */
+        flex-direction: column;
         flex-wrap: wrap;
     }
     .right-side {
-        width: 100%;          /* Di HP chat selebar layar */
-        position: static;     /* Matikan sticky di HP */
+        width: 100%;
+        max-width: 100%;
+        position: static;
     }
     .chat-container {
-        height: 400px;        /* Pendekin dikit di HP */
+        height: 380px;
     }
 }
 
-/* Mencegah seluruh halaman meluber ke samping */
+/* Anti meluber ke samping */
 html, body {
     max-width: 100%;
     overflow-x: hidden;
 }
+
 
 
 
