@@ -642,13 +642,14 @@ body.light-mode .rank-1 .team-name {
     min-width: 0;
 }
 
-/* Kolom Kanan (Chat) - VERSI ULTRA SLIM */
+/* Kolom Kanan (Chat) */
 .right-side {
-    width: 180px;             /* <--- Ukuran paling ramping */
+    width: 180px;
     flex-shrink: 0;
     position: sticky;
-    top: 5px;
+    top: 10px; /* <--- Ubah ini agar sama dengan padding container atau margin tabel */
     z-index: 100;
+    margin-top: 10px; /* <--- Tambahkan ini untuk nurunin posisi chat box-nya */
 }
 
 /* Box Chat Style */
@@ -764,6 +765,7 @@ html, body {
     max-width: 100%;
     overflow-x: hidden;
 }
+
 
 
 
