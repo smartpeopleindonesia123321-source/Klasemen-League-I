@@ -769,80 +769,86 @@ body.light-mode .rank-1 .team-name {
     text-transform: uppercase;
 }
 
-/* --- OPTIMASI CHAT & LAYOUT KHUSUS HP --- */
-@media (max-width: 800px) {
-    .main-layout {
-        flex-direction: column; /* Chat pindah ke bawah tabel */
-        gap: 20px;
-        padding: 10px;
-    }
-
-    .right-side {
-        width: 100% !important; /* Chat jadi lebar penuh di HP */
-        position: static;        /* Gak usah sticky biar gak ganggu scroll */
-        margin-top: 20px;
-    }
-
-    .chat-container {
-        height: 500px;           /* Lebih tinggi biar enak liat history chat */
-        border-radius: 15px;
-        border: 2px solid var(--accent); /* Biar lebih tegas batasnya */
-    }
-
-    /* Bikin area ngetik jadi lega buat jempol */
-    .chat-header {
-        font-size: 12px;
-        padding: 10px;
-    }
-
-    #userName, #userComment {
-        font-size: 14px !important; /* Ukuran font input standar HP biar gak auto-zoom */
-        padding: 12px !important;
-        margin-bottom: 8px;
-        border-radius: 8px;
-    }
-
-    #userComment {
-        height: 60px; /* Lebih tinggi biar teks kelihatan pas ngetik panjang */
-    }
-
-    #btnSendComment {
-        padding: 12px;
-        font-size: 14px;
-        border-radius: 8px;
-        letter-spacing: 1px;
-    }
-}
-
-/* Mencegah slide ke samping */
-html, body {
-    max-width: 100%;
-    overflow-x: hidden;
-}
-
-/* --- FIX: SIMPAN AGG, BUANG YANG GAK PENTING DI HP --- */
+/* ===================================================
+    SOLUSI TOTAL: LAYOUT & TABEL KHUSUS HP (MAX 800PX)
+   =================================================== */
 @media screen and (max-width: 800px) {
-    /* Kita tembak tepat sasaran: */
-    /* Kolom 5 (TREND), Kolom 6 (+/-), dan Kolom 7 (POTW) kita hilangkan */
-    
+    /* 1. Layout: Chat pindah ke bawah tabel */
+    .main-layout {
+        flex-direction: column;
+        gap: 25px;
+        padding: 10px;
+    }
+
+    /* 2. Kolom Tabel: Buang TREND(5), +/-(6), POTW(7) agar POTY Masuk */
     #mainTable th:nth-child(5), #mainTable td:nth-child(5),
     #mainTable th:nth-child(6), #mainTable td:nth-child(6),
     #mainTable th:nth-child(7), #mainTable td:nth-child(7) {
         display: none !important;
     }
 
-    /* Kecilin sedikit padding biar makin muat */
-    td, th {
-        padding: 6px 3px !important;
-        font-size: 11px !important;
-    }
-
-    /* Lebarin container tabel biar POTY kepancing masuk */
+    /* 3. Penyesuaian Ukuran Tabel agar tidak scroll samping */
     #mainTable {
         min-width: 100% !important;
         width: 100% !important;
     }
+
+    td, th {
+        padding: 8px 4px !important;
+        font-size: 11px !important;
+    }
+
+    /* 4. Chat Area: Full Width & Enak buat ngetik */
+    .right-side {
+        width: 100% !important;
+        position: static;
+        margin-top: 20px;
+    }
+
+    .chat-container {
+        height: 450px;
+        border-radius: 15px;
+        border: 2px solid var(--accent);
+    }
+
+    /* 5. Input Chat: Font 14px-16px ANTI ZOOM SENSOR */
+    .chat-header { font-size: 12px; padding: 10px; }
+
+    #userName, #userComment {
+        font-size: 16px !important; /* Standar kenyamanan ngetik di HP */
+        padding: 12px !important;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        background: #000;
+        border: 1px solid #333;
+    }
+
+    #userComment {
+        height: 80px; /* Lebih lega buat ngetik panjang */
+    }
+
+    #btnSendComment {
+        padding: 15px;
+        font-size: 14px;
+        font-weight: 900;
+        border-radius: 8px;
+    }
+
+    /* Fix Nama Tim di HP agar tidak terlalu lebar */
+    .team-name {
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }
+
+/* Mencegah slide ke samping (Global) */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    position: relative;
+}
+
 
 
 
