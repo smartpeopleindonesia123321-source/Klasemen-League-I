@@ -790,6 +790,29 @@ html, body {
     overflow-x: hidden;
 }
 
+/* --- FIX: SIMPAN AGG, BUANG YANG GAK PENTING DI HP --- */
+@media screen and (max-width: 800px) {
+    /* Kita tembak tepat sasaran: */
+    /* Kolom 5 (TREND), Kolom 6 (+/-), dan Kolom 7 (POTW) kita hilangkan */
+    
+    #mainTable th:nth-child(5), #mainTable td:nth-child(5),
+    #mainTable th:nth-child(6), #mainTable td:nth-child(6),
+    #mainTable th:nth-child(7), #mainTable td:nth-child(7) {
+        display: none !important;
+    }
+
+    /* Kecilin sedikit padding biar makin muat */
+    td, th {
+        padding: 6px 3px !important;
+        font-size: 11px !important;
+    }
+
+    /* Lebarin container tabel biar POTY kepancing masuk */
+    #mainTable {
+        min-width: 100% !important;
+        width: 100% !important;
+    }
+}
 
 
 
