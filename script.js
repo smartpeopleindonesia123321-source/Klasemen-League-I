@@ -526,7 +526,6 @@ const CHAT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyf6o6U3vAceeTd
 
 async function loadComments() {
     try {
-        // Tambahkan timestamp agar browser tidak ambil data jadul (cache)
         const response = await fetch(`${CHAT_SCRIPT_URL}?t=${new Date().getTime()}`);
         const comments = await response.json();
         const display = document.getElementById('commentDisplay');
@@ -538,17 +537,24 @@ async function loadComments() {
             return;
         }
 
+        // --- FUNGSI HELPER UNTUK FORMAT JAM ---
+        const formatWaktu = (isoString) => {
+            const d = new Date(isoString);
+            if (isNaN(d.getTime())) return isoString; // Jaga-jaga kalau format bukan tanggal
+            return d.getHours().toString().padStart(2, '0') + ':' + 
+                   d.getMinutes().toString().padStart(2, '0');
+        };
+
         display.innerHTML = comments.map(c => `
             <div class="chat-msg-item" style="margin-bottom:10px; border-left:3px solid var(--accent); background:rgba(255,255,255,0.03); padding:8px; border-radius:4px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                     <b style="color:#facc15; font-size:12px;">${c.nama}</b>
-                    <span style="font-size:9px; color:#555;">${c.waktu}</span>
+                    <span style="font-size:9px; color:rgba(255,255,255,0.4); font-family:monospace;">${formatWaktu(c.waktu)}</span>
                 </div>
                 <p style="margin:0; font-size:13px; color:#ddd; line-height:1.4;">${c.pesan}</p>
             </div>
         `).join('');
         
-        // Scroll otomatis ke bawah
         display.scrollTop = display.scrollHeight;
     } catch (error) {
         console.log("Chat sync pending...");
@@ -602,6 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadComments();
     setInterval(loadComments, 7000);
 });
+
 
 
 
