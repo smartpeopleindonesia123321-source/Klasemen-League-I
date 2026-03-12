@@ -790,25 +790,31 @@ html, body {
     overflow-x: hidden;
 }
 
-/*menghilangkan agg dan trend di hp*/
-/* --- SEMBUNYIKAN KOLOM TREND DI HP --- */
-@media screen and (max-width: 600px) {
-    /* Sembunyikan Header TREND (Kolom ke-4) */
-    #mainTable thead th:nth-child(4) {
-        display: none !important;
-    }
+/* --- SOLUSI AMPUH HILANGKAN KOLOM TREND & +/- DI HP --- */
+@media screen and (max-width: 800px) {
+    /* Kita hilangkan berdasarkan urutan yang pasti di tabel lo */
+    /* Kolom 4 (TREND), Kolom 5 (+/-), Kolom 6 (POTW) */
     
-    /* Sembunyikan Isi TREND (Kolom ke-4) */
-    #mainTable tbody td:nth-child(4) {
+    #mainTable th:nth-child(4), #mainTable td:nth-child(4),
+    #mainTable th:nth-child(5), #mainTable td:nth-child(5),
+    #mainTable th:nth-child(6), #mainTable td:nth-child(6) {
         display: none !important;
     }
 
-    /* Opsional: Sembunyikan juga kolom +/- (Kolom ke-5) biar makin lega */
-    #mainTable thead th:nth-child(5),
-    #mainTable tbody td:nth-child(5) {
-        display: none !important;
+    /* Lebarkan kolom CONTENDER biar sisa ruangnya penuh */
+    .team-name {
+        max-width: 120px !important;
+        white-space: normal !important; /* Biar nama tim bisa turun 2 baris kalau kepanjangan */
+    }
+
+    /* Paksa tabel untuk memenuhi layar agar POTY % terdorong masuk ke area pandang */
+    #mainTable {
+        width: 100% !important;
+        min-width: 100% !important;
+        table-layout: auto !important;
     }
 }
+
 
 
 
