@@ -790,6 +790,13 @@ html, body {
     overflow-x: hidden;
 }
 
+@media screen and (max-width: 480px) {
+    /* Sembunyikan kolom ke-4 (TREND) atau ke-5 (+/-) */
+    #mainTable th:nth-child(4), 
+    #mainTable td:nth-child(4) {
+        display: none;
+    }
+}
 
 
 
