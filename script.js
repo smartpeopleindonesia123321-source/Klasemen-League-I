@@ -518,31 +518,39 @@ closeModal = function() {
     }
 };
 
-// PASTE URL dari Google Apps Script tadi di sini
+// ==========================================
+// SEKSI LIVE CHAT (FIXED & SYNCED)
+// ==========================================
 const CHAT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyf6o6U3vAceeTdKM1Rb8WGWKcTScj4wHFiUytK4yLbp7FYs16dHMQVVWZVdPfzaYv3Dw/exec";
 
 async function loadComments() {
     try {
-        const response = await fetch(CHAT_SCRIPT_URL);
+        // Tambahkan timestamp agar browser tidak ambil data jadul (cache)
+        const response = await fetch(`${CHAT_SCRIPT_URL}?t=${new Date().getTime()}`);
         const comments = await response.json();
         const display = document.getElementById('commentDisplay');
         
-        if (comments.length === 0) {
-            display.innerHTML = '<p style="text-align:center; color:#555; font-size:12px;">Belum ada komentar. Jadilah yang pertama!</p>';
+        if (!display) return;
+
+        if (!comments || comments.length === 0) {
+            display.innerHTML = '<p style="text-align:center; color:#666; font-size:12px; margin-top:20px;">Belum ada obrolan...</p>';
             return;
         }
 
         display.innerHTML = comments.map(c => `
-            <div class="chat-msg-item">
-                <b>${c.nama} <span style="font-size:10px; color:#555; float:right;">${c.waktu}</span></b>
-                <p>${c.pesan}</p>
+            <div class="chat-msg-item" style="margin-bottom:10px; border-left:3px solid var(--accent); background:rgba(255,255,255,0.03); padding:8px; border-radius:4px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                    <b style="color:#facc15; font-size:12px;">${c.nama}</b>
+                    <span style="font-size:9px; color:#555;">${c.waktu}</span>
+                </div>
+                <p style="margin:0; font-size:13px; color:#ddd; line-height:1.4;">${c.pesan}</p>
             </div>
         `).join('');
         
-        // Auto-scroll ke paling bawah tiap ada pesan baru
+        // Scroll otomatis ke bawah
         display.scrollTop = display.scrollHeight;
     } catch (error) {
-        console.error("Gagal memuat chat:", error);
+        console.log("Chat sync pending...");
     }
 }
 
@@ -555,39 +563,45 @@ async function sendComment() {
     const pesan = commentInput.value.trim();
 
     if (!nama || !pesan) {
-        alert("Nama dan pesan jangan kosong bro!");
+        alert("Nama & Pesan jangan kosong ya!");
         return;
     }
 
-    // Lock tombol biar gak spam klik
     sendBtn.disabled = true;
     sendBtn.innerText = "MENGIRIM...";
 
     try {
+        // Kita kirim pakai format URLSearchParams supaya lebih universal diterima Apps Script
+        const bodyData = new URLSearchParams();
+        bodyData.append('nama', nama);
+        bodyData.append('pesan', pesan);
+
         await fetch(CHAT_SCRIPT_URL, {
             method: 'POST',
-            mode: 'no-cors', // Penting untuk Google Apps Script
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nama, pesan })
+            mode: 'no-cors', // Menghindari CORS block
+            body: bodyData
         });
 
-        // Bersihkan input pesan saja, nama biarkan tetap ada biar gak ngetik ulang
+        // Reset input pesan
         commentInput.value = "";
         
-        // Refresh chat
-        setTimeout(loadComments, 1000); 
+        // Kasih jeda 1.5 detik biar Google selesai nulis, baru refresh display
+        setTimeout(loadComments, 1500);
     } catch (error) {
-        alert("Gagal kirim pesan. Coba lagi!");
+        console.error("Error kirim:", error);
+        alert("Gagal kirim, coba lagi bro!");
     } finally {
         sendBtn.disabled = false;
-        sendBtn.innerText = "KIRIM 🚀";
+        sendBtn.innerText = "KIRIM";
     }
 }
 
-// Jalankan fungsi muat chat secara berkala (tiap 5 detik)
-setInterval(loadComments, 5000);
-// Muat chat pertama kali saat web dibuka
-document.addEventListener('DOMContentLoaded', loadComments);
+// Jalankan load pertama kali & set interval (7 detik biar gak overload)
+document.addEventListener('DOMContentLoaded', () => {
+    loadComments();
+    setInterval(loadComments, 7000);
+});
+
 
 
 
