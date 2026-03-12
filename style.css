@@ -617,21 +617,21 @@ body.light-mode .rank-1 .team-name {
 }
 
 /* ==========================================
-    LAYOUT SYSTEM: SUPER SLIM CHAT 
+    LAYOUT SYSTEM: ULTRA SLIM CHAT (180px)
    ========================================== */
 
 /* Container Utama */
 .main-layout {
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap;        /* Tetap sejajar di desktop */
-    gap: 8px;                 /* Jarak antar tabel dan chat diperkecil */
-    margin: 20px auto;
+    flex-wrap: nowrap;        /* Anti-turun di PC */
+    gap: 5px;                 /* Jarak super rapat */
+    margin: 15px auto;
     align-items: flex-start;
     justify-content: center;
     width: 100%;
     max-width: 1400px;
-    padding: 0 10px;
+    padding: 0 5px;
     box-sizing: border-box;
 }
 
@@ -641,92 +641,92 @@ body.light-mode .rank-1 .team-name {
     min-width: 0;
 }
 
-/* Kolom Kanan (Chat) - VERSI SUPER SLIM */
+/* Kolom Kanan (Chat) - VERSI ULTRA SLIM */
 .right-side {
-    width: 220px;             /* <--- Lebar paling kecil agar tabel lega */
+    width: 180px;             /* <--- Ukuran paling ramping */
     flex-shrink: 0;
     position: sticky;
-    top: 10px;
+    top: 5px;
     z-index: 100;
 }
 
 /* Box Chat Style */
 .chat-container {
-    background: #0d0d0d;
-    border: 1px solid #333;
-    border-radius: 10px;
+    background: #080808;
+    border: 1px solid #222;
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
-    height: 480px;            /* Tinggi dikurangi agar tidak terlalu jangkung */
-    box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    height: 450px;            /* Lebih pendek agar proporsional */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.7);
     overflow: hidden;
 }
 
 .chat-header {
-    background: #1a1a1a;
-    padding: 8px;
+    background: #111;
+    padding: 6px;
     color: #facc15;
     font-weight: bold;
     text-align: center;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid #222;
     text-transform: uppercase;
-    font-size: 10px;          /* Font header kecil */
-    letter-spacing: 1px;
+    font-size: 9px;           /* Font header super kecil */
+    letter-spacing: 0.5px;
 }
 
 .chat-messages {
     flex: 1;
     overflow-y: auto;
-    padding: 8px;
+    padding: 5px;
     display: flex;
     flex-direction: column;
-    gap: 6px;                 /* Jarak antar pesan lebih rapat */
+    gap: 4px;
 }
 
 /* Item chat per orang */
 .chat-msg-item {
-    background: rgba(255,255,255,0.03);
-    padding: 5px 8px;
-    border-radius: 6px;
+    background: rgba(255,255,255,0.02);
+    padding: 4px 6px;
+    border-radius: 4px;
     border-left: 2px solid var(--accent);
 }
 
 .chat-msg-item b {
     color: #facc15;
-    font-size: 10px;          /* Font nama mungil */
+    font-size: 9px;           /* Font nama minimalis */
     display: block;
-    margin-bottom: 2px;
 }
 
 .chat-msg-item p {
     margin: 0;
-    font-size: 11px;          /* Font isi chat ramping */
-    color: #ccc;
-    line-height: 1.3;
+    font-size: 10px;          /* Font isi chat minimalis */
+    color: #bbb;
+    line-height: 1.2;
+    word-wrap: break-word;    /* Paksa bungkus kata agar tidak meluber */
 }
 
 /* Area Input */
 .chat-input-area {
-    padding: 10px;
-    background: #141414;
-    border-top: 1px solid #333;
+    padding: 8px;
+    background: #111;
+    border-top: 1px solid #222;
 }
 
 #userName, #userComment {
     width: 100%;
     background: #000;
-    border: 1px solid #444;
+    border: 1px solid #333;
     color: white;
-    margin-bottom: 4px;
-    padding: 5px 8px;
-    border-radius: 4px;
+    margin-bottom: 3px;
+    padding: 4px 6px;
+    border-radius: 3px;
     font-family: 'Kanit';
-    font-size: 10px;          /* Font input kecil */
+    font-size: 9px;           /* Font input mungil */
     box-sizing: border-box;
 }
 
 #userComment {
-    height: 35px;             /* Box komentar pendek */
+    height: 30px;             /* Input komentar sangat tipis */
     resize: none;
 }
 
@@ -735,16 +735,16 @@ body.light-mode .rank-1 .team-name {
     background: linear-gradient(135deg, #00f2ff 0%, #0061ff 100%);
     color: #000;
     border: none;
-    padding: 6px;
-    font-weight: bold;
-    font-size: 10px;
-    border-radius: 4px;
+    padding: 5px;
+    font-weight: 900;
+    font-size: 9px;
+    border-radius: 3px;
     cursor: pointer;
     text-transform: uppercase;
 }
 
-/* --- RESPONSIVE MOBILE (Otomatis pindah ke bawah di HP) --- */
-@media (max-width: 900px) {
+/* --- RESPONSIVE MOBILE (Pindah ke bawah hanya di layar sangat sempit) --- */
+@media (max-width: 800px) {
     .main-layout {
         flex-direction: column;
         flex-wrap: wrap;
@@ -754,7 +754,7 @@ body.light-mode .rank-1 .team-name {
         position: static;
     }
     .chat-container {
-        height: 350px;
+        height: 300px;
     }
 }
 
@@ -763,6 +763,7 @@ html, body {
     max-width: 100%;
     overflow-x: hidden;
 }
+
 
 
 
