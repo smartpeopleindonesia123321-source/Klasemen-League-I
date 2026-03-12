@@ -790,10 +790,10 @@ html, body {
     overflow-x: hidden;
 }
 
-/* --- SOLUSI AMPUH HILANGKAN KOLOM TREND & +/- DI HP --- */
+/* --- FIX: SIMPAN AGG, BUANG YANG GAK PENTING DI HP --- */
 @media screen and (max-width: 800px) {
-    /* Kita hilangkan berdasarkan urutan yang pasti di tabel lo */
-    /* Kolom 4 (TREND), Kolom 5 (+/-), Kolom 6 (POTW) */
+    /* Kita tembak tepat sasaran: */
+    /* Kolom 5 (TREND), Kolom 6 (+/-), dan Kolom 7 (POTW) kita hilangkan */
     
     #mainTable th:nth-child(5), #mainTable td:nth-child(5),
     #mainTable th:nth-child(6), #mainTable td:nth-child(6),
@@ -801,19 +801,19 @@ html, body {
         display: none !important;
     }
 
-    /* Lebarkan kolom CONTENDER biar sisa ruangnya penuh */
-    .team-name {
-        max-width: 120px !important;
-        white-space: normal !important; /* Biar nama tim bisa turun 2 baris kalau kepanjangan */
+    /* Kecilin sedikit padding biar makin muat */
+    td, th {
+        padding: 6px 3px !important;
+        font-size: 11px !important;
     }
 
-    /* Paksa tabel untuk memenuhi layar agar POTY % terdorong masuk ke area pandang */
+    /* Lebarin container tabel biar POTY kepancing masuk */
     #mainTable {
-        width: 100% !important;
         min-width: 100% !important;
-        table-layout: auto !important;
+        width: 100% !important;
     }
 }
+
 
 
 
