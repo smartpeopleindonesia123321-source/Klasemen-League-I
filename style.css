@@ -709,12 +709,25 @@ body.light-mode .rank-1 .team-name {
     display: block;
 }
 
+/* Item isi chat agar lebih jelas dibaca */
 .chat-msg-item p {
     margin: 0;
-    font-size: 10px;          /* Font isi chat minimalis */
-    color: #bbb;
-    line-height: 1.2;
-    word-wrap: break-word;    /* Paksa bungkus kata agar tidak meluber */
+    font-family: 'Times New Roman', Times, serif; /* Ganti ke Times New Roman */
+    font-size: 11px;          /* Naikkan 1px biar makin mantap */
+    color: #dfdfdf;           /* Warna abu terang biar kontras sama background hitam */
+    line-height: 1.3;         /* Kasih spasi antar baris sedikit biar nggak rapet banget */
+    word-wrap: break-word;
+    font-weight: normal;      /* Pastikan nggak bold biar nggak blur */
+    letter-spacing: 0.2px;    /* Kasih jarak antar huruf dikit */
+}
+
+/* Opsional: Kalau mau nama user-nya juga ganti biar senada */
+.chat-msg-item b {
+    color: #facc15;
+    font-family: Arial, sans-serif; /* Nama pakai font tegas tanpa lekukan */
+    font-size: 9px;
+    display: block;
+    text-transform: uppercase;
 }
 
 /* Area Input */
@@ -775,6 +788,7 @@ html, body {
     max-width: 100%;
     overflow-x: hidden;
 }
+
 
 
 
