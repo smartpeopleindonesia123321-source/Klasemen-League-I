@@ -850,6 +850,24 @@ html, body {
 }
 
 
+/* Contoh edit untuk tombol World Cup agar terlihat spesial */
+.btn-wc {
+    background: linear-gradient(135deg, #ffffff 0%, #facc15 100%);
+    color: #000;
+    box-shadow: 0 0 15px rgba(250, 204, 21, 0.4);
+}
+
+.btn-wc:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(250, 204, 21, 0.7);
+}
+
+/* Tombol Biru (Bagikan Klasemen) */
+.btn-share {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    color: white;
+}
+
 
 
 
