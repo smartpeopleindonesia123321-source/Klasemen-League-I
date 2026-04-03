@@ -144,6 +144,34 @@
             background: var(--accent);
             color: black;
         }
+        /* Label khusus Juara 1, 2, 3 */
+.country-box.juara-1::after,
+.country-box.juara-2::after,
+.country-box.juara-3::after {
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    color: white;
+    font-size: 8px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 0 0 4px 4px;
+    padding: 2px 0;
+    z-index: 5;
+    }
+    
+    /* Juara 1 - Gold */
+    .country-box.juara-1 { border: 2px solid #ffd700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+    .country-box.juara-1::after { content: "WINNER 🏆"; background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728); color: #000; }
+    
+    /* Juara 2 - Silver */
+    .country-box.juara-2 { border: 2px solid #c0c0c0; }
+    .country-box.juara-2::after { content: "2nd PLACE"; background: #aaa9ad; }
+    
+    /* Juara 3 - Bronze */
+    .country-box.juara-3 { border: 2px solid #cd7f32; }
+    .country-box.juara-3::after { content: "3rd PLACE"; background: #cd7f32; }
     </style>
 </head>
 <body>
@@ -187,56 +215,47 @@
             return `https://flagcdn.com/w80/${code}.png`;
         }
 
-        // --- 3. CORE FUNCTION ---
-        async function loadWorldCup() {
-            try {
-                const res = await fetch(`${WC_SHEET_URL}&nocache=${new Date().getTime()}`);
-                const csv = await res.text();
-                const rows = csv.split('\n').slice(1);
-                
-                const container = document.getElementById('wc-container');
-                container.innerHTML = "";
+        /// Looping 5 Negara (Kolom 1-2, 3-4, 5-6, 7-8, 9-10)
+for (let i = 1; i <= 10; i += 2) {
+    const negara = col[i];
+    const statusRaw = col[i+1] ? col[i+1].toLowerCase() : "aktif";
+    
+    if (!negara) continue;
 
-                rows.forEach(line => {
-                    const col = line.split(',').map(c => c.trim().replace(/"/g, ''));
-                    if (!col[0]) return; // Skip baris kosong
+    // Logika Status
+    const isGugur = statusRaw.includes("gugur");
+    const isJuara1 = statusRaw.includes("juara 1");
+    const isJuara2 = statusRaw.includes("juara 2");
+    const isJuara3 = statusRaw.includes("juara 3");
 
-                    const namaOrang = col[0];
-                    let teamsHTML = "";
+    // Tentukan Class CSS
+    let statusClass = "";
+    let badgeHTML = "";
 
-                    // Looping 5 Negara (Kolom 1-2, 3-4, 5-6, 7-8, 9-10)
-                    for (let i = 1; i <= 10; i += 2) {
-                        const negara = col[i];
-                        const status = col[i+1] ? col[i+1].toLowerCase() : "aktif";
-                        
-                        if (!negara) continue;
+    if (isGugur) {
+        statusClass = "gugur";
+        badgeHTML = '<span class="status-badge">ELIMINATED</span>';
+    } else if (isJuara1) {
+        statusClass = "juara-1";
+        badgeHTML = '<span class="status-badge">WINNER 🏆</span>';
+    } else if (isJuara2) {
+        statusClass = "juara-2";
+        badgeHTML = '<span class="status-badge">2nd PLACE</span>';
+    } else if (isJuara3) {
+        statusClass = "juara-3";
+        badgeHTML = '<span class="status-badge">3rd PLACE</span>';
+    }
 
-                        const isGugur = status.includes("gugur");
-                        const flagUrl = getFlag(negara);
+    const flagUrl = getFlag(negara);
 
-                        teamsHTML += `
-                            <div class="country-box ${isGugur ? 'gugur' : ''}">
-                                <img src="${flagUrl}" class="flag-img" onerror="this.src='https://flagcdn.com/w80/un.png'">
-                                <span class="country-name">${negara}</span>
-                                ${isGugur ? '<span class="status-badge">ELIMINATED</span>' : ''}
-                            </div>
-                        `;
-                    }
-
-                    container.innerHTML += `
-                        <div class="player-card">
-                            <span class="player-name">${namaOrang}</span>
-                            <div class="team-list">
-                                ${teamsHTML}
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch (error) {
-                console.error("Error WC:", error);
-                document.getElementById('wc-container').innerHTML = "<p>Gagal memuat data. Pastikan Google Sheet sudah di-Publish ke Web.</p>";
-            }
-        }
+    teamsHTML += `
+        <div class="country-box ${statusClass}">
+            <img src="${flagUrl}" class="flag-img" onerror="this.src='https://flagcdn.com/w80/un.png'">
+            <span class="country-name">${negara}</span>
+            ${badgeHTML}
+        </div>
+    `;
+}
 
         // Jalankan saat load
         window.onload = loadWorldCup;
