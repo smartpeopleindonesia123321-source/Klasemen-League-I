@@ -1,0 +1,45 @@
+<div id="wc-container" class="wc-grid">
+    </div>
+
+<style>
+.wc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+    padding: 10px;
+}
+.player-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 15px;
+}
+.team-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+.country-box {
+    text-align: center;
+    width: 60px;
+    transition: all 0.5s ease;
+}
+.country-box.gugur {
+    filter: grayscale(100%); /* Bikin bendera jadi hitam putih */
+    opacity: 0.3; /* Bikin makin gelap/transparan */
+}
+.flag-img {
+    width: 40px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 3px;
+    border: 1px solid #444;
+}
+.country-name {
+    font-size: 8px;
+    display: block;
+    margin-top: 4px;
+    text-transform: uppercase;
+}
+</style>
