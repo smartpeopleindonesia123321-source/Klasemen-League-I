@@ -872,43 +872,77 @@ html, body {
     text-decoration: none; /* Biar kalau pake tag <a> gak ada garis bawah */
 }
 
-/* Tombol World Cup (Emas Menyala) */
-.btn-wc {
-    background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
-    color: #000;
-    box-shadow: 0 4px 20px rgba(250, 204, 21, 0.4);
+/* Container Utama Tombol */
+.main-button-container {
+    text-align: center; 
+    margin: 30px auto; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 12px;
+    width: 100%;
+    max-width: 350px; /* Lebar maksimal tombol */
 }
 
-.btn-wc:hover {
+/* Base Style untuk Semua Tombol */
+.btn-custom {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-family: var(--font-sporty);
+    font-weight: 900;
+    text-transform: uppercase;
+    font-style: italic;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    letter-spacing: 1px;
+}
+
+/* Efek Hover Umum */
+.btn-custom:hover {
     transform: scale(1.05) translateY(-3px);
-    box-shadow: 0 8px 30px rgba(250, 204, 21, 0.6);
     filter: brightness(1.1);
 }
 
-/* Tombol Bagikan (Biru Sporty) */
-.btn-share {
-    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
-    color: #fff;
-    box-shadow: 0 4px 20px rgba(30, 64, 175, 0.4);
-}
-
-.btn-share:hover {
-    transform: scale(1.05) translateY(-3px);
-    box-shadow: 0 8px 30px rgba(30, 64, 175, 0.6);
-}
-
-/* Tombol Drawing & Piagam (Glass Style) */
-.btn-draw, .btn-cert {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(5px);
-    color: var(--accent);
-    border: 1px solid var(--accent);
-}
-
-.btn-draw:hover, .btn-cert:hover {
-    background: var(--accent);
+/* 1. Tombol Drawing (Cyan Neon) */
+.btn-drawing {
+    background: linear-gradient(135deg, #00f2ff 0%, #0061ff 100%);
     color: #000;
-    box-shadow: 0 0 20px var(--accent);
+    box-shadow: 0 4px 15px rgba(0, 242, 255, 0.4);
+}
+
+/* 2. Tombol Share (Biru Deep - Senada Header lo) */
+.btn-share-wa {
+    background: #1e40af;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(30, 64, 175, 0.4);
+}
+
+/* 3. Tombol Piagam (Emas Sunset) */
+.btn-piagam {
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    color: #000;
+    box-shadow: 0 4px 15px rgba(246, 211, 101, 0.4);
+}
+
+/* 4. Tombol World Cup (Emas Mewah & Glow Putih) */
+.btn-wc-edition {
+    background: linear-gradient(135deg, #ffffff 0%, #facc15 100%);
+    color: #000;
+    border: 2px solid #facc15;
+    box-shadow: 0 0 20px rgba(250, 204, 21, 0.5);
+    animation: pulseGlow 2s infinite; /* Efek kedip halus */
+}
+
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 15px rgba(250, 204, 21, 0.4); }
+    50% { box-shadow: 0 0 25px rgba(250, 204, 21, 0.7); }
+    100% { box-shadow: 0 0 15px rgba(250, 204, 21, 0.4); }
 }
 
 
