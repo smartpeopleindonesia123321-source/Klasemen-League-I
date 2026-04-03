@@ -1,45 +1,235 @@
-<div id="wc-container" class="wc-grid">
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WORLD CUP 2026 EDITION - LEAGUE-I</title>
+    <style>
+        :root {
+            --bg: #0a0a0c;
+            --card-bg: #161b22;
+            --accent: #facc15; /* Kuning Emas */
+            --text: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.6);
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(250, 204, 21, 0.3);
+            margin-bottom: 5px;
+            font-size: 1.8rem;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        /* Grid System untuk 10 Orang */
+        .wc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .player-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .player-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+        }
+
+        .player-name {
+            font-size: 18px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(250, 204, 21, 0.2);
+            padding-bottom: 8px;
+            display: block;
+        }
+
+        .team-list {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        /* Container Bendera */
+        .country-box {
+            width: 55px;
+            text-align: center;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* EFEK GUGUR */
+        .country-box.gugur {
+            filter: grayscale(100%) brightness(30%); /* Jadi hitam putih & gelap */
+            opacity: 0.5;
+            transform: scale(0.9);
+        }
+
+        .flag-img {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .country-name {
+            font-size: 9px;
+            font-weight: bold;
+            display: block;
+            margin-top: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-dim);
+        }
+
+        .status-badge {
+            font-size: 8px;
+            padding: 2px 5px;
+            border-radius: 3px;
+            margin-top: 3px;
+            display: inline-block;
+        }
+
+        .gugur .status-badge {
+            background: #ff4444;
+            color: white;
+        }
+
+        .btn-back {
+            background: none;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .btn-back:hover {
+            background: var(--accent);
+            color: black;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="btn-back" onclick="window.location.href='index.html'">⬅ KEMBALI KE KLASEMEN</button>
+    
+    <h1>WORLD CUP 2026 EDITION</h1>
+    <p class="subtitle">LAST MAN STANDING SYSTEM • 48 TEAMS</p>
+
+    <div id="wc-container" class="wc-grid">
+        <p style="color: var(--accent);">Menghubungkan ke satelit World Cup...</p>
     </div>
 
-<style>
-.wc-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 15px;
-    padding: 10px;
-}
-.player-card {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--accent);
-    border-radius: 10px;
-    padding: 15px;
-}
-.team-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
-}
-.country-box {
-    text-align: center;
-    width: 60px;
-    transition: all 0.5s ease;
-}
-.country-box.gugur {
-    filter: grayscale(100%); /* Bikin bendera jadi hitam putih */
-    opacity: 0.3; /* Bikin makin gelap/transparan */
-}
-.flag-img {
-    width: 40px;
-    height: 30px;
-    object-fit: cover;
-    border-radius: 3px;
-    border: 1px solid #444;
-}
-.country-name {
-    font-size: 8px;
-    display: block;
-    margin-top: 4px;
-    text-transform: uppercase;
-}
-</style>
+    <script>
+        // --- 1. CONFIGURATION ---
+        // Ganti URL ini dengan URL CSV Tab "WorldCup" lo
+        const WC_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/PAKE_ID_LO/pub?gid=MASUKKAN_GID_TAB_WORLDCUP&single=true&output=csv';
+
+        // --- 2. FLAG MAPPING (Manual Override jika nama gak sesuai standar) ---
+        const countryCodes = {
+            "brazil": "br", "prancis": "fr", "portugal": "pt", "mesir": "eg", "iran": "ir",
+            "argentina": "ar", "inggris": "gb", "jerman": "de", "indonesia": "id", "jepang": "jp",
+            "spanyol": "es", "belanda": "nl", "meksiko": "mx", "kanada": "ca", "amerika": "us",
+            "korea selatan": "kr", "arab saudi": "sa", "maroko": "ma", "belgia": "be", "uruguay": "uy"
+            // Tambahkan terus ke bawah sesuai list 48 negara lo nanti
+        };
+
+        function getFlag(name) {
+            const cleanName = name.toLowerCase().trim();
+            const code = countryCodes[cleanName] || "unknown"; 
+            // Jika tidak ada di list atas, dia pakai pencarian nama langsung ke flagcdn
+            // FlagCDN butuh kode 2 digit. Kalau lo capek input manual, lo bisa tulis kodenya langsung di Google Sheet.
+            return `https://flagcdn.com/w80/${code}.png`;
+        }
+
+        // --- 3. CORE FUNCTION ---
+        async function loadWorldCup() {
+            try {
+                const res = await fetch(`${WC_SHEET_URL}&nocache=${new Date().getTime()}`);
+                const csv = await res.text();
+                const rows = csv.split('\n').slice(1);
+                
+                const container = document.getElementById('wc-container');
+                container.innerHTML = "";
+
+                rows.forEach(line => {
+                    const col = line.split(',').map(c => c.trim().replace(/"/g, ''));
+                    if (!col[0]) return; // Skip baris kosong
+
+                    const namaOrang = col[0];
+                    let teamsHTML = "";
+
+                    // Looping 5 Negara (Kolom 1-2, 3-4, 5-6, 7-8, 9-10)
+                    for (let i = 1; i <= 10; i += 2) {
+                        const negara = col[i];
+                        const status = col[i+1] ? col[i+1].toLowerCase() : "aktif";
+                        
+                        if (!negara) continue;
+
+                        const isGugur = status.includes("gugur");
+                        const flagUrl = getFlag(negara);
+
+                        teamsHTML += `
+                            <div class="country-box ${isGugur ? 'gugur' : ''}">
+                                <img src="${flagUrl}" class="flag-img" onerror="this.src='https://flagcdn.com/w80/un.png'">
+                                <span class="country-name">${negara}</span>
+                                ${isGugur ? '<span class="status-badge">ELIMINATED</span>' : ''}
+                            </div>
+                        `;
+                    }
+
+                    container.innerHTML += `
+                        <div class="player-card">
+                            <span class="player-name">${namaOrang}</span>
+                            <div class="team-list">
+                                ${teamsHTML}
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error("Error WC:", error);
+                document.getElementById('wc-container').innerHTML = "<p>Gagal memuat data. Pastikan Google Sheet sudah di-Publish ke Web.</p>";
+            }
+        }
+
+        // Jalankan saat load
+        window.onload = loadWorldCup;
+        // Auto refresh tiap 1 menit biar gak ketinggalan berita gugur
+        setInterval(loadWorldCup, 60000);
+
+    </script>
+</body>
+</html>
