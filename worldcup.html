@@ -85,10 +85,25 @@
         }
 
         /* EFEK GUGUR */
+        /* EFEK GUGUR: Tetap terlihat tapi redup & hitam putih */
         .country-box.gugur {
-            filter: grayscale(100%) brightness(30%); /* Jadi hitam putih & gelap */
-            opacity: 0.5;
-            transform: scale(0.9);
+            filter: grayscale(100%) brightness(50%); /* Brightness dinaikkan dari 30% ke 50% */
+            opacity: 0.6; /* Opacity dinaikkan agar bendera masih terlihat jelas */
+            transform: scale(0.95);
+            position: relative;
+        }
+        
+        /* Tambahan: Kasih garis merah silang tipis kalau mau lebih jelas gugur (Opsional) */
+        .country-box.gugur::after {
+            content: "✖";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255, 0, 0, 0.7);
+            font-size: 20px;
+            font-weight: bold;
+            pointer-events: none;
         }
 
         .flag-img {
