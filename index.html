@@ -70,19 +70,21 @@
             <div id="topScorerPodium" class="podium-wrapper"></div>
         </div>
 
-        <div style="text-align: center; margin: 25px 0; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-            <button onclick="window.location.href='drawing.html'" class="share-btn" style="background: linear-gradient(135deg, #00f2ff 0%, #0061ff 100%); color: #000; margin: 0; box-shadow: 0 4px 15px rgba(0, 242, 255, 0.3);">
+        <div class="main-button-container">
+            <button onclick="window.location.href='drawing.html'" class="btn-custom btn-drawing">
                 <span>🎲 DRAWING URUTAN TEBAK</span>
             </button>
-
-            <button onclick="shareToWA()" class="share-btn" style="margin: 0;">
-                <span>Bagikan Klasemen</span>
+            
+            <button onclick="shareToWA()" class="btn-custom btn-share-wa">
+                <span>📤 BAGIKAN KLASEMEN</span>
             </button>
-            <button onclick="window.location.href='piagam.html'" class="share-btn" style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #000; margin: 0;">
-                <span>🏆 Lihat Piagam Juara</span>
+            
+            <button onclick="window.location.href='piagam.html'" class="btn-custom btn-piagam">
+                <span>🏆 LIHAT PIAGAM JUARA</span>
             </button>
-            <button class="btn-wc" onclick="window.location.href='worldcup.html'">
-                🏆 WORLD CUP 2026 EDITION
+            
+            <button onclick="window.location.href='worldcup.html'" class="btn-custom btn-wc-edition">
+                <span>🌎 WORLD CUP 2026 EDITION</span>
             </button>
         </div>
 
