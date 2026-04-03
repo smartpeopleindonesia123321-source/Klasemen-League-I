@@ -159,11 +159,19 @@
 
         // --- 2. FLAG MAPPING (Manual Override jika nama gak sesuai standar) ---
         const countryCodes = {
-            "brazil": "br", "prancis": "fr", "portugal": "pt", "mesir": "eg", "iran": "ir",
-            "argentina": "ar", "inggris": "gb", "jerman": "de", "indonesia": "id", "jepang": "jp",
-            "spanyol": "es", "belanda": "nl", "meksiko": "mx", "kanada": "ca", "amerika": "us",
-            "korea selatan": "kr", "arab saudi": "sa", "maroko": "ma", "belgia": "be", "uruguay": "uy"
-            // Tambahkan terus ke bawah sesuai list 48 negara lo nanti
+        // Pot 1
+        "amerika serikat": "us", "meksiko": "mx", "kanada": "ca", "prancis": "fr", 
+        "spanyol": "es", "argentina": "ar", "inggris": "gb", "portugal": "pt", "brasil": "br", "belanda": "nl",
+        // Pot 2
+        "belgia": "be", "jerman": "de", "kroasia": "hr", "maroko": "ma", "kolombia": "co", 
+        "uruguay": "uy", "swiss": "ch", "jepang": "jp", "senegal": "sn", "iran": "ir",
+        // Pot 3
+        "korea selatan": "kr", "ekuador": "ec", "australia": "au", "norwegia": "no", 
+        "panama": "pa", "mesir": "eg", "aljazair": "dz", "skotlandia": "gb-sct", "paraguay": "py",
+        // Pot 4
+        "tunisia": "tn", "pantai gading": "ci", "uzbekistan": "uz", "qatar": "qa", "arab saudi": "sa", "yordania": "jo", "tanjung verde": "cv", "ghana": "gh", "curacao": "cw", "afrika selatan": "za",
+        // Pot 5
+        "haiti": "ht", "selandia baru": "nz", "swedia": "se", "turki": "tr", "ceko": "cz", "bosnia & herzegovina": "ba", "irak": "iq", "dr kongo": "cd"
         };
 
         function getFlag(name) {
