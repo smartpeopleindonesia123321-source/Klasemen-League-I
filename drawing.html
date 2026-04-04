@@ -27,6 +27,20 @@
         #btn-lock { background: var(--red); color: white; }
         #btn-wa { background: #25d366; color: white; display: none; text-decoration: none; align-items: center; justify-content: center; padding: 15px; border-radius: 8px; font-weight: bold; }
         .status-lock { color: var(--blue); margin-top: 15px; font-weight: bold; display: none; }
+        textarea#teams {
+        background: #252525;
+        border: 1px solid #444;
+        color: white;
+        padding: 12px;
+        border-radius: 8px;
+        font-family: 'Kanit';
+        font-size: 14px;
+        width: 100%;
+        box-sizing: border-box;
+        resize: none; 
+        height: 80px; /* Biar agak tinggi kotaknya */
+        line-height: 1.4;
+        }
     </style>
 </head>
 <body>
@@ -45,7 +59,10 @@
         </div>
         <div class="input-group"><label>Tanggal</label><input type="text" id="match-date" readonly></div>
         <div class="input-group"><label>Jam</label><input type="text" id="start-time" readonly></div>
-        <div class="input-group full-col"><label>Tim</label><input type="text" id="teams" readonly></div>
+        <div class="input-group full-col">
+        <label>Tim yang Bertanding</label>
+        <textarea id="teams" readonly maxlength="1000" placeholder="List tim..."></textarea>
+        </div>
         <div class="input-group"><label>Durasi (Mnt)</label><input type="text" id="duration" readonly></div>
         <div class="input-group"><label>Saksi</label><input type="text" id="witness-name" readonly></div>
         <div class="input-group full-col">
@@ -273,7 +290,7 @@
         const jm = document.getElementById('start-time').value;
         const dr = document.getElementById('duration').value;
 
-        let msg = `*${m.toUpperCase()}*%0A*${tm.toUpperCase()}*%0A*${tg.toUpperCase()}*%0A%0A`;
+        let msg = `*${m.toUpperCase()}*%0A*TIM: ${tm.toUpperCase()}*%0A*TGL: ${tg.toUpperCase()}*%0A%0A`;
         msg += `⚖️ Saksi: ${document.getElementById('witness-name').value}%0A🎲 Acakan: ${shuffleCount}x%0A%0A`;
         msg += `*HASIL DRAWING:*%0A`;
         
