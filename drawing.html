@@ -13,9 +13,29 @@
         .full-col { grid-column: span 2; }
         .input-group { display: flex; flex-direction: column; gap: 5px; }
         .input-group label { font-size: 11px; color: var(--gold); font-weight: bold; text-transform: uppercase; }
-        input, select { background: #252525; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; font-family: 'Kanit'; font-size: 14px; width: 100%; box-sizing: border-box; }
-        /* Style dropdown saat aktif meski match di-lock */
-        select { border: 1px solid #444; cursor: pointer; }
+        
+        /* Style Input & Textarea */
+        input, select, textarea { 
+            background: #252525; 
+            border: 1px solid #444; 
+            color: white; 
+            padding: 12px; 
+            border-radius: 8px; 
+            font-family: 'Kanit'; 
+            font-size: 14px; 
+            width: 100%; 
+            box-sizing: border-box; 
+        }
+        
+        /* Khusus Textarea Tim agar bisa panjang */
+        textarea#teams {
+            resize: none; /* Biar user gak ngerusak layout */
+            height: 80px; /* Tinggi default */
+            line-height: 1.4;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gold) #252525;
+        }
+
         .absen-container { background: #111; padding: 10px; border-radius: 8px; border: 1px solid #333; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; }
         .absen-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #ccc; }
         #draw-list { display: flex; flex-direction: column; gap: 8px; margin: 20px 0; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; min-height: 50px; transition: 0.5s ease; }
@@ -45,7 +65,12 @@
         </div>
         <div class="input-group"><label>Tanggal</label><input type="text" id="match-date" readonly></div>
         <div class="input-group"><label>Jam</label><input type="text" id="start-time" readonly></div>
-        <div class="input-group full-col"><label>Tim</label><input type="text" id="teams" readonly></div>
+        
+        <div class="input-group full-col">
+            <label>Tim yang Bertanding</label>
+            <textarea id="teams" readonly maxlength="1000" placeholder="List tim akan muncul di sini..."></textarea>
+        </div>
+
         <div class="input-group"><label>Durasi (Mnt)</label><input type="text" id="duration" readonly></div>
         <div class="input-group"><label>Saksi</label><input type="text" id="witness-name" readonly></div>
         <div class="input-group full-col">
@@ -67,6 +92,7 @@
 </div>
 
 <script>
+    // URL & Konfigurasi tetap sama
     const drawingSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=353274036&single=true&output=csv';
     const playerMaster = ["Dandi", "Asep", "Rizal", "Aries", "Ikmal", "Regi", "Yanti", "Erni", "Dicky", "Maya"];
     
@@ -85,6 +111,7 @@
         try {
             const res = await fetch(`${drawingSheetUrl}&nocache=${new Date().getTime()}`);
             const csv = await res.text();
+            // Membersihkan CSV dari karakter aneh dan split baris
             const rows = csv.split('\n').slice(1).map(r => r.split(',').map(c => c.trim().replace(/"/g, '')));
             
             const resetFound = rows.some(row => row[7] && row[7].toUpperCase() === "RESET");
@@ -104,24 +131,19 @@
     function renderDropdown() {
         const select = document.getElementById('match-select');
         const currentVal = select.value;
-        
         let html = '<option value="">-- Pilih Match --</option>';
         allMatchesData.forEach((data, index) => {
             html += `<option value="${index}">${data[0]}</option>`;
         });
-
         if (select.innerHTML !== html) {
             select.innerHTML = html;
-            if (currentVal !== "" && allMatchesData[currentVal]) {
-                select.value = currentVal;
-            }
+            if (currentVal !== "" && allMatchesData[currentVal]) select.value = currentVal;
         }
     }
 
     function updateMatchDetails() {
         const select = document.getElementById('match-select');
         const idx = select.value;
-        
         if (idx === "" || !allMatchesData[idx]) {
             resetUIForNewMatch();
             return;
@@ -129,44 +151,30 @@
 
         const data = allMatchesData[idx];
         document.getElementById('match-date').value = data[1];
+        
+        // Mengisi Textarea Tim (Data[2])
         document.getElementById('teams').value = data[2];
+        
         document.getElementById('start-time').value = data[3];
         document.getElementById('duration').value = data[4];
         document.getElementById('witness-name').value = data[5];
 
-        // 1. Ambil data absen TERBARU dari Google Sheets
         const sheetAbsentRaw = data[6] ? data[6].split(';').map(n => n.trim()).filter(n => n !== "").sort().join(';') : "";
         globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()) : [];
         
         const savedData = localStorage.getItem('match_lock_' + idx);
-        
         if (savedData) {
             const parsed = JSON.parse(savedData);
-            
-            // 2. Cek data absen yang tersimpan di HP (kalau ada)
-            // Kita bikin pembanding biar kalau lo ubah absen di Sheets, HP otomatis ngereset
-            const localAbsentRaw = parsed.absentSnapshot || "";
-
-            if (sheetAbsentRaw !== localAbsentRaw) {
-                // JIKA ABSEN BERUBAH: Paksa reset khusus untuk match ini
+            if (sheetAbsentRaw !== (parsed.absentSnapshot || "")) {
                 localStorage.removeItem('match_lock_' + idx);
-                isLocked = false;
-                currentList = [];
-                shuffleCount = 0;
                 resetUIForNewMatch();
-                console.log("Data absen berubah, sistem otomatis unlock match ini.");
             } else {
-                // JIKA ABSEN SAMA: Pakai data yang sudah terkunci
                 currentList = parsed.list;
                 shuffleCount = parsed.count;
                 isLocked = true;
                 applyLockUI();
             }
         } else {
-            // BELUM ADA DATA TERKUNCI
-            isLocked = false;
-            currentList = [];
-            shuffleCount = 0;
             resetUIForNewMatch();
         }
 
@@ -175,6 +183,7 @@
         document.getElementById('count').innerText = shuffleCount;
     }
 
+    // Fungsi lainnya tetap (renderList, shuffle, shareToWA, dll)
     function renderAbsentStatus() {
         document.getElementById('absen-list-display').innerHTML = playerMaster.map(p => {
             const isAbs = globalAbsent.includes(p);
@@ -224,16 +233,13 @@
         const idx = document.getElementById('match-select').value;
         if (idx === "") return alert("Pilih match dulu!");
         if (currentList.length === 0) return alert("Belum ada urutan!");
-        
         if (confirm("KUNCI HASIL MATCH INI?")) {
             isLocked = true;
-            const dataToSave = {
+            localStorage.setItem('match_lock_' + idx, JSON.stringify({
                 list: currentList,
                 count: shuffleCount,
-                // SIMPAN STATUS ABSEN SAAT INI SEBAGAI PENANDA
                 absentSnapshot: globalAbsent.sort().join(';') 
-            };
-            localStorage.setItem('match_lock_' + idx, JSON.stringify(dataToSave));
+            }));
             applyLockUI();
         }
     }
@@ -242,8 +248,6 @@
         document.getElementById('draw-list').classList.remove('is-blind');
         document.getElementById('btn-shuffle').style.display = "none";
         document.getElementById('btn-lock').style.display = "none";
-        // BARIS DIBAWAH INI GUE UBAH AGAR DROPDOWN TETAP BISA DIKLIK
-        document.getElementById('match-select').disabled = false; 
         document.getElementById('status').style.display = "block";
         document.getElementById('btn-wa').style.display = "flex";
         renderList();
@@ -251,38 +255,32 @@
 
     function resetUIForNewMatch() {
         isLocked = false;
+        shuffleCount = 0;
+        currentList = [];
         document.getElementById('draw-list').classList.add('is-blind');
         document.getElementById('btn-shuffle').style.display = "block";
         document.getElementById('btn-lock').style.display = "block";
-        document.getElementById('match-select').disabled = false;
         document.getElementById('status').style.display = "none";
         document.getElementById('btn-wa').style.display = "none";
     }
 
     function shareToWA() {
-        let m = "";
         const select = document.getElementById('match-select');
-        if (select.selectedIndex > 0) {
-            m = select.options[select.selectedIndex].text;
-        } else {
-            m = "MATCH TERKUNCI";
-        }
-                  
+        const m = select.selectedIndex > 0 ? select.options[select.selectedIndex].text : "MATCH";
         const tm = document.getElementById('teams').value;
         const tg = document.getElementById('match-date').value; 
         const jm = document.getElementById('start-time').value;
         const dr = document.getElementById('duration').value;
 
-        let msg = `*${m.toUpperCase()}*%0A*${tm.toUpperCase()}*%0A*${tg.toUpperCase()}*%0A%0A`;
+        let msg = `*${m.toUpperCase()}*%0A*TIM: ${tm.toUpperCase()}*%0A*TGL: ${tg.toUpperCase()}*%0A%0A`;
         msg += `⚖️ Saksi: ${document.getElementById('witness-name').value}%0A🎲 Acakan: ${shuffleCount}x%0A%0A`;
         msg += `*HASIL DRAWING:*%0A`;
         
         currentList.forEach((name, i) => {
             const isAbs = globalAbsent.includes(name);
             const t = calculateSchedule(jm, i, dr);
-            msg += isAbs ? `${i+1}. ${name.toUpperCase()} (ABSEN)%0A` : `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}] : %0A`;
+            msg += isAbs ? `${i+1}. ${name.toUpperCase()} (ABSEN)%0A` : `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}]%0A`;
         });
-        
         window.open(`https://wa.me/?text=${msg}`, '_blank');
     }
 
@@ -294,19 +292,12 @@
 
     async function manualSync() {
         const btn = event.target;
-        const originalText = btn.innerText;
         btn.innerText = "⏳...";
-        btn.disabled = true;
         await syncData();
-        setTimeout(() => {
-            btn.innerText = originalText;
-            btn.disabled = false;
-        }, 1000);
+        btn.innerText = "REFRESH";
     }
 
     window.onload = initApp;
 </script>
 </body>
 </html>
-
-
