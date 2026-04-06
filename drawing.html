@@ -277,30 +277,43 @@
     }
 
     function shareToWA() {
-        let m = "";
-        const select = document.getElementById('match-select');
-        if (select.selectedIndex > 0) {
-            m = select.options[select.selectedIndex].text;
-        } else {
-            m = "MATCH TERKUNCI";
-        }
-                  
-        const tm = document.getElementById('teams').value;
-        const tg = document.getElementById('match-date').value; 
-        const jm = document.getElementById('start-time').value;
-        const dr = document.getElementById('duration').value;
+    let m = "";
+    const select = document.getElementById('match-select');
+    if (select.selectedIndex > 0) {
+        m = select.options[select.selectedIndex].text;
+    } else {
+        m = "MATCH TERKUNCI";
+    }
+            
+    const tm = document.getElementById('teams').value;
+    const tg = document.getElementById('match-date').value; 
+    const jm = document.getElementById('start-time').value;
+    const dr = document.getElementById('duration').value;
+    const saksi = document.getElementById('witness-name').value;
 
-        let msg = `*${m.toUpperCase()}*%0A*TIM: ${tm.toUpperCase()}*%0A*TGL: ${tg.toUpperCase()}*%0A%0A`;
-        msg += `⚖️ Saksi: ${document.getElementById('witness-name').value}%0A🎲 Acakan: ${shuffleCount}x%0A%0A`;
-        msg += `*HASIL DRAWING:*%0A`;
-        
-        currentList.forEach((name, i) => {
-            const isAbs = globalAbsent.includes(name);
-            const t = calculateSchedule(jm, i, dr);
-            msg += isAbs ? `${i+1}. ${name.toUpperCase()} (ABSEN)%0A` : `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}] : %0A`;
-        });
-        
-        window.open(`https://wa.me/?text=${msg}`, '_blank');
+    // 1. Susun pesan mentahnya dulu di dalam variabel biasa
+    let rawMsg = `*${m.toUpperCase()}*\n`;
+    rawMsg += `*TIM:* ${tm.toUpperCase()}\n`;
+    rawMsg += `*TGL:* ${tg.toUpperCase()}\n\n`;
+    rawMsg += `⚖️ Saksi: ${saksi}\n`;
+    rawMsg += `🎲 Acakan: ${shuffleCount}x\n\n`;
+    rawMsg += `*HASIL DRAWING:*\n`;
+    
+    currentList.forEach((name, i) => {
+        const isAbs = globalAbsent.includes(name);
+        const t = calculateSchedule(jm, i, dr);
+        if (isAbs) {
+            rawMsg += `${i+1}. ${name.toUpperCase()} (ABSEN)\n`;
+        } else {
+            rawMsg += `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}] : \n`;
+        }
+    });
+    
+    // 2. GUNAKAN encodeURIComponent agar karakter || dan spasi tidak merusak link
+    const encodedMsg = encodeURIComponent(rawMsg);
+    
+    // 3. Buka WhatsApp dengan pesan yang sudah aman
+    window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
     }
 
     function hardReset() {
