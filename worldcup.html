@@ -8,7 +8,7 @@
         :root {
             --bg: #0a0a0c;
             --card-bg: #161b22;
-            --accent: #facc15; /* Kuning Emas */
+            --accent: #facc15;
             --text: #ffffff;
             --text-dim: rgba(255, 255, 255, 0.6);
         }
@@ -22,26 +22,15 @@
             text-align: center;
         }
 
-        h1 {
-            color: var(--accent);
-            text-shadow: 0 0 10px rgba(250, 204, 21, 0.3);
-            margin-bottom: 5px;
-            font-size: 1.8rem;
-        }
-
-        .subtitle {
-            font-size: 12px;
-            color: var(--text-dim);
-            margin-bottom: 30px;
-            letter-spacing: 2px;
-        }
+        h1 { color: var(--accent); text-shadow: 0 0 10px rgba(250, 204, 21, 0.3); margin-bottom: 5px; }
+        .subtitle { font-size: 11px; color: var(--text-dim); margin-bottom: 30px; letter-spacing: 2px; }
 
         .wc-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
             max-width: 1200px;
-            margin: 0 auto;
+            margin: 0 auto 50px auto;
         }
 
         .player-card {
@@ -49,103 +38,19 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             padding: 20px;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.3s ease;
         }
 
-        .player-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-5px);
-        }
+        .player-name { font-size: 18px; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; border-bottom: 1px solid var(--accent); padding-bottom: 8px; display: block; }
+        .team-list { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
 
-        .player-name {
-            font-size: 18px;
-            font-weight: 900;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            border-bottom: 1px solid rgba(250, 204, 21, 0.2);
-            padding-bottom: 8px;
-            display: block;
-        }
+        .country-box { width: 50px; text-align: center; }
+        .country-box.gugur { filter: grayscale(100%); opacity: 0.5; }
+        .flag-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 3px; }
+        .country-name { font-size: 8px; font-weight: bold; display: block; margin-top: 4px; color: var(--text-dim); }
 
-        .team-list {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .country-box {
-            width: 55px;
-            text-align: center;
-            position: relative;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .country-box.gugur {
-            filter: grayscale(100%) brightness(70%);
-            opacity: 0.6;
-        }
-        
-        .country-box.gugur:hover {
-            filter: grayscale(0%);
-            opacity: 1;
-        }
-
-        .country-box.juara-1 { border: 2px solid #ffd700; border-radius: 6px; box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); transform: scale(1.05); }
-        .country-box.juara-2 { border: 2px solid #c0c0c0; border-radius: 6px; }
-        .country-box.juara-3 { border: 2px solid #cd7f32; border-radius: 6px; }
-
-        .flag-img {
-            width: 100%;
-            aspect-ratio: 4/3;
-            object-fit: cover;
-            border-radius: 4px;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        .country-name {
-            font-size: 9px;
-            font-weight: bold;
-            display: block;
-            margin-top: 6px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: var(--text-dim);
-        }
-
-        .status-badge {
-            font-size: 7px;
-            padding: 2px 4px;
-            border-radius: 3px;
-            margin-top: 4px;
-            display: block;
-            font-weight: 900;
-            text-transform: uppercase;
-        }
-
-        .gugur .status-badge { background: #ff4444; color: white; }
-        .juara-1 .status-badge { background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728); color: #000; }
-
-        .btn-back {
-            background: none;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-
-        .btn-back:hover { background: var(--accent); color: black; }
-
-        /* Leaderboard Style */
-        .leaderboard-section {
-            margin: 50px auto;
+        /* Leaderboard Section */
+        .section-container {
+            margin: 40px auto;
             max-width: 1000px;
             background: var(--card-bg);
             padding: 20px;
@@ -153,61 +58,60 @@
             border: 1px solid rgba(250, 204, 21, 0.2);
         }
 
-        .leaderboard-table {
-            width: 100%;
-            border-collapse: collapse;
-            color: white;
-            font-size: 14px;
-        }
+        .l-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .l-table th { background: rgba(250, 204, 21, 0.1); color: var(--accent); padding: 12px; border-bottom: 2px solid var(--accent); }
+        .l-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-        .leaderboard-table th {
+        /* Group Detail Style */
+        .manager-detail-card {
+            background: #1c2128;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            border-left: 4px solid var(--accent);
+        }
+        .manager-header {
             background: rgba(250, 204, 21, 0.1);
+            padding: 10px 15px;
+            text-align: left;
+            font-weight: bold;
             color: var(--accent);
-            padding: 12px;
-            border-bottom: 2px solid var(--accent);
+            display: flex;
+            justify-content: space-between;
         }
-
-        .leaderboard-table td {
-            padding: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        @media (max-width: 600px) {
-            .wc-grid { grid-template-columns: 1fr; }
-            .country-box { width: 50px; }
-        }
+        
+        .btn-back { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 8px 16px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <button class="btn-back" onclick="window.location.href='index.html'">⬅ KEMBALI KE KLASEMEN</button>
+    <button class="btn-back" onclick="window.location.href='index.html'">⬅ BACK TO HOME</button>
     
     <h1>WORLD CUP 2026 EDITION</h1>
-    <p class="subtitle">LAST MAN STANDING SYSTEM • 48 TEAMS</p>
+    <p class="subtitle">MANAGER & TEAM ANALYTICS</p>
 
-    <div id="wc-container" class="wc-grid">
-        <p style="color: var(--accent);">Menghubungkan ke satelit World Cup...</p>
-    </div>
+    <div id="wc-container" class="wc-grid"></div>
 
-    <div class="leaderboard-section">
-        <h2 style="color: var(--accent); text-transform: uppercase; margin-bottom: 5px;">Manager Standings</h2>
-        <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 20px;">POIN GABUNGAN (MENANG: 3, SERI: 1, KALAH: 0)</p>
+    <div class="section-container">
+        <h2 style="color: var(--accent); margin-bottom: 15px;">OVERALL MANAGER STANDINGS</h2>
         <div style="overflow-x: auto;">
-            <table class="leaderboard-table">
+            <table class="l-table">
                 <thead>
                     <tr>
                         <th>RANK</th>
                         <th style="text-align: left;">MANAGER</th>
-                        <th>P</th>
-                        <th>M</th>
-                        <th>S</th>
-                        <th>K</th>
+                        <th>P</th><th>M</th><th>S</th><th>K</th>
                         <th style="color: #4ade80;">PTS</th>
                     </tr>
                 </thead>
-                <tbody id="leaderboard-body"></tbody>
+                <tbody id="leaderboard-manager"></tbody>
             </table>
         </div>
+    </div>
+
+    <div class="section-container" style="background: transparent; border: none; padding: 0;">
+        <h2 style="color: var(--accent); margin-bottom: 15px;">TEAM BREAKDOWN PER MANAGER</h2>
+        <div id="detailed-teams-container"></div>
     </div>
 
     <script>
@@ -224,12 +128,6 @@
             "haiti": "ht", "selandia baru": "nz", "swedia": "se", "turki": "tr", "ceko": "cz", "bosnia & herzegovina": "ba", "irak": "iq", "dr kongo": "cd"
         };
 
-        function getFlag(name) {
-            const cleanName = name.toLowerCase().trim();
-            const code = countryCodes[cleanName] || "un"; 
-            return `https://flagcdn.com/w80/${code}.png`;
-        }
-
         async function loadWorldCup() {
             try {
                 const res = await fetch(`${WC_SHEET_URL}&nocache=${new Date().getTime()}`);
@@ -237,81 +135,83 @@
                 const rows = csv.split('\n').slice(1);
                 
                 const container = document.getElementById('wc-container');
-                const leaderboardBody = document.getElementById('leaderboard-body');
+                const managerBody = document.getElementById('leaderboard-manager');
+                const detailedContainer = document.getElementById('detailed-teams-container');
                 
-                container.innerHTML = "";
-                leaderboardBody.innerHTML = "";
+                container.innerHTML = ""; managerBody.innerHTML = ""; detailedContainer.innerHTML = "";
 
-                let managerScores = [];
+                let allData = [];
 
                 rows.forEach(line => {
                     const col = line.split(',').map(c => c.trim().replace(/"/g, ''));
                     if (!col[0]) return;
 
-                    const namaOrang = col[0];
+                    let managerObj = { 
+                        name: col[0], 
+                        teams: [], 
+                        totalPts: 0, totalP: 0, totalM: 0, totalS: 0, totalK: 0 
+                    };
+
                     let teamsHTML = "";
-                    let m_pts = 0, m_win = 0, m_draw = 0, m_lose = 0, m_play = 0;
 
                     for (let i = 1; i <= 10; i += 2) {
                         const negara = col[i];
                         const statusRaw = col[i+1] ? col[i+1].toLowerCase() : "0-0-0 (aktif)";
                         if (!negara) continue;
 
-                        // Hitung Poin
-                        const statPart = statusRaw.split(' ')[0];
-                        const parts = statPart.split('-');
-                        if(parts.length === 3) {
-                            const w = parseInt(parts[0]) || 0;
-                            const d = parseInt(parts[1]) || 0;
-                            const l = parseInt(parts[2]) || 0;
-                            m_win += w; m_draw += d; m_lose += l;
-                            m_play += (w + d + l);
-                            m_pts += (w * 3) + (d * 1);
-                        }
+                        const parts = statusRaw.split(' ')[0].split('-');
+                        let w = parseInt(parts[0]) || 0;
+                        let d = parseInt(parts[1]) || 0;
+                        let l = parseInt(parts[2]) || 0;
+                        let pts = (w * 3) + (d * 1);
 
-                        // UI Status
-                        const isGugur = statusRaw.includes("gugur");
-                        const isJuara1 = statusRaw.includes("juara 1");
-                        const statusClass = isGugur ? "gugur" : (isJuara1 ? "juara-1" : "");
-                        const badgeHTML = isGugur ? '<span class="status-badge">ELIMINATED</span>' : (isJuara1 ? '<span class="status-badge">WINNER 🏆</span>' : "");
+                        managerObj.teams.push({ name: negara, p: (w+d+l), w, d, l, pts, raw: statusRaw });
+                        managerObj.totalPts += pts;
+                        managerObj.totalP += (w+d+l);
+                        managerObj.totalM += w;
+                        managerObj.totalS += d;
+                        managerObj.totalK += l;
 
                         teamsHTML += `
-                            <div class="country-box ${statusClass}">
-                                <img src="${getFlag(negara)}" class="flag-img" onerror="this.src='https://flagcdn.com/w80/un.png'">
+                            <div class="country-box ${statusRaw.includes("gugur") ? "gugur" : ""}">
+                                <img src="https://flagcdn.com/w80/${countryCodes[negara.toLowerCase()] || "un"}.png" class="flag-img">
                                 <span class="country-name">${negara}</span>
-                                ${badgeHTML}
-                            </div>
-                        `;
+                            </div>`;
                     }
-
-                    managerScores.push({ name: namaOrang, p: m_play, w: m_win, d: m_draw, l: m_lose, pts: m_pts });
-
-                    container.innerHTML += `
-                        <div class="player-card">
-                            <span class="player-name">${namaOrang}</span>
-                            <div class="team-list">${teamsHTML}</div>
-                        </div>
-                    `;
+                    allData.push(managerObj);
+                    container.innerHTML += `<div class="player-card"><span class="player-name">${managerObj.name}</span><div class="team-list">${teamsHTML}</div></div>`;
                 });
 
-                managerScores.sort((a, b) => b.pts - a.pts);
-                managerScores.forEach((m, idx) => {
-                    leaderboardBody.innerHTML += `
+                // Sort Manager by Points
+                allData.sort((a, b) => b.totalPts - a.totalPts);
+
+                allData.forEach((m, idx) => {
+                    // 1. Fill Manager Table
+                    managerBody.innerHTML += `<tr><td>${idx+1}</td><td style="text-align:left">${m.name}</td><td>${m.totalP}</td><td>${m.totalM}</td><td>${m.totalS}</td><td>${m.totalK}</td><td style="font-weight:bold;color:#4ade80">${m.totalPts}</td></tr>`;
+
+                    // 2. Fill Detailed Breakdown
+                    let teamRows = m.teams.map(t => `
                         <tr>
-                            <td style="font-weight: bold; color: var(--accent);">${idx + 1}</td>
-                            <td style="text-align: left;">${m.name}</td>
-                            <td>${m.p}</td><td>${m.w}</td><td>${m.d}</td><td>${m.l}</td>
-                            <td style="font-weight: bold; color: #4ade80;">${m.pts}</td>
-                        </tr>
-                    `;
+                            <td style="text-align:left"><b>${t.name}</b></td>
+                            <td>${t.p}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td>
+                            <td style="font-weight:bold;color:#4ade80">${t.pts}</td>
+                        </tr>`).join('');
+
+                    detailedContainer.innerHTML += `
+                        <div class="manager-detail-card">
+                            <div class="manager-header">
+                                <span>MANAGER: ${m.name}</span>
+                                <span>TOTAL: ${m.totalPts} PTS</span>
+                            </div>
+                            <table class="l-table">
+                                <thead><tr><th style="text-align:left">NEGARA</th><th>P</th><th>M</th><th>S</th><th>K</th><th>PTS</th></tr></thead>
+                                <tbody>${teamRows}</tbody>
+                            </table>
+                        </div>`;
                 });
 
-            } catch (error) {
-                console.error("Error:", error);
-                document.getElementById('wc-container').innerHTML = "<p>Gagal memuat data.</p>";
-            }
+            } catch (e) { console.error(e); }
         }
-
         window.onload = loadWorldCup;
         setInterval(loadWorldCup, 60000);
     </script>
