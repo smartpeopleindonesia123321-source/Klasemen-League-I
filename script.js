@@ -401,12 +401,12 @@ function shareToWA() {
     text += "----------------------------------------------\n\n";
 
     // Bagian Penghargaan Musim (Compact Mode)
-    //text += "🔥 *OFFICIAL AWARDS CATEGORIES* 🔥\n";
-    //text += "🏆 Champion | 🥈 Runner Up | 🥉 3rd Place\n";
-    //text += "🌏 AFC Elite 2 Trophy | 🎖️ Admin Award\n"; // Tambahan baru di sini
-    //text += "🎯 Golden Boot | 👑 Ballon d’Or\n";
-    //text += "⚖️ Best Witness by Vote | 🤝 Fair Play Trophy by Vote\n";
-    //text += "----------------------------------------------\n\n";
+    text += "🔥 *OFFICIAL AWARDS CATEGORIES* 🔥\n";
+    text += "🏆 Champion | 🥈 Runner Up | 🥉 3rd Place\n";
+    text += "🌏 AFC Elite 2 Trophy | 🎖️ Admin Award\n"; // Tambahan baru di sini
+    text += "🎯 Golden Boot | 👑 Ballon d’Or\n";
+    text += "⚖️ Best Witness by Vote | 🤝 Fair Play Trophy by Vote\n";
+    text += "----------------------------------------------\n\n";
 
     // Footer & Link
     text += "📑 *Digital Card, Market Value, & Certificates:* \n";
