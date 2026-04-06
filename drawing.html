@@ -277,43 +277,43 @@
     }
 
     function shareToWA() {
-    let m = "";
-    const select = document.getElementById('match-select');
-    if (select.selectedIndex > 0) {
-        m = select.options[select.selectedIndex].text;
-    } else {
-        m = "MATCH TERKUNCI";
-    }
-            
-    const tm = document.getElementById('teams').value;
-    const tg = document.getElementById('match-date').value; 
-    const jm = document.getElementById('start-time').value;
-    const dr = document.getElementById('duration').value;
-    const saksi = document.getElementById('witness-name').value;
-
-    // 1. Susun pesan mentahnya dulu di dalam variabel biasa
-    let rawMsg = `*${m.toUpperCase()}*\n`;
-    rawMsg += `*TIM:* ${tm.toUpperCase()}\n`;
-    rawMsg += `*TGL:* ${tg.toUpperCase()}\n\n`;
-    rawMsg += `⚖️ Saksi: ${saksi}\n`;
-    rawMsg += `🎲 Acakan: ${shuffleCount}x\n\n`;
-    rawMsg += `*HASIL DRAWING:*\n`;
-    
-    currentList.forEach((name, i) => {
-        const isAbs = globalAbsent.includes(name);
-        const t = calculateSchedule(jm, i, dr);
-        if (isAbs) {
-            rawMsg += `${i+1}. ${name.toUpperCase()} (ABSEN)\n`;
+        let m = "";
+        const select = document.getElementById('match-select');
+        if (select.selectedIndex > 0) {
+            m = select.options[select.selectedIndex].text;
         } else {
-            rawMsg += `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}] : \n`;
+            m = "MATCH TERKUNCI";
         }
-    });
-    
-    // 2. GUNAKAN encodeURIComponent agar karakter || dan spasi tidak merusak link
-    const encodedMsg = encodeURIComponent(rawMsg);
-    
-    // 3. Buka WhatsApp dengan pesan yang sudah aman
-    window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
+                
+        const tm = document.getElementById('teams').value.trim(); // Tambah trim biar gak ada spasi liar
+        const tg = document.getElementById('match-date').value; 
+        const jm = document.getElementById('start-time').value;
+        const dr = document.getElementById('duration').value;
+        const saksi = document.getElementById('witness-name').value;
+
+        // Gunakan satu variabel string panjang, jangan pakai enter manual di dalam kode
+        let rawMsg = "*" + m.toUpperCase() + "*\n";
+        rawMsg += "*TIM:* " + tm.toUpperCase() + "\n";
+        rawMsg += "*TGL:* " + tg.toUpperCase() + "\n\n";
+        rawMsg += "⚖️ Saksi: " + saksi + "\n";
+        rawMsg += "🎲 Acakan: " + shuffleCount + "x\n\n";
+        rawMsg += "*HASIL DRAWING:*\n";
+        
+        currentList.forEach((name, i) => {
+            const isAbs = globalAbsent.includes(name);
+            const t = calculateSchedule(jm, i, dr);
+            if (isAbs) {
+                rawMsg += (i + 1) + ". " + name.toUpperCase() + " (ABSEN)\n";
+            } else {
+                rawMsg += (i + 1) + ". " + name.toUpperCase() + " [" + t.start + "-" + t.end + "]\n";
+            }
+        });
+        
+        // Encode total agar simbol || dan spasi aman
+        const encodedMsg = encodeURIComponent(rawMsg);
+        
+        // Buka link WA
+        window.open("https://wa.me/?text=" + encodedMsg, '_blank');
     }
 
     function hardReset() {
