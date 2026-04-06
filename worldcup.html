@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WORLD CUP 2026 EDITION - LEAGUE-I</title>
+    <title>WORLD CUP 2026 - LIGA-I IDR EDITION</title>
     <style>
         :root {
             --bg: #0a0a0c;
@@ -11,6 +11,7 @@
             --accent: #facc15;
             --text: #ffffff;
             --text-dim: rgba(255, 255, 255, 0.6);
+            --money: #4ade80; 
         }
 
         body {
@@ -48,7 +49,6 @@
         .flag-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 3px; }
         .country-name { font-size: 8px; font-weight: bold; display: block; margin-top: 4px; color: var(--text-dim); }
 
-        /* Leaderboard Section */
         .section-container {
             margin: 40px auto;
             max-width: 1000px;
@@ -62,7 +62,6 @@
         .l-table th { background: rgba(250, 204, 21, 0.1); color: var(--accent); padding: 12px; border-bottom: 2px solid var(--accent); }
         .l-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-        /* Group Detail Style */
         .manager-detail-card {
             background: #1c2128;
             margin-bottom: 15px;
@@ -78,6 +77,20 @@
             color: var(--accent);
             display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Style Market Value Kecil di Samping Nama */
+        .idr-val {
+            font-size: 9px;
+            color: var(--money);
+            background: rgba(74, 222, 128, 0.1);
+            padding: 1px 5px;
+            border-radius: 3px;
+            margin-left: 6px;
+            border: 1px solid rgba(74, 222, 128, 0.1);
+            font-weight: normal;
+            vertical-align: middle;
         }
         
         .btn-back { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 8px 16px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; font-weight: bold; }
@@ -85,15 +98,15 @@
 </head>
 <body>
 
-    <button class="btn-back" onclick="window.location.href='index.html'">⬅ BACK TO HOME</button>
+    <button class="btn-back" onclick="window.location.href='index.html'">⬅ KEMBALI KE LIGA-I</button>
     
     <h1>WORLD CUP 2026 EDITION</h1>
-    <p class="subtitle">MANAGER & TEAM ANALYTICS</p>
+    <p class="subtitle">STATISTICS & MARKET VALUE (IDR)</p>
 
     <div id="wc-container" class="wc-grid"></div>
 
     <div class="section-container">
-        <h2 style="color: var(--accent); margin-bottom: 15px;">OVERALL MANAGER STANDINGS</h2>
+        <h2 style="color: var(--accent); margin-bottom: 15px;">MANAGER STANDINGS</h2>
         <div style="overflow-x: auto;">
             <table class="l-table">
                 <thead>
@@ -110,12 +123,34 @@
     </div>
 
     <div class="section-container" style="background: transparent; border: none; padding: 0;">
-        <h2 style="color: var(--accent); margin-bottom: 15px;">TEAM BREAKDOWN PER MANAGER</h2>
+        <h2 style="color: var(--accent); margin-bottom: 15px;">SQUAD BREAKDOWN (IDR VALUE)</h2>
         <div id="detailed-teams-container"></div>
     </div>
 
     <script>
         const WC_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=1875833446&single=true&output=csv';
+
+        // Nilai pasar dlm Juta Euro -> Konversi ke Triliun/Miliar Rupiah (Kurs 17rb)
+        const marketValuesEuro = {
+            "inggris": 1470, "prancis": 1210, "brasil": 1100, "portugal": 1050, "spanyol": 960,
+            "jerman": 850, "argentina": 820, "belanda": 650, "italia": 610, "belgia": 580,
+            "uruguay": 480, "norwegia": 450, "kroasia": 320, "maroko": 310, "kolombia": 280,
+            "amerika serikat": 250, "swiss": 230, "jepang": 210, "senegal": 200, "meksiko": 190,
+            "turki": 180, "austria": 175, "korea selatan": 160, "kanada": 150, "ekuador": 145,
+            "pantai gading": 140, "iran": 120, "aljazair": 115, "mesir": 110, "ceko": 105,
+            "skotlandia": 100, "paraguay": 95, "ghana": 90, "australia": 85, "bosnia & herzegovina": 80,
+            "tunisia": 60, "saudi arabia": 55, "uzbekistan": 45, "qatar": 40, "irak": 35,
+            "yordania": 30, "tanjung verde": 25, "selandia baru": 20, "afrika selatan": 18,
+            "dr kongo": 15, "haiti": 12, "curacao": 10, "panama": 8
+        };
+
+        function formatIDR(euro) {
+            const rupiah = euro * 17; // Nilai dlm Miliar Rupiah
+            if (rupiah >= 1000) {
+                return "Rp" + (rupiah / 1000).toFixed(1) + "T"; // Triliun
+            }
+            return "Rp" + rupiah.toFixed(0) + "M"; // Miliar
+        }
 
         const countryCodes = {
             "amerika serikat": "us", "meksiko": "mx", "kanada": "ca", "prancis": "fr", 
@@ -146,12 +181,7 @@
                     const col = line.split(',').map(c => c.trim().replace(/"/g, ''));
                     if (!col[0]) return;
 
-                    let managerObj = { 
-                        name: col[0], 
-                        teams: [], 
-                        totalPts: 0, totalP: 0, totalM: 0, totalS: 0, totalK: 0 
-                    };
-
+                    let mObj = { name: col[0], teams: [], totalPts: 0, tP: 0, tM: 0, tS: 0, tK: 0, tVal: 0 };
                     let teamsHTML = "";
 
                     for (let i = 1; i <= 10; i += 2) {
@@ -160,56 +190,50 @@
                         if (!negara) continue;
 
                         const parts = statusRaw.split(' ')[0].split('-');
-                        let w = parseInt(parts[0]) || 0;
-                        let d = parseInt(parts[1]) || 0;
-                        let l = parseInt(parts[2]) || 0;
+                        let w = parseInt(parts[0]) || 0, d = parseInt(parts[1]) || 0, l = parseInt(parts[2]) || 0;
                         let pts = (w * 3) + (d * 1);
+                        let val = marketValuesEuro[negara.toLowerCase()] || 0;
 
-                        managerObj.teams.push({ name: negara, p: (w+d+l), w, d, l, pts, raw: statusRaw });
-                        managerObj.totalPts += pts;
-                        managerObj.totalP += (w+d+l);
-                        managerObj.totalM += w;
-                        managerObj.totalS += d;
-                        managerObj.totalK += l;
+                        mObj.teams.push({ name: negara, p: (w+d+l), w, d, l, pts, val });
+                        mObj.totalPts += pts; mObj.tP += (w+d+l); mObj.tM += w; mObj.tS += d; mObj.tK += l; mObj.tVal += val;
 
-                        teamsHTML += `
-                            <div class="country-box ${statusRaw.includes("gugur") ? "gugur" : ""}">
-                                <img src="https://flagcdn.com/w80/${countryCodes[negara.toLowerCase()] || "un"}.png" class="flag-img">
-                                <span class="country-name">${negara}</span>
-                            </div>`;
+                        teamsHTML += `<div class="country-box ${statusRaw.includes("gugur") ? "gugur" : ""}">
+                            <img src="https://flagcdn.com/w80/${countryCodes[negara.toLowerCase()] || "un"}.png" class="flag-img">
+                            <span class="country-name">${negara}</span>
+                        </div>`;
                     }
-                    allData.push(managerObj);
-                    container.innerHTML += `<div class="player-card"><span class="player-name">${managerObj.name}</span><div class="team-list">${teamsHTML}</div></div>`;
+                    allData.push(mObj);
+                    container.innerHTML += `<div class="player-card"><span class="player-name">${mObj.name}</span><div class="team-list">${teamsHTML}</div></div>`;
                 });
 
-                // Sort Manager by Points
-                allData.sort((a, b) => b.totalPts - a.totalPts);
+                allData.sort((a, b) => b.totalPts - a.totalPts).forEach((m, idx) => {
+                    // Manager Table
+                    managerBody.innerHTML += `<tr>
+                        <td>${idx+1}</td>
+                        <td style="text-align:left"><b>${m.name}</b> <span class="idr-val">${formatIDR(m.tVal)}</span></td>
+                        <td>${m.tP}</td><td>${m.tM}</td><td>${m.tS}</td><td>${m.tK}</td>
+                        <td style="font-weight:bold;color:#4ade80">${m.totalPts}</td>
+                    </tr>`;
 
-                allData.forEach((m, idx) => {
-                    // 1. Fill Manager Table
-                    managerBody.innerHTML += `<tr><td>${idx+1}</td><td style="text-align:left">${m.name}</td><td>${m.totalP}</td><td>${m.totalM}</td><td>${m.totalS}</td><td>${m.totalK}</td><td style="font-weight:bold;color:#4ade80">${m.totalPts}</td></tr>`;
-
-                    // 2. Fill Detailed Breakdown
-                    let teamRows = m.teams.map(t => `
-                        <tr>
-                            <td style="text-align:left"><b>${t.name}</b></td>
-                            <td>${t.p}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td>
-                            <td style="font-weight:bold;color:#4ade80">${t.pts}</td>
-                        </tr>`).join('');
+                    // Breakdown
+                    let tRows = m.teams.map(t => `<tr>
+                        <td style="text-align:left">${t.name} <span class="idr-val">${formatIDR(t.val)}</span></td>
+                        <td>${t.p}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td>
+                        <td style="font-weight:bold;color:#4ade80">${t.pts}</td>
+                    </tr>`).join('');
 
                     detailedContainer.innerHTML += `
                         <div class="manager-detail-card">
                             <div class="manager-header">
-                                <span>MANAGER: ${m.name}</span>
-                                <span>TOTAL: ${m.totalPts} PTS</span>
+                                <span>${m.name}'s SQUAD</span>
+                                <span style="font-size:11px; color:var(--money)">TOTAL VALUE: ${formatIDR(m.tVal)}</span>
                             </div>
                             <table class="l-table">
                                 <thead><tr><th style="text-align:left">NEGARA</th><th>P</th><th>M</th><th>S</th><th>K</th><th>PTS</th></tr></thead>
-                                <tbody>${teamRows}</tbody>
+                                <tbody>${tRows}</tbody>
                             </table>
                         </div>`;
                 });
-
             } catch (e) { console.error(e); }
         }
         window.onload = loadWorldCup;
