@@ -401,17 +401,17 @@ function shareToWA() {
     text += "----------------------------------------------\n\n";
 
     // Bagian Penghargaan Musim (Compact Mode)
-    text += "🔥 *OFFICIAL AWARDS CATEGORIES* 🔥\n";
-    text += "🏆 Champion | 🥈 Runner Up | 🥉 3rd Place\n";
-    text += "🌏 AFC Elite 2 Trophy | 🎖️ Admin Award\n"; // Tambahan baru di sini
-    text += "🎯 Golden Boot | 👑 Ballon d’Or\n";
-    text += "⚖️ Best Witness by Vote | 🤝 Fair Play Trophy by Vote\n";
-    text += "----------------------------------------------\n\n";
+    //text += "🔥 *OFFICIAL AWARDS CATEGORIES* 🔥\n";
+    //text += "🏆 Champion | 🥈 Runner Up | 🥉 3rd Place\n";
+    //text += "🌏 AFC Elite 2 Trophy | 🎖️ Admin Award\n"; // Tambahan baru di sini
+    //text += "🎯 Golden Boot | 👑 Ballon d’Or\n";
+    //text += "⚖️ Best Witness by Vote | 🤝 Fair Play Trophy by Vote\n";
+    //text += "----------------------------------------------\n\n";
 
     // Footer & Link
     text += "📑 *Digital Card, Market Value, & Certificates:* \n";
     text += "https://smartpeopleindonesia123321-source.github.io/Klasemen-League-I/\n\n";
-    text += "_Stay Sporty & Keep the Solidarity!_";
+    //text += "_Stay Sporty & Keep the Solidarity!_";
 
     window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), '_blank');
 }
