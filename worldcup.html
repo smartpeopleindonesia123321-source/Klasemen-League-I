@@ -45,9 +45,35 @@
         .player-name { font-size: 18px; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; border-bottom: 1px solid var(--accent); padding-bottom: 8px; display: block; }
         .team-list { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
 
-        .country-box { width: 50px; text-align: center; transition: 0.3s; }
+        .country-box { width: 50px; text-align: center; transition: 0.3s; position: relative; }
         .country-box.gugur { filter: grayscale(100%); opacity: 0.4; }
-        .flag-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 3px; }
+        
+        /* EFEK JUARA 1 (GOLD) */
+        .country-box.juara1 .flag-img { 
+            border: 2px solid #ffd700; 
+            box-shadow: 0 0 15px #ffd700;
+            animation: crown-glow 1.5s infinite alternate;
+        }
+        .country-box.juara1::after { content: '👑'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 14px; }
+
+        /* EFEK JUARA 2 (SILVER) */
+        .country-box.juara2 .flag-img { 
+            border: 2px solid #e5e4e2; 
+            box-shadow: 0 0 10px #e5e4e2;
+        }
+
+        /* EFEK JUARA 3 (BRONZE) */
+        .country-box.juara3 .flag-img { 
+            border: 2px solid #cd7f32; 
+            box-shadow: 0 0 10px #cd7f32;
+        }
+
+        @keyframes crown-glow {
+            from { box-shadow: 0 0 5px #ffd700; }
+            to { box-shadow: 0 0 20px #ffd700; }
+        }
+
+        .flag-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 3px; border: 1px solid transparent; }
         .country-name { font-size: 8px; font-weight: bold; display: block; margin-top: 4px; color: var(--text-dim); }
 
         .section-container {
@@ -65,7 +91,6 @@
 
         .row-gugur td { color: var(--gugur-text) !important; }
         .row-gugur .idr-val { opacity: 0.3; filter: grayscale(100%); }
-        .row-gugur b { font-weight: normal; }
 
         .manager-detail-card {
             background: #1c2128;
@@ -193,30 +218,29 @@
                         if (!negara) continue;
 
                         const isGugur = statusRaw.includes("gugur");
-                        const parts = statusRaw.split(' ')[0].split('-');
+                        const isJuara1 = statusRaw.includes("juara1");
+                        const isJuara2 = statusRaw.includes("juara2");
+                        const isJuara3 = statusRaw.includes("juara3");
                         
-                        let w = parseInt(parts[0]) || 0;
-                        let d = parseInt(parts[1]) || 0;
-                        let l = parseInt(parts[2]) || 0;
-                        let gf = parseInt(parts[3]) || 0;
-                        let ga = parseInt(parts[4]) || 0;
+                        const parts = statusRaw.split(' ')[0].split('-');
+                        let w = parseInt(parts[0]) || 0, d = parseInt(parts[1]) || 0, l = parseInt(parts[2]) || 0;
+                        let gf = parseInt(parts[3]) || 0, ga = parseInt(parts[4]) || 0;
                         
                         let pts = (w * 3) + (d * 1);
                         let gd = gf - ga;
                         let val = marketValuesEuro[negara.toLowerCase()] || 0;
 
-                        mObj.teams.push({ name: negara, p: (w+d+l), w, d, l, gf, ga, gd, pts, val, isGugur });
-                        mObj.totalPts += pts; 
-                        mObj.totalGD += gd;
-                        mObj.totalGF += gf;
-                        mObj.totalGA += ga;
-                        mObj.tP += (w+d+l); 
-                        mObj.tM += w; 
-                        mObj.tS += d; 
-                        mObj.tK += l; 
-                        mObj.tVal += val;
+                        mObj.teams.push({ name: negara, p: (w+d+l), w, d, l, gf, ga, gd, pts, val, isGugur, isJuara1, isJuara2, isJuara3 });
+                        mObj.totalPts += pts; mObj.totalGD += gd; mObj.totalGF += gf; mObj.totalGA += ga;
+                        mObj.tP += (w+d+l); mObj.tM += w; mObj.tS += d; mObj.tK += l; mObj.tVal += val;
 
-                        teamsHTML += `<div class="country-box ${isGugur ? "gugur" : ""}">
+                        let statusClass = "";
+                        if (isGugur) statusClass = "gugur";
+                        else if (isJuara1) statusClass = "juara1";
+                        else if (isJuara2) statusClass = "juara2";
+                        else if (isJuara3) statusClass = "juara3";
+
+                        teamsHTML += `<div class="country-box ${statusClass}">
                             <img src="https://flagcdn.com/w80/${countryCodes[negara.toLowerCase()] || "un"}.png" class="flag-img">
                             <span class="country-name">${negara}</span>
                         </div>`;
@@ -239,13 +263,16 @@
                         <td style="font-weight:bold;color:#4ade80">${m.totalPts}</td>
                     </tr>`;
 
-                    let tRows = m.teams.map(t => `<tr class="${t.isGugur ? 'row-gugur' : ''}">
-                        <td style="text-align:left"><b>${t.name}</b> ${t.isGugur ? '(GUGUR)' : ''} <span class="idr-val">${formatIDR(t.val)}</span></td>
-                        <td>${t.p}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td>
-                        <td>${t.gf}</td><td>${t.ga}</td>
-                        <td>${t.gd > 0 ? '+' + t.gd : t.gd}</td>
-                        <td style="font-weight:bold;color:${t.isGugur ? 'inherit' : '#4ade80'}">${t.pts}</td>
-                    </tr>`).join('');
+                    let tRows = m.teams.map(t => {
+                        let rowClass = t.isGugur ? 'row-gugur' : '';
+                        let labelJuara = t.isJuara1 ? ' (JUARA 1)' : (t.isJuara2 ? ' (JUARA 2)' : (t.isJuara3 ? ' (JUARA 3)' : (t.isGugur ? ' (GUGUR)' : '')));
+                        return `<tr class="${rowClass}">
+                            <td style="text-align:left"><b>${t.name}</b>${labelJuara} <span class="idr-val">${formatIDR(t.val)}</span></td>
+                            <td>${t.p}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td>
+                            <td>${t.gf}</td><td>${t.ga}</td>
+                            <td>${t.gd > 0 ? '+' + t.gd : t.gd}</td>
+                            <td style="font-weight:bold;color:${t.isGugur ? 'inherit' : '#4ade80'}">${t.pts}</td>
+                        </tr>`}).join('');
 
                     detailedContainer.innerHTML += `
                         <div class="manager-detail-card">
