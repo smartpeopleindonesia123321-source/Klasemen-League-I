@@ -20,85 +20,67 @@
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
-            padding: 20px;
+            padding: 10px; /* Diperkecil untuk mobile */
             text-align: center;
         }
 
-        h1 { color: var(--accent); text-shadow: 0 0 10px rgba(250, 204, 21, 0.3); margin-bottom: 5px; }
-        .subtitle { font-size: 11px; color: var(--text-dim); margin-bottom: 30px; letter-spacing: 2px; }
+        h1 { color: var(--accent); text-shadow: 0 0 10px rgba(250, 204, 21, 0.3); margin-bottom: 5px; font-size: 1.5rem; }
+        .subtitle { font-size: 10px; color: var(--text-dim); margin-bottom: 20px; letter-spacing: 2px; }
 
         .wc-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
             max-width: 1200px;
-            margin: 0 auto 50px auto;
+            margin: 0 auto 30px auto;
         }
 
         .player-card {
             background: var(--card-bg);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
-            padding: 20px;
+            padding: 15px;
         }
 
-        .player-name { font-size: 18px; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; border-bottom: 1px solid var(--accent); padding-bottom: 8px; display: block; }
-        .team-list { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+        .player-name { font-size: 16px; font-weight: 900; margin-bottom: 12px; text-transform: uppercase; border-bottom: 1px solid var(--accent); padding-bottom: 8px; display: block; }
+        .team-list { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
 
-        .country-box { width: 50px; text-align: center; transition: 0.3s; position: relative; }
+        .country-box { width: 45px; text-align: center; transition: 0.3s; position: relative; }
         .country-box.gugur { filter: grayscale(100%); opacity: 0.4; }
         
-        /* EFEK JUARA 1 (GOLD) */
-        .country-box.juara1 .flag-img { 
-            border: 2px solid #ffd700; 
-            box-shadow: 0 0 15px #ffd700;
-            animation: crown-glow 1.5s infinite alternate;
-        }
-        .country-box.juara1::after { content: '👑'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 14px; }
+        .country-box.juara1 .flag-img { border: 2px solid #ffd700; box-shadow: 0 0 15px #ffd700; animation: crown-glow 1.5s infinite alternate; }
+        .country-box.juara1::after { content: '👑'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 12px; }
+        .country-box.juara2 .flag-img { border: 2px solid #e5e4e2; box-shadow: 0 0 10px #e5e4e2; }
+        .country-box.juara3 .flag-img { border: 2px solid #cd7f32; box-shadow: 0 0 10px #cd7f32; }
 
-        /* EFEK JUARA 2 (SILVER) */
-        .country-box.juara2 .flag-img { 
-            border: 2px solid #e5e4e2; 
-            box-shadow: 0 0 10px #e5e4e2;
-        }
-
-        /* EFEK JUARA 3 (BRONZE) */
-        .country-box.juara3 .flag-img { 
-            border: 2px solid #cd7f32; 
-            box-shadow: 0 0 10px #cd7f32;
-        }
-
-        @keyframes crown-glow {
-            from { box-shadow: 0 0 5px #ffd700; }
-            to { box-shadow: 0 0 20px #ffd700; }
-        }
+        @keyframes crown-glow { from { box-shadow: 0 0 5px #ffd700; } to { box-shadow: 0 0 20px #ffd700; } }
 
         .flag-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 3px; border: 1px solid transparent; }
-        .country-name { font-size: 8px; font-weight: bold; display: block; margin-top: 4px; color: var(--text-dim); }
+        .country-name { font-size: 7px; font-weight: bold; display: block; margin-top: 4px; color: var(--text-dim); }
 
         .section-container {
-            margin: 40px auto;
+            margin: 20px auto;
             max-width: 1100px;
             background: var(--card-bg);
-            padding: 20px;
+            padding: 15px;
             border-radius: 12px;
             border: 1px solid rgba(250, 204, 21, 0.2);
         }
 
-        .l-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .l-table th { background: rgba(250, 204, 21, 0.1); color: var(--accent); padding: 12px; border-bottom: 2px solid var(--accent); }
-        .l-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        /* FIX: Tambahkan pembungkus scroll horizontal */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch; /* Biar scroll di iOS mulus */
+            margin-top: 10px;
+        }
+
+        .l-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 500px; /* Paksa lebar minimal biar bisa di-slide */ }
+        .l-table th { background: rgba(250, 204, 21, 0.1); color: var(--accent); padding: 10px; border-bottom: 2px solid var(--accent); white-space: nowrap; }
+        .l-table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); white-space: nowrap; }
 
         .row-gugur td { color: var(--gugur-text) !important; }
-        .row-gugur .idr-val { opacity: 0.3; filter: grayscale(100%); }
-
-        .manager-detail-card {
-            background: #1c2128;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            overflow: hidden;
-            border-left: 4px solid var(--accent);
-        }
+        .manager-detail-card { background: #1c2128; margin-bottom: 20px; border-radius: 8px; overflow: hidden; border-left: 4px solid var(--accent); }
+        
         .manager-header {
             background: rgba(250, 204, 21, 0.1);
             padding: 10px 15px;
@@ -108,20 +90,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-size: 13px;
         }
 
-        .idr-val {
-            font-size: 9px;
-            color: var(--money);
-            background: rgba(74, 222, 128, 0.1);
-            padding: 1px 5px;
-            border-radius: 3px;
-            margin-left: 6px;
-            border: 1px solid rgba(74, 222, 128, 0.1);
-            font-weight: normal;
-        }
-        
-        .btn-back { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 8px 16px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; font-weight: bold; }
+        .idr-val { font-size: 9px; color: var(--money); background: rgba(74, 222, 128, 0.1); padding: 1px 5px; border-radius: 3px; margin-left: 6px; border: 1px solid rgba(74, 222, 128, 0.1); }
+        .btn-back { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 8px 16px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; font-weight: bold; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -134,8 +107,8 @@
     <div id="wc-container" class="wc-grid"></div>
 
     <div class="section-container">
-        <h2 style="color: var(--accent); margin-bottom: 15px;">FIFA WORLD CUP 2026 STANDING MANAGERS</h2>
-        <div style="overflow-x: auto;">
+        <h2 style="color: var(--accent); margin-bottom: 10px; font-size: 16px;">FIFA WORLD CUP 2026 STANDING MANAGERS</h2>
+        <div class="table-responsive">
             <table class="l-table">
                 <thead>
                     <tr>
@@ -151,7 +124,7 @@
     </div>
 
     <div class="section-container" style="background: transparent; border: none; padding: 0;">
-        <h2 style="color: var(--accent); margin-bottom: 15px;">SQUAD BREAKDOWN (IDR VALUE)</h2>
+        <h2 style="color: var(--accent); margin-bottom: 15px; font-size: 16px;">SQUAD BREAKDOWN (IDR VALUE)</h2>
         <div id="detailed-teams-container"></div>
     </div>
 
@@ -265,7 +238,7 @@
 
                     let tRows = m.teams.map(t => {
                         let rowClass = t.isGugur ? 'row-gugur' : '';
-                        let labelJuara = t.isJuara1 ? ' (JUARA 1)' : (t.isJuara2 ? ' (JUARA 2)' : (t.isJuara3 ? ' (JUARA 3)' : (t.isGugur ? ' (GUGUR)' : '')));
+                        let labelJuara = t.isJuara1 ? ' (J1)' : (t.isJuara2 ? ' (J2)' : (t.isJuara3 ? ' (J3)' : (t.isGugur ? ' (X)' : '')));
                         return `<tr class="${rowClass}">
                             <td style="text-align:left"><b>${t.name}</b>${labelJuara} <span class="idr-val">${formatIDR(t.val)}</span></td>
                             <td>${t.p}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td>
@@ -274,16 +247,19 @@
                             <td style="font-weight:bold;color:${t.isGugur ? 'inherit' : '#4ade80'}">${t.pts}</td>
                         </tr>`}).join('');
 
+                    // FIX: Bungkus l-table dengan div table-responsive
                     detailedContainer.innerHTML += `
                         <div class="manager-detail-card">
                             <div class="manager-header">
                                 <span>${m.name}'s SQUAD</span>
-                                <span style="font-size:11px; color:var(--money)">TOTAL VALUE: ${formatIDR(m.tVal)}</span>
+                                <span style="font-size:10px; color:var(--money)">TOTAL: ${formatIDR(m.tVal)}</span>
                             </div>
-                            <table class="l-table">
-                                <thead><tr><th style="text-align:left">NEGARA</th><th>MP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>PTS</th></tr></thead>
-                                <tbody>${tRows}</tbody>
-                            </table>
+                            <div class="table-responsive">
+                                <table class="l-table">
+                                    <thead><tr><th style="text-align:left">NEGARA</th><th>MP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>PTS</th></tr></thead>
+                                    <tbody>${tRows}</tbody>
+                                </table>
+                            </div>
                         </div>`;
                 });
             } catch (e) { console.error(e); }
