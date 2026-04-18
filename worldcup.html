@@ -123,6 +123,7 @@
                         <th>RANK</th>
                         <th style="text-align: left;">MANAGER</th>
                         <th>P</th><th>M</th><th>S</th><th>K</th>
+                        <th style="color: #facc15;">GD</th>
                         <th style="color: #4ade80;">PTS</th>
                     </tr>
                 </thead>
@@ -187,22 +188,36 @@
                     const col = line.split(',').map(c => c.trim().replace(/"/g, ''));
                     if (!col[0]) return;
 
-                    let mObj = { name: col[0], teams: [], totalPts: 0, tP: 0, tM: 0, tS: 0, tK: 0, tVal: 0 };
+                    let mObj = { name: col[0], teams: [], totalPts: 0, totalGD: 0, tP: 0, tM: 0, tS: 0, tK: 0, tVal: 0 };
                     let teamsHTML = "";
 
                     for (let i = 1; i <= 10; i += 2) {
                         const negara = col[i];
-                        const statusRaw = col[i+1] ? col[i+1].toLowerCase() : "0-0-0 (aktif)";
+                        const statusRaw = col[i+1] ? col[i+1].toLowerCase() : "0-0-0-0-0 (aktif)";
                         if (!negara) continue;
 
                         const isGugur = statusRaw.includes("gugur");
                         const parts = statusRaw.split(' ')[0].split('-');
-                        let w = parseInt(parts[0]) || 0, d = parseInt(parts[1]) || 0, l = parseInt(parts[2]) || 0;
+                        
+                        // Menang-Seri-Kalah-GM-GK
+                        let w = parseInt(parts[0]) || 0;
+                        let d = parseInt(parts[1]) || 0;
+                        let l = parseInt(parts[2]) || 0;
+                        let gm = parseInt(parts[3]) || 0;
+                        let gk = parseInt(parts[4]) || 0;
+                        
                         let pts = (w * 3) + (d * 1);
+                        let gd = gm - gk;
                         let val = marketValuesEuro[negara.toLowerCase()] || 0;
 
-                        mObj.teams.push({ name: negara, p: (w+d+l), w, d, l, pts, val, isGugur });
-                        mObj.totalPts += pts; mObj.tP += (w+d+l); mObj.tM += w; mObj.tS += d; mObj.tK += l; mObj.tVal += val;
+                        mObj.teams.push({ name: negara, p: (w+d+l), w, d, l, gm, gk, gd, pts, val, isGugur });
+                        mObj.totalPts += pts; 
+                        mObj.totalGD += gd;
+                        mObj.tP += (w+d+l); 
+                        mObj.tM += w; 
+                        mObj.tS += d; 
+                        mObj.tK += l; 
+                        mObj.tVal += val;
 
                         teamsHTML += `<div class="country-box ${isGugur ? "gugur" : ""}">
                             <img src="https://flagcdn.com/w80/${countryCodes[negara.toLowerCase()] || "un"}.png" class="flag-img">
@@ -213,11 +228,16 @@
                     container.innerHTML += `<div class="player-card"><span class="player-name">${mObj.name}</span><div class="team-list">${teamsHTML}</div></div>`;
                 });
 
-                allData.sort((a, b) => b.totalPts - a.totalPts).forEach((m, idx) => {
+                // SORTING: Poin Utama, lalu Selisih Gol (GD)
+                allData.sort((a, b) => {
+                    if (b.totalPts !== a.totalPts) return b.totalPts - a.totalPts;
+                    return b.totalGD - a.totalGD;
+                }).forEach((m, idx) => {
                     managerBody.innerHTML += `<tr>
                         <td>${idx+1}</td>
                         <td style="text-align:left"><b>${m.name}</b> <span class="idr-val">${formatIDR(m.tVal)}</span></td>
                         <td>${m.tP}</td><td>${m.tM}</td><td>${m.tS}</td><td>${m.tK}</td>
+                        <td style="font-weight:bold;color:#facc15">${m.totalGD > 0 ? '+' + m.totalGD : m.totalGD}</td>
                         <td style="font-weight:bold;color:#4ade80">${m.totalPts}</td>
                     </tr>`;
 
