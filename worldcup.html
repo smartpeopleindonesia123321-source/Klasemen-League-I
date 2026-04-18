@@ -12,7 +12,7 @@
             --text: #ffffff;
             --text-dim: rgba(255, 255, 255, 0.6);
             --money: #4ade80; 
-            --gugur-text: rgba(255, 255, 255, 0.25); /* Abu-abu redup banget */
+            --gugur-text: rgba(255, 255, 255, 0.25);
         }
 
         body {
@@ -52,7 +52,7 @@
 
         .section-container {
             margin: 40px auto;
-            max-width: 1000px;
+            max-width: 1100px;
             background: var(--card-bg);
             padding: 20px;
             border-radius: 12px;
@@ -63,14 +63,8 @@
         .l-table th { background: rgba(250, 204, 21, 0.1); color: var(--accent); padding: 12px; border-bottom: 2px solid var(--accent); }
         .l-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
 
-        /* EFEK BARIS GUGUR */
-        .row-gugur td {
-            color: var(--gugur-text) !important;
-        }
-        .row-gugur .idr-val {
-            opacity: 0.3;
-            filter: grayscale(100%);
-        }
+        .row-gugur td { color: var(--gugur-text) !important; }
+        .row-gugur .idr-val { opacity: 0.3; filter: grayscale(100%); }
         .row-gugur b { font-weight: normal; }
 
         .manager-detail-card {
@@ -120,10 +114,9 @@
             <table class="l-table">
                 <thead>
                     <tr>
-                        <th>RANK</th>
+                        <th>#</th>
                         <th style="text-align: left;">MANAGER</th>
-                        <th>P</th><th>M</th><th>S</th><th>K</th>
-                        <th style="color: #facc15;">GD</th>
+                        <th>MP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th>
                         <th style="color: #4ade80;">PTS</th>
                     </tr>
                 </thead>
@@ -188,7 +181,10 @@
                     const col = line.split(',').map(c => c.trim().replace(/"/g, ''));
                     if (!col[0]) return;
 
-                    let mObj = { name: col[0], teams: [], totalPts: 0, totalGD: 0, tP: 0, tM: 0, tS: 0, tK: 0, tVal: 0 };
+                    let mObj = { 
+                        name: col[0], teams: [], totalPts: 0, totalGD: 0, 
+                        totalGF: 0, totalGA: 0, tP: 0, tM: 0, tS: 0, tK: 0, tVal: 0 
+                    };
                     let teamsHTML = "";
 
                     for (let i = 1; i <= 10; i += 2) {
@@ -199,20 +195,21 @@
                         const isGugur = statusRaw.includes("gugur");
                         const parts = statusRaw.split(' ')[0].split('-');
                         
-                        // Menang-Seri-Kalah-GM-GK
                         let w = parseInt(parts[0]) || 0;
                         let d = parseInt(parts[1]) || 0;
                         let l = parseInt(parts[2]) || 0;
-                        let gm = parseInt(parts[3]) || 0;
-                        let gk = parseInt(parts[4]) || 0;
+                        let gf = parseInt(parts[3]) || 0;
+                        let ga = parseInt(parts[4]) || 0;
                         
                         let pts = (w * 3) + (d * 1);
-                        let gd = gm - gk;
+                        let gd = gf - ga;
                         let val = marketValuesEuro[negara.toLowerCase()] || 0;
 
-                        mObj.teams.push({ name: negara, p: (w+d+l), w, d, l, gm, gk, gd, pts, val, isGugur });
+                        mObj.teams.push({ name: negara, p: (w+d+l), w, d, l, gf, ga, gd, pts, val, isGugur });
                         mObj.totalPts += pts; 
                         mObj.totalGD += gd;
+                        mObj.totalGF += gf;
+                        mObj.totalGA += ga;
                         mObj.tP += (w+d+l); 
                         mObj.tM += w; 
                         mObj.tS += d; 
@@ -228,15 +225,16 @@
                     container.innerHTML += `<div class="player-card"><span class="player-name">${mObj.name}</span><div class="team-list">${teamsHTML}</div></div>`;
                 });
 
-                // SORTING: Poin Utama, lalu Selisih Gol (GD)
                 allData.sort((a, b) => {
                     if (b.totalPts !== a.totalPts) return b.totalPts - a.totalPts;
-                    return b.totalGD - a.totalGD;
+                    if (b.totalGD !== a.totalGD) return b.totalGD - a.totalGD;
+                    return b.totalGF - a.totalGF;
                 }).forEach((m, idx) => {
                     managerBody.innerHTML += `<tr>
                         <td>${idx+1}</td>
                         <td style="text-align:left"><b>${m.name}</b> <span class="idr-val">${formatIDR(m.tVal)}</span></td>
                         <td>${m.tP}</td><td>${m.tM}</td><td>${m.tS}</td><td>${m.tK}</td>
+                        <td>${m.totalGF}</td><td>${m.totalGA}</td>
                         <td style="font-weight:bold;color:#facc15">${m.totalGD > 0 ? '+' + m.totalGD : m.totalGD}</td>
                         <td style="font-weight:bold;color:#4ade80">${m.totalPts}</td>
                     </tr>`;
@@ -244,6 +242,8 @@
                     let tRows = m.teams.map(t => `<tr class="${t.isGugur ? 'row-gugur' : ''}">
                         <td style="text-align:left"><b>${t.name}</b> ${t.isGugur ? '(GUGUR)' : ''} <span class="idr-val">${formatIDR(t.val)}</span></td>
                         <td>${t.p}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td>
+                        <td>${t.gf}</td><td>${t.ga}</td>
+                        <td>${t.gd > 0 ? '+' + t.gd : t.gd}</td>
                         <td style="font-weight:bold;color:${t.isGugur ? 'inherit' : '#4ade80'}">${t.pts}</td>
                     </tr>`).join('');
 
@@ -254,7 +254,7 @@
                                 <span style="font-size:11px; color:var(--money)">TOTAL VALUE: ${formatIDR(m.tVal)}</span>
                             </div>
                             <table class="l-table">
-                                <thead><tr><th style="text-align:left">NEGARA</th><th>P</th><th>M</th><th>S</th><th>K</th><th>PTS</th></tr></thead>
+                                <thead><tr><th style="text-align:left">NEGARA</th><th>MP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>PTS</th></tr></thead>
                                 <tbody>${tRows}</tbody>
                             </table>
                         </div>`;
