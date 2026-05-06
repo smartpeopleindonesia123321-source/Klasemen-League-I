@@ -241,21 +241,16 @@ function renderTable(players) {
         }
         
         // 6. HIGHLIGHT BARIS (Rank 1-3 & Degradasi 9-10)
-        if(currentRank === 1) {
+        if(currentRank === 1) {
             tr.className = "rank-1";
         } else if(currentRank === 2) {
             tr.className = "rank-2";
         } else if(currentRank === 3) {
             tr.className = "rank-3";
         } else if(currentRank === 9 || currentRank === 10) {
+            // Ini akan memaksa baris 9 DAN 10 pakai class degradasi
             tr.className = "degradasi";
         }
-
-        // --- DISINI TARUH FOR LOOP-NYA ---
-        let yellowCardsHTML = "";
-        for (let j = 0; j < Math.min(p.yellowCards, 3); j++) {
-            yellowCardsHTML += `<span style="display:inline-block; width:10px; height:14px; background:#facc15; border-radius:2px; margin-left:5px; border:1px solid rgba(0,0,0,0.2); vertical-align: middle;" title="Pelanggaran Internal"></span>`;
-        }
         // 7. INJECT HTML KE BARIS TABEL
         // (Pastikan baris let yellowCardsHTML = ... sudah lo taruh di atasnya ya)
         tr.innerHTML = `
