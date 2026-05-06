@@ -55,7 +55,7 @@ function stopWithFadeOut() {
     }, 100);
 }
 
-// --- DATA FETCH (REVISED FOR POTY %) ---
+// --- DATA FETCH ---
 async function fetchData() {
     try {
         const res = await fetch(`${sheetUrl}&nocache=${new Date().getTime()}`);
@@ -75,10 +75,8 @@ async function fetchData() {
             };
         }).filter(p => p.nama);
 
-        // 1. Sorting Berdasarkan Poin & Goal
         players.sort((a, b) => b.point - a.point || b.goals - a.goals);
 
-        // 2. LOGIKA SPARKLINE TREND
         let history = JSON.parse(localStorage.getItem('rankHistory')) || {};
         players = players.map((player, index) => {
             const currentRank = index + 1;
@@ -89,7 +87,6 @@ async function fetchData() {
         });
         localStorage.setItem('rankHistory', JSON.stringify(history));
 
-        // 3. UPDATE TICKER NEWS
         const tickerEl = document.getElementById('newsTicker');
         if (tickerEl && players.length > 0) {
             const leader = players[0].nama;
@@ -124,14 +121,10 @@ async function fetchData() {
             tickerEl.innerText = `📢 NEWS UPDATE: ${leader.toUpperCase()} MEMIMPIN KLASEMEN! --- ${potyText}💰 TOP 3 MARKET VALUE: ${topMarketValues} --- ⭐ BEST PLAYER OF THE WEEK: ${bestPlayerText} --- 🔥 TOP SCORER: ${topScorerData.nama.toUpperCase()} (${topScorerData.goals} GOALS) ---`;
         }
 
-        // 4. Render Utama
         renderTable(players); 
         
-        // Render Podium Top Scorer
         const topScorers = [...players].sort((a, b) => b.goals - a.goals).slice(0, 3);
         renderTopScorer(topScorers);
-
-        // --- RENDER PODIUM POTY (BALLON D'OR) ---
         renderPotyPodium(players);
 
         document.getElementById('status').innerText = "LIVE • TERKONEKSI";
@@ -160,7 +153,6 @@ function renderPotyPodium(players) {
         const row = document.createElement("div");
         row.className = `poty-level-row level-${index + 1}`;
         
-        // --- DI SINI PERUBAHANNYA: LEVEL GANTI JADI RANK ---
         let content = `
             <div style="width:100%; font-size:11px; font-weight:900; color:#facc15; margin-bottom:10px; text-shadow: 0 0 5px rgba(0,0,0,0.5); letter-spacing: 2px;">
                 RANK ${index + 1} • ${percentage}% PROBABILITY
@@ -185,21 +177,19 @@ function renderPotyPodium(players) {
 
 function renderTable(players) {
     const body = document.querySelector("#mainTable tbody");
+    if(!body) return;
     body.innerHTML = "";
 
-    // 1. HITUNG TOTAL POIN KOLEKTIF DARI KOLOM F (potw_winner)
     const totalPoinKolektif = players.reduce((acc, p) => acc + (p.potw_winner || 0), 0);
 
     players.forEach((p, i) => {
         const tr = document.createElement("tr");
         const currentRank = i + 1;
         
-        // 2. LOGIKA PERSENTASE POTY (Individu / Total * 100)
         const persentase = totalPoinKolektif > 0 
             ? ((p.potw_winner / totalPoinKolektif) * 100).toFixed(1) 
             : 0;
 
-        // 3. LOGIKA SPARKLINE TREND (SVG)
         const history = p.rankHistory || [currentRank];
         const maxRanks = players.length || 10;
         
@@ -219,28 +209,29 @@ function renderTable(players) {
                 <circle cx="${(history.length - 1) * 10}" cy="${(history[history.length - 1] / maxRanks) * 20}" r="2.5" fill="${trendColor}" />
             </svg>`;
 
-        // 4. HITUNG SELISIH POSISI (+/-)
         const diff = history.length > 1 ? history[history.length - 2] - currentRank : 0;
         let diffText = diff > 0 ? `+${diff}` : (diff < 0 ? diff : "-");
         let diffClass = diff > 0 ? "pos-up" : (diff < 0 ? "pos-down" : "");
 
-        // 5. STATUS POTW (SEJAJAR & PROPORSIONAL)
+        // --- LOGIKA KARTU KUNING (DIBENAHI) ---
+        let yellowCardsHTML = "";
+        for (let j = 0; j < Math.min(p.yellowCards, 3); j++) {
+            yellowCardsHTML += `<span style="display:inline-block; width:10px; height:14px; background:#facc15; border-radius:2px; margin-left:5px; border:1px solid rgba(0,0,0,0.2); vertical-align: middle;" title="Pelanggaran"></span>`;
+        }
+
         let potwContent = "";
         const currentRate = p.rate || "0"; 
         
         if (p.potw.toLowerCase().includes("best player")) {
-            // Pakai flex agar sejajar, gap dikecilkan ke 5px biar hemat tempat
             potwContent = `
                 <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
                     <strong style="font-size: 0.9rem;">${currentRate}</strong>
                     <span class="potw-highlight">BEST PLAYER OF THE WEEK</span>
                 </div>`;
         } else {
-            // Untuk yang biasa, samakan ukuran font-nya (0.9rem)
             potwContent = `<strong style="font-size: 0.9rem; opacity: 0.8;">${currentRate}</strong>`;
         }
         
-        // 6. HIGHLIGHT BARIS (Rank 1-3 & Degradasi 9-10)
         if(currentRank === 1) {
             tr.className = "rank-1";
         } else if(currentRank === 2) {
@@ -248,11 +239,9 @@ function renderTable(players) {
         } else if(currentRank === 3) {
             tr.className = "rank-3";
         } else if(currentRank === 9 || currentRank === 10) {
-            // Ini akan memaksa baris 9 DAN 10 pakai class degradasi
             tr.className = "degradasi";
         }
-        // 7. INJECT HTML KE BARIS TABEL
-        // (Pastikan baris let yellowCardsHTML = ... sudah lo taruh di atasnya ya)
+
         tr.innerHTML = `
             <td>${currentRank}</td>
             <td style="text-align:left">
@@ -362,7 +351,6 @@ function shareToWA() {
     const tickerEl = document.getElementById('newsTicker');
     let tickerText = tickerEl ? tickerEl.innerText : "";
 
-    // Ambil Waktu Update
     const now = new Date();
     const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
     const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
@@ -378,85 +366,56 @@ function shareToWA() {
         };
     });
 
-    // Cari Puncak Ballon d'Or
     const maxPercentValue = Math.max(...allPlayers.map(p => parseFloat(p.percent) || 0));
     const topPOTYGroup = allPlayers.filter(p => (parseFloat(p.percent) || 0) === maxPercentValue);
     const leaderNames = topPOTYGroup.map(p => p.name).join(", ").replace(/, ([^,]*)$/, " & $1");
 
-    // --- RAKIT TEKS PROFESIONAL ---
     let text = "🗞️ *FOOTBALL LEAGUE-I OFFICIAL REPORT* 🗞️\n";
     text += `📅 _Update: ${dateStr} | ${timeStr} WIB_\n`;
     text += "----------------------------------------------\n\n";
-
-    // Bagian Klasemen & Persentase
     text += "🏆 *LEAGUE STANDINGS & BALLON D'OR %*\n";
     allPlayers.forEach((p, index) => {
         const potwIcon = p.potwStatus.toLowerCase().includes("best player") ? "⭐" : "";
-        // Format: 01. NAMA - 45 Pts (15.5%)
         const pos = (index + 1).toString().padStart(2, '0');
         text += `\`${pos}.\` *${p.name}* • ${p.pts} Pts (${p.percent}) ${potwIcon}\n`;
     });
 
     text += `\n👑 *BALLON D'OR LEADER:* ${leaderNames}\n`;
     text += "----------------------------------------------\n\n";
-
-    // Bagian Penghargaan Musim (Compact Mode)
-    //text += "🔥 *OFFICIAL AWARDS CATEGORIES* 🔥\n";
-    //text += "🏆 Champion | 🥈 Runner Up | 🥉 3rd Place\n";
-    //text += "🌏 AFC Elite 2 Trophy | 🎖️ Admin Award\n"; // Tambahan baru di sini
-    //text += "🎯 Golden Boot | 👑 Ballon d’Or\n";
-    //text += "⚖️ Best Witness by Vote | 🤝 Fair Play Trophy by Vote\n";
-    //text += "----------------------------------------------\n\n";
-
-    // Footer & Link
     text += "📑 *Digital Card, Market Value, & Certificates:* \n";
     text += "https://smartpeopleindonesia123321-source.github.io/Klasemen-League-I/\n\n";
-    //text += "_Stay Sporty & Keep the Solidarity!_";
 
     window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), '_blank');
 }
 
-// --- PLUGIN DYNAMIC JERSEY COLORS (SAFE ADD-ON) ---
 const jerseyColors = {
-    "Dandi": { primary: "#4b2c20", secondary: "#d4af37" }, // Cokelat Beruang & Emas
-    "Erni": { primary: "#f3f4f6", secondary: "#60a5fa" },  // Putih Angora & Biru Muda
-    "Regi": { primary: "#2d3436", secondary: "#00f2ff" },  // Abu Husky & Neon
-    "Rizal": { primary: "#636e72", secondary: "#ffffff" }, // Serigala Abu & Putih
-    "Asep": { primary: "#8b0000", secondary: "#facc15" },  // Merah Banteng & Kuning
-    "Aries": { primary: "#1a1a1a", secondary: "#fbbf24" }, // Hitam Singa & Amber
-    "Ikmal": { primary: "#3f6212", secondary: "#a3e635" }, // Hijau Rusa & Lime
-    "Yanti": { primary: "#be185d", secondary: "#f472b6" }, // Pink Kelinci
-    "Maya": { primary: "#000000", secondary: "#ffffff" }, // Hitam Putih Panda
-    "Dicky": { primary: "#1e1b4b", secondary: "#d4af37" }  // Biru Gelap & Emas Kingkong
+    "Dandi": { primary: "#4b2c20", secondary: "#d4af37" },
+    "Erni": { primary: "#f3f4f6", secondary: "#60a5fa" },
+    "Regi": { primary: "#2d3436", secondary: "#00f2ff" },
+    "Rizal": { primary: "#636e72", secondary: "#ffffff" },
+    "Asep": { primary: "#8b0000", secondary: "#facc15" },
+    "Aries": { primary: "#1a1a1a", secondary: "#fbbf24" },
+    "Ikmal": { primary: "#3f6212", secondary: "#a3e635" },
+    "Yanti": { primary: "#be185d", secondary: "#f472b6" },
+    "Maya": { primary: "#000000", secondary: "#ffffff" },
+    "Dicky": { primary: "#1e1b4b", secondary: "#d4af37" }
 };
 
-// Fungsi ini akan berjalan otomatis tanpa merusak openModal asli
 const originalOpenModal = openModal;
 openModal = function(name, logo) {
-    originalOpenModal(name, logo); // Jalankan fungsi asli lo dulu
-    
+    originalOpenModal(name, logo);
     const colorData = jerseyColors[name];
     const modalContent = document.querySelector('.modal-content');
-    
     if (colorData && modalContent) {
-        // Beri transisi halus
         modalContent.style.transition = "all 0.5s ease";
-        // Ubah background modal sesuai warna karakter
         modalContent.style.background = `linear-gradient(135deg, ${colorData.primary} 0%, #111 100%)`;
-        // Ubah warna border agar matching
         modalContent.style.borderColor = colorData.secondary;
-        // Beri efek glow pada border
         modalContent.style.boxShadow = `0 0 30px ${colorData.secondary}44`;
     } else if (modalContent) {
-        // Balikin ke warna default kalau nama gak terdaftar
         modalContent.style.background = "var(--modal-bg)";
         modalContent.style.borderColor = "var(--accent)";
     }
 };
-
-// ==========================================
-// PLUGIN: SIGNATURE THEME & SLOGAN (FINAL VERSION)
-// ==========================================
 
 const predatorDatabase = {
     "Dandi": { slogan: "THE MOUNTAIN CRUSHER", music: "assets/dandi.mp3" },
@@ -474,26 +433,13 @@ const predatorDatabase = {
 const sigPlayer = new Audio();
 let isMainMusicActive = false;
 
-// Override fungsi openModal
 const backupOpenModal = openModal;
 openModal = function(name, logo) {
-    // Jalankan modal stats asli
     if (typeof backupOpenModal === 'function') backupOpenModal(name, logo);
-
-    // Tampilkan Slogan Emas
     const sloganArea = document.getElementById('playerSlogan');
-    if (sloganArea && predatorDatabase[name]) {
-        sloganArea.innerText = predatorDatabase[name].slogan;
-    }
-
-    // Kontrol Musik Utama (UCL)
+    if (sloganArea && predatorDatabase[name]) { sloganArea.innerText = predatorDatabase[name].slogan; }
     const mainTrack = document.getElementById('uclMusic');
-    if (mainTrack && !mainTrack.paused) {
-        isMainMusicActive = true;
-        mainTrack.pause();
-    }
-
-    // Putar Musik Signature
+    if (mainTrack && !mainTrack.paused) { isMainMusicActive = true; mainTrack.pause(); }
     if (predatorDatabase[name]) {
         sigPlayer.src = predatorDatabase[name].music;
         sigPlayer.volume = 0.6;
@@ -501,27 +447,17 @@ openModal = function(name, logo) {
     }
 };
 
-// Override fungsi closeModal
 const backupCloseModal = closeModal;
 closeModal = function() {
     if (typeof backupCloseModal === 'function') backupCloseModal();
-    
-    // Reset Tampilan Slogan
     const sloganArea = document.getElementById('playerSlogan');
     if (sloganArea) sloganArea.innerText = "";
-
-    // Stop Musik Signature & Resume Musik Utama
     sigPlayer.pause();
     sigPlayer.currentTime = 0;
     const mainTrack = document.getElementById('uclMusic');
-    if (isMainMusicActive && mainTrack) {
-        mainTrack.play();
-    }
+    if (isMainMusicActive && mainTrack) { mainTrack.play(); }
 };
 
-// ==========================================
-// SEKSI LIVE CHAT (FIXED & SYNCED)
-// ==========================================
 const CHAT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyf6o6U3vAceeTdKM1Rb8WGWKcTScj4wHFiUytK4yLbp7FYs16dHMQVVWZVdPfzaYv3Dw/exec";
 
 async function loadComments() {
@@ -529,22 +465,16 @@ async function loadComments() {
         const response = await fetch(`${CHAT_SCRIPT_URL}?t=${new Date().getTime()}`);
         const comments = await response.json();
         const display = document.getElementById('commentDisplay');
-        
         if (!display) return;
-
         if (!comments || comments.length === 0) {
             display.innerHTML = '<p style="text-align:center; color:#666; font-size:12px; margin-top:20px;">Belum ada obrolan...</p>';
             return;
         }
-
-        // --- FUNGSI HELPER UNTUK FORMAT JAM ---
         const formatWaktu = (isoString) => {
             const d = new Date(isoString);
-            if (isNaN(d.getTime())) return isoString; // Jaga-jaga kalau format bukan tanggal
-            return d.getHours().toString().padStart(2, '0') + ':' + 
-                   d.getMinutes().toString().padStart(2, '0');
+            if (isNaN(d.getTime())) return isoString;
+            return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
         };
-
         display.innerHTML = comments.map(c => `
             <div class="chat-msg-item" style="margin-bottom:10px; border-left:3px solid var(--accent); background:rgba(255,255,255,0.03); padding:8px; border-radius:4px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
@@ -554,88 +484,31 @@ async function loadComments() {
                 <p style="margin:0; font-size:13px; color:#ddd; line-height:1.4;">${c.pesan}</p>
             </div>
         `).join('');
-        
         display.scrollTop = display.scrollHeight;
-    } catch (error) {
-        console.log("Chat sync pending...");
-    }
+    } catch (error) { console.log("Chat sync pending..."); }
 }
 
 async function sendComment() {
     const nameInput = document.getElementById('userName');
     const commentInput = document.getElementById('userComment');
     const sendBtn = document.getElementById('btnSendComment');
-
     const nama = nameInput.value.trim();
     const pesan = commentInput.value.trim();
-
-    if (!nama || !pesan) {
-        alert("Nama & Pesan jangan kosong ya!");
-        return;
-    }
-
+    if (!nama || !pesan) { alert("Nama & Pesan jangan kosong ya!"); return; }
     sendBtn.disabled = true;
     sendBtn.innerText = "MENGIRIM...";
-
     try {
-        // Kita kirim pakai format URLSearchParams supaya lebih universal diterima Apps Script
         const bodyData = new URLSearchParams();
         bodyData.append('nama', nama);
         bodyData.append('pesan', pesan);
-
-        await fetch(CHAT_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors', // Menghindari CORS block
-            body: bodyData
-        });
-
-        // Reset input pesan
+        await fetch(CHAT_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: bodyData });
         commentInput.value = "";
-        
-        // Kasih jeda 1.5 detik biar Google selesai nulis, baru refresh display
         setTimeout(loadComments, 1500);
-    } catch (error) {
-        console.error("Error kirim:", error);
-        alert("Gagal kirim, coba lagi bro!");
-    } finally {
-        sendBtn.disabled = false;
-        sendBtn.innerText = "KIRIM";
-    }
+    } catch (error) { alert("Gagal kirim, coba lagi bro!"); } 
+    finally { sendBtn.disabled = false; sendBtn.innerText = "KIRIM"; }
 }
 
-// Jalankan load pertama kali & set interval (7 detik biar gak overload)
 document.addEventListener('DOMContentLoaded', () => {
     loadComments();
     setInterval(loadComments, 7000);
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
