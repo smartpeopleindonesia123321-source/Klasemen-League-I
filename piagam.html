@@ -101,6 +101,7 @@
         .cert-fairplay .award-title { color: #2e7d32; } .cert-fairplay .corner { border-color: #2e7d32; }
         .cert-afc .award-title { color: var(--afc-purple); } .cert-afc .corner { border-color: var(--afc-purple); }
         .cert-staff .award-title { color: #ffbf00; } .cert-staff .corner { border-color: #ffbf00; }
+        .cert-puskas .award-title { color: #ff5722; } .cert-puskas .corner { border-color: #ff5722; }
 
         /* WARNA KHUSUS WORLD CUP EDITION */
         .cert-wc-1 .award-title { color: #ffca28; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); } 
@@ -174,6 +175,7 @@
     const NAMA_FAIR_PLAY = "DANDI";
     const NAMA_AFC_ELITE = "MAYA"; 
     const NAMA_STAFF_TERBAIK = "REGI"; 
+    const NAMA_PUSKAS_WINNER = "NAMA_PEMENANG_DI_SINI"; // Ganti nama pemenang Puskas Award
 
     const assets = {
         pialadunia: 'assets/pialadunia.png',
@@ -189,6 +191,7 @@
         fairplay: 'assets/fairplay.png',
         afc: 'assets/afc.png',
         admin: 'assets/admin.png',
+        puskas: 'assets/puskas.png', // Pastikan file puskas.png ada di folder assets
         ttdRegi: 'assets/ttdregi.png',
         ttdRizal: 'assets/ttdrizal.png',
         cap: 'assets/cap.png'
@@ -300,6 +303,15 @@
                 desc: 'Penghargaan atas loyalitas, dedikasi tinggi, dan kontribusi teknis luar biasa dalam menyukseskan operasional Football League-I musim ini.'
             });
 
+            // --- TAMBAHAN PUSKAS AWARD ---
+            renderCard(container, {
+                type: 'cert-puskas',
+                imgs: [assets.puskas],
+                title: 'PUSKAS AWARD (BEST GOAL)',
+                name: NAMA_PUSKAS_WINNER,
+                desc: 'Diberikan atas terciptanya gol terbaik yang spektakuler, estetik, dan ikonik pada laga: [ISI_DETAIL_PERTANDINGAN_DI_SINI]'
+            });
+
         } catch (e) { 
             console.error("Error:", e); 
             document.getElementById('loading').innerText = "❌ GAGAL MEMUAT DATA!";
@@ -354,12 +366,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
