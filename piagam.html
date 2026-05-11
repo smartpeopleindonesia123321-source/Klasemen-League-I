@@ -10,6 +10,7 @@
             --gold: #d4af37; --silver: #aaa9ad; --bronze: #cd7f32;
             --dark: #0a0a0a; --white: #ffffff;
             --afc-purple: #4a148c; /* Warna nuansa AFC Elite */
+            --timnas-red: #ce1126; /* Merah Bendera Indonesia */
         }
         body { background: #222; font-family: 'Kanit', sans-serif; display: flex; flex-direction: column; align-items: center; gap: 50px; padding: 50px 0; }
         
@@ -102,6 +103,7 @@
         .cert-afc .award-title { color: var(--afc-purple); } .cert-afc .corner { border-color: var(--afc-purple); }
         .cert-staff .award-title { color: #ffbf00; } .cert-staff .corner { border-color: #ffbf00; }
         .cert-puskas .award-title { color: #ff5722; } .cert-puskas .corner { border-color: #ff5722; }
+        .cert-timnas .award-title { color: var(--timnas-red); } .cert-timnas .corner { border-color: var(--timnas-red); }
 
         /* WARNA KHUSUS WORLD CUP EDITION */
         .cert-wc-1 .award-title { color: #ffca28; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); } 
@@ -175,7 +177,8 @@
     const NAMA_FAIR_PLAY = "DANDI";
     const NAMA_AFC_ELITE = "MAYA"; 
     const NAMA_STAFF_TERBAIK = "REGI"; 
-    const NAMA_PUSKAS_WINNER = "DICKY"; // Ganti nama pemenang Puskas Award
+    const NAMA_PUSKAS_WINNER = "DICKY"; 
+    const NAMA_TIMNAS_WINNER = "RIZAL"; // Ganti nama pemenang Timnas Trophy
 
     const assets = {
         pialadunia: 'assets/pialadunia.png',
@@ -191,7 +194,8 @@
         fairplay: 'assets/fairplay.png',
         afc: 'assets/afc.png',
         admin: 'assets/admin.png',
-        puskas: 'assets/puskas.png', // Pastikan file puskas.png ada di folder assets
+        puskas: 'assets/puskas.png',
+        timnas: 'assets/timnas.png', // Pastikan file timnas.png ada di folder assets
         ttdRegi: 'assets/ttdregi.png',
         ttdRizal: 'assets/ttdrizal.png',
         cap: 'assets/cap.png'
@@ -235,28 +239,26 @@
                     type: 'cert-wc-1', 
                     imgs: [assets.pialadunia, assets.emas], 
                     title: 'WORLD CUP 2026 - 1st PLACE', 
-                    name: 'NAMA_PEMENANG_DI_SINI', // Ganti Nama Pemenang Juara 1
+                    name: 'NAMA_PEMENANG_DI_SINI', 
                     desc: 'Atas pencapaian legendaris menjadi Juara Utama dalam turnamen WORLD CUP 2026 EDITION dengan membawa negara [NAMA_NEGARA].' 
                 },
                 { 
                     type: 'cert-wc-2', 
                     imgs: [assets.perak], 
                     title: 'WORLD CUP 2026 - 2nd PLACE', 
-                    name: 'NAMA_PEMENANG_DI_SINI', // Ganti Nama Pemenang Juara 2
+                    name: 'NAMA_PEMENANG_DI_SINI', 
                     desc: 'Atas perjuangan luar biasa meraih posisi Runner-Up dalam turnamen WORLD CUP 2026 EDITION bersama negara [NAMA_NEGARA].' 
                 },
                 { 
                     type: 'cert-wc-3', 
                     imgs: [assets.perunggu], 
                     title: 'WORLD CUP 2026 - 3rd PLACE', 
-                    name: 'NAMA_PEMENANG_DI_SINI', // Ganti Nama Pemenang Juara 3
+                    name: 'NAMA_PEMENANG_DI_SINI', 
                     desc: 'Atas keberhasilan meraih medali perunggu dan posisi ketiga dalam turnamen WORLD CUP 2026 EDITION bersama negara [NAMA_NEGARA].' 
                 }
             ];
             
-            // Render piagam World Cup dulu paling atas
             wcAwards.forEach(data => renderCard(container, data));
-            // ------------------------------------------
 
             awards.forEach(data => renderCard(container, data));
 
@@ -303,13 +305,21 @@
                 desc: 'Penghargaan atas loyalitas, dedikasi tinggi, dan kontribusi teknis luar biasa dalam menyukseskan operasional Football League-I musim ini.'
             });
 
-            // --- TAMBAHAN PUSKAS AWARD ---
             renderCard(container, {
                 type: 'cert-puskas',
                 imgs: [assets.puskas],
                 title: 'PUSKAS TROPHY (BEST SCORES)',
                 name: NAMA_PUSKAS_WINNER,
                 desc: 'Diberikan atas terciptanya skor terbaik yang spektakuler, estetik, dan ikonik pada laga Psbs biak vs Dewa United Dengan skor 0-5, tanggal 08 May 2026.'
+            });
+
+            // --- TAMBAHAN TIMNAS TROPHY ---
+            renderCard(container, {
+                type: 'cert-timnas',
+                imgs: [assets.timnas],
+                title: 'TIMNAS TROPHY (NATIONAL PRIDE)',
+                name: NAMA_TIMNAS_WINNER,
+                desc: 'Penghargaan khusus atas performa gemilang dan kontribusi vital dalam laga-laga bertema Tim Nasional Indonesia pada gelaran Football League-I.'
             });
 
         } catch (e) { 
