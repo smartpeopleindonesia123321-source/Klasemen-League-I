@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DRAWING CENTER | STABLE MODE</title>
+    <title>DRAWING CENTER | PREMIUM STABLE</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #d4af37; --dark: #0a0a0a; --white: #ffffff; --blue: #00f2ff; --red: #ff4d4d; }
+        :root { --gold: #d4af37; --dark: #0a0a0a; --white: #ffffff; --blue: #00f2ff; --red: #ff4d4d; --yellow: #ffc107; }
         body { background: #1a1a1a; font-family: 'Kanit', sans-serif; margin: 0; color: var(--white); padding: 10px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
         .container { width: 100%; max-width: 500px; background: #1a1a1a; padding: 20px; border-radius: 20px; border: 3px solid var(--gold); box-shadow: 0 0 30px rgba(212, 175, 55, 0.3); text-align: center; box-sizing: border-box; }
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; text-align: left; }
@@ -15,8 +15,8 @@
         .input-group label { font-size: 11px; color: var(--gold); font-weight: bold; text-transform: uppercase; }
         input, select { background: #252525; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; font-family: 'Kanit'; font-size: 14px; width: 100%; box-sizing: border-box; }
         select { border: 1px solid #444; cursor: pointer; }
-        .absen-container { background: #111; padding: 10px; border-radius: 8px; border: 1px solid #333; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; }
-        .absen-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #ccc; }
+        .absen-container { background: #111; padding: 12px; border-radius: 8px; border: 1px solid #333; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
+        .absen-item { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; letter-spacing: 0.5px; }
         #draw-list { display: flex; flex-direction: column; gap: 8px; margin: 20px 0; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; min-height: 50px; transition: 0.5s ease; }
         .is-blind { filter: blur(20px) grayscale(1); pointer-events: none; user-select: none; }
         .draw-item { background: #252525; padding: 12px 15px; border-radius: 8px; border-left: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; font-size: 14px; text-align: left; }
@@ -26,7 +26,7 @@
         #btn-lock { background: var(--red); color: white; }
         #btn-wa { background: #25d366; color: white; display: none; text-decoration: none; align-items: center; justify-content: center; padding: 15px; border-radius: 8px; font-weight: bold; }
         .status-lock { color: var(--blue); margin-top: 15px; font-weight: bold; display: none; }
-        textarea#teams { background: #252525; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; font-family: 'Kanit'; font-size: 14px; width: 100%; box-sizing: border-box; resize: none; height: 80px; line-height: 1.4; }
+        textarea#teams { background: #252525; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; font-family: 'Kanit'; font-size: 14px; width: 100%; box-sizing: border-box; resize: none; height: 60px; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -88,10 +88,28 @@
         setInterval(syncData, 5000);
     }
 
-    // Fungsi pembagi CSV pintar untuk mendeteksi pembatas koma (,) atau titik koma (;) otomatis
+    // Fungsi pemisah baris CSV pintar untuk mengantisipasi data koma ganda
     function parseCSVLine(line) {
-        const delimiter = line.includes(';') ? ';' : ',';
-        return line.split(delimiter).map(c => c.trim().replace(/"/g, ''));
+        let result = [];
+        let current = '';
+        let inQuotes = false;
+        
+        // Cek tipe separator primer data sheet
+        const separator = line.includes(';') ? ';' : ',';
+
+        for (let i = 0; i < line.length; i++) {
+            let char = line[i];
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === separator && !inQuotes) {
+                result.push(current.trim().replace(/^"|"$/g, ''));
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        result.push(current.trim().replace(/^"|"$/g, ''));
+        return result;
     }
 
     async function syncData() {
@@ -101,14 +119,11 @@
             const csvMatch = await resMatch.text();
             const rowsMatch = csvMatch.split('\n').filter(l => l.trim() !== '').slice(1).map(parseCSVLine);
             
-            // Perbaikan Logika Reset: Mengecek kata "RESET" di seluruh baris Kolom H (index 7) agar tidak macet
+            // Deteksi Global Admin RESET
             const resetFound = rowsMatch.some(row => row[7] && row[7].toUpperCase().trim() === "RESET");
-            if (resetFound) { 
-                hardReset(); 
-                return; 
-            }
+            if (resetFound) { hardReset(); return; }
 
-            // Menyaring data match agar baris instruksi reset di bawah tidak ikut masuk dropdown
+            // Filter agar baris kosong / baris reset tidak masuk ke pilihan match dropdown
             allMatchesData = rowsMatch.filter(r => r[0] && r[0].trim() !== "" && r[0].toUpperCase() !== "MATCH NO");
 
             // 2. Fetch Data Kartu Kuning Master (Sheet1)
@@ -125,7 +140,7 @@
                     const cardCount = parseInt(row[7]) || 0;
                     playerCardMap[p] = cardCount;
                     if (cardCount >= 2) {
-                        yellowCardData.push(p); // Masuk daftar hukuman otomatis absen
+                        yellowCardData.push(p); 
                     }
                 } else {
                     playerCardMap[p] = 0;
@@ -143,7 +158,9 @@
         const select = document.getElementById('match-select');
         const currentVal = select.value;
         let html = '<option value="">-- Pilih Match --</option>';
-        allMatchesData.forEach((data, index) => { html += `<option value="${index}">${data[0]}</option>`; });
+        allMatchesData.forEach((data, index) => { 
+            html += `<option value="${index}">${data[0].toUpperCase()}</option>`; 
+        });
         if (select.innerHTML !== html) {
             select.innerHTML = html;
             if (currentVal !== "" && allMatchesData[currentVal]) { select.value = currentVal; }
@@ -156,11 +173,11 @@
         if (idx === "" || !allMatchesData[idx]) { resetUIForNewMatch(); return; }
 
         const data = allMatchesData[idx];
-        document.getElementById('match-date').value = data[1];
-        document.getElementById('teams').value = data[2];
-        document.getElementById('start-time').value = data[3];
-        document.getElementById('duration').value = data[4];
-        document.getElementById('witness-name').value = data[5];
+        document.getElementById('match-date').value = data[1] || '';
+        document.getElementById('teams').value = data[2] || '';
+        document.getElementById('start-time').value = data[3] || '';
+        document.getElementById('duration').value = data[4] || '';
+        document.getElementById('witness-name').value = data[5] || '';
 
         const sheetAbsentRaw = data[6] ? data[6].split(';').map(n => n.trim()).filter(n => n !== "").sort().join(';') : "";
         globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()).filter(n => n !== "") : [];
@@ -190,10 +207,13 @@
         document.getElementById('absen-list-display').innerHTML = playerMaster.map(p => {
             const isAbs = globalAbsent.includes(p);
             const isYel = yellowCardData.includes(p);
-            let style = '#00ff88'; let txt = '✅ Main';
-            if (isYel) { style = '#ff4d4d'; txt = '❌ Akumulasi Kartu'; }
-            else if (isAbs) { style = '#ffc107'; txt = '❌ Gak Masuk'; }
-            return `<div class="absen-item" style="color:${style}">${txt} ${p}</div>`;
+            
+            // Konfigurasi warna estetik langsung pada nama orangnya tanpa embel-embel kata lain
+            let currentStyle = '#00ff88'; // Hijau normal
+            if (isYel) currentStyle = 'var(--red)'; // Merah Akumulasi
+            else if (isAbs) currentStyle = 'var(--yellow)'; // Kuning Gak Masuk
+
+            return `<div class="absen-item" style="color:${currentStyle}">● ${p.toUpperCase()}</div>`;
         }).join('');
     }
 
@@ -232,14 +252,28 @@
 
             let cardsHTML = "";
             for (let j = 0; j < Math.min(totalCards, 3); j++) {
-                cardsHTML += `<span style="display:inline-block; width:10px; height:14px; background:#facc15; border-radius:2px; margin-left:4px; border:1px solid rgba(0,0,0,0.3); vertical-align: middle;"></span>`;
+                cardsHTML += `<span style="display:inline-block; width:10px; height:14px; background:#facc15; border-radius:2px; margin-left:5px; border:1px solid rgba(0,0,0,0.4); vertical-align: middle;"></span>`;
             }
 
             const t = calculateSchedule(jm, i, dr);
-            return `<div class="draw-item" style="${isAbs || isYel ? 'opacity:0.5; border-left:red 5px solid;' : ''}">
-                <span><span class="rank">#${i+1}</span> <b>${name.toUpperCase()}</b>${cardsHTML} 
-                <span style="color:var(--gold);margin-left:8px">${isAbs || isYel ? '' : '('+t.start+'-'+t.end+')'}</span>
-                ${isYel ? '<b style="color:#ff4d4d;">(ABSEN AKUMULASIKARTU)</b>' : (isAbs ? '(ABSEN)' : '')}</span>
+            
+            // Styling baris list berdasarkan status kartu atau absen
+            let itemStyle = "border-left: 5px solid var(--gold);";
+            let textColor = "white";
+            let timeHTML = `<span style="color:var(--gold);margin-left:8px">(${t.start}-${t.end})</span>`;
+
+            if (isYel) {
+                itemStyle = "opacity:0.4; border-left: 5px solid var(--red); background: rgba(255, 77, 77, 0.05);";
+                textColor = "var(--red)";
+                timeHTML = "";
+            } else if (isAbs) {
+                itemStyle = "opacity:0.4; border-left: 5px solid var(--yellow);";
+                textColor = "var(--yellow)";
+                timeHTML = "";
+            }
+
+            return `<div class="draw-item" style="${itemStyle}">
+                <span style="color:${textColor}; flex-grow:1;"><span class="rank" style="${isYel || isAbs ? 'color:'+textColor : ''}">#${i+1}</span> <b style="letter-spacing:0.5px">${name.toUpperCase()}</b>${cardsHTML} ${timeHTML}</span>
             </div>`;
         }).join('');
     }
@@ -281,25 +315,15 @@
         
         currentList.forEach((name, i) => {
             const t = calculateSchedule(document.getElementById('start-time').value, i, document.getElementById('duration').value);
-            if (yellowCardData.includes(name)) rawMsg += `${i+1}. ${name.toUpperCase()} (ABSEN AKUMULASIKARTU)\n`;
+            if (yellowCardData.includes(name)) rawMsg += `${i+1}. ${name.toUpperCase()} (AKUMULASI KARTU)\n`;
             else if (globalAbsent.includes(name)) rawMsg += `${i+1}. ${name.toUpperCase()} (ABSEN)\n`;
             else rawMsg += `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}]\n`;
         });
         window.open("https://wa.me/?text=" + encodeURIComponent(rawMsg), '_blank');
     }
 
-    function hardReset() { 
-        localStorage.clear(); 
-        alert("Sistem di-Reset Admin!"); 
-        location.reload(); 
-    }
-    
-    async function manualSync() { 
-        const btn = event.target; 
-        btn.innerText = "⏳..."; 
-        await syncData(); 
-        btn.innerText = "REFRESH"; 
-    }
+    function hardReset() { localStorage.clear(); alert("Sistem di-Reset Admin!"); location.reload(); }
+    async function manualSync() { const btn = event.target; btn.innerText = "⏳..."; await syncData(); btn.innerText = "REFRESH"; }
 
     window.onload = initApp;
 </script>
