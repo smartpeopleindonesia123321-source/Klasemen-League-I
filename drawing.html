@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DRAWING CENTER | PREMIUM FIXED</title>
+    <title>DRAWING CENTER | PRO MODE</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #d4af37; --dark: #0a0a0a; --white: #ffffff; --blue: #00f2ff; --red: #ff4d4d; --yellow: #ffc107; }
@@ -35,7 +35,7 @@
     <h1 style="color: var(--gold); margin: 0 0 5px 0; font-size: 24px;">🎰 DRAWING CENTER</h1>
     <div style="display: flex; flex-direction: column; align-items: center; gap: 5px; margin-bottom: 10px;">
         <div id="sync-status" style="font-size: 10px; color: #555;">Menghubungkan...</div>
-        <button onclick="manualSync()" style="width: auto; padding: 4px 12px; font-size: 10px; background: transparent; color: var(--gold); border: 1px solid var(--gold); border-radius: 4px; cursor: pointer; font-family: 'Kanit';">REFRESH</button>
+        <button onclick="manualSync(event)" style="width: auto; padding: 4px 12px; font-size: 10px; background: transparent; color: var(--gold); border: 1px solid var(--gold); border-radius: 4px; cursor: pointer; font-family: 'Kanit';">REFRESH</button>
     </div>
 
     <div class="input-grid">
@@ -90,7 +90,6 @@
         setInterval(syncData, 5000);
     }
 
-    // Fungsi pemisah baris CSV standar Google Sheets (Koma murni)
     function parseCSVLine(line) {
         let result = [];
         let current = '';
@@ -99,7 +98,7 @@
         for (let i = 0; i < line.length; i++) {
             let char = line[i];
             if (char === '"') {
-                inQuotes = !inQuotes; // Abaikan koma jika berada di dalam tanda kutip teks
+                inQuotes = !inQuotes;
             } else if (char === ',' && !inQuotes) {
                 result.push(current.trim().replace(/^"|"$/g, ''));
                 current = '';
@@ -118,11 +117,11 @@
             const csvMatch = await resMatch.text();
             const rowsMatch = csvMatch.split('\n').filter(l => l.trim() !== '').slice(1).map(parseCSVLine);
             
-            // Cek Trigger Reset Admin
-            const resetFound = rowsMatch.some(row => row[7] && row[7].toUpperCase().trim() === "RESET");
+            // FIX: Deteksi Trigger Reset Admin di Kolom K (Indeks ke-10) sesuai posisi spreadsheet lo
+            const resetFound = rowsMatch.some(row => row[10] && row[10].toUpperCase().trim() === "RESET");
             if (resetFound) { hardReset(); return; }
 
-            // Filter baris kosong agar tidak merusak UI dropdown
+            // Filter data match agar baris kosong tidak masuk
             allMatchesData = rowsMatch.filter(r => r[0] && r[0].trim() !== "" && r[0].toUpperCase() !== "MATCH NO");
 
             // 2. Ambil Data Kartu Kuning (Sheet1)
@@ -138,9 +137,7 @@
                 if (row && row[7]) { 
                     const cardCount = parseInt(row[7]) || 0;
                     playerCardMap[p] = cardCount;
-                    if (cardCount >= 2) {
-                        yellowCardData.push(p); // Masuk list akumulasi jika kartu kuning >= 2
-                    }
+                    if (cardCount >= 2) { yellowCardData.push(p); }
                 } else {
                     playerCardMap[p] = 0;
                 }
@@ -159,7 +156,6 @@
         let html = '<option value="">-- Pilih Match --</option>';
         
         allMatchesData.forEach((data, index) => { 
-            // Ambil spesifik kolom pertama saja (index 0 yaitu Match No)
             if (data[0]) {
                 html += `<option value="${index}">${data[0].toUpperCase()}</option>`; 
             }
@@ -183,7 +179,6 @@
         document.getElementById('duration').value = data[4] || '';
         document.getElementById('witness-name').value = data[5] || '';
 
-        // Ambil data absen dari Kolom G (index 6) dengan pemisah semicolon (;)
         const sheetAbsentRaw = data[6] ? data[6].split(';').map(n => n.trim()).filter(n => n !== "").sort().join(';') : "";
         globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()).filter(n => n !== "") : [];
         
@@ -213,12 +208,9 @@
             const isAbs = globalAbsent.some(name => name.toLowerCase().trim() === p.toLowerCase().trim());
             const isYel = yellowCardData.some(name => name.toLowerCase().trim() === p.toLowerCase().trim());
             
-            let currentStyle = '#00ff88'; // Default Hijau (Main)
-            if (isYel) {
-                currentStyle = 'var(--red)'; // Merah (Akumulasi Kartu dari Sheet1)
-            } else if (isAbs) {
-                currentStyle = 'var(--yellow)'; // Kuning (Absen/Gak Main dari Sheet2)
-            }
+            let currentStyle = '#00ff88'; 
+            if (isYel) { currentStyle = 'var(--red)'; } 
+            else if (isAbs) { currentStyle = 'var(--yellow)'; }
 
             return `<div class="absen-item" style="color:${currentStyle}">● ${p.toUpperCase()}</div>`;
         }).join('');
@@ -237,7 +229,6 @@
         if (isLocked) return;
         document.getElementById('draw-list').classList.add('is-blind');
         
-        // Filter pemisahan kategori list saat diacak
         let active = playerMaster.filter(p => !globalAbsent.some(x => x.toLowerCase().trim() === p.toLowerCase().trim()) && !yellowCardData.some(x => x.toLowerCase().trim() === p.toLowerCase().trim())).sort(() => Math.random() - 0.5);
         let abs = playerMaster.filter(p => globalAbsent.some(x => x.toLowerCase().trim() === p.toLowerCase().trim()) && !yellowCardData.some(x => x.toLowerCase().trim() === p.toLowerCase().trim())).sort(() => Math.random() - 0.5);
         let yel = playerMaster.filter(p => yellowCardData.some(x => x.toLowerCase().trim() === p.toLowerCase().trim())).sort(() => Math.random() - 0.5);
@@ -329,8 +320,18 @@
         window.open("https://wa.me/?text=" + encodeURIComponent(rawMsg), '_blank');
     }
 
-    function hardReset() { localStorage.clear(); alert("Sistem di-Reset Admin!"); location.reload(); }
-    async function manualSync() { const btn = event.target; btn.innerText = "⏳..."; await syncData(); btn.innerText = "REFRESH"; }
+    function hardReset() { 
+        localStorage.clear(); 
+        alert("Sistem berhasil di-RESET otomatis oleh Admin via Google Sheets!"); 
+        location.reload(); 
+    }
+    
+    async function manualSync(e) { 
+        const btn = e.target; 
+        btn.innerText = "⏳..."; 
+        await syncData(); 
+        btn.innerText = "REFRESH"; 
+    }
 
     window.onload = initApp;
 </script>
