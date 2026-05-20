@@ -56,7 +56,7 @@
         <div class="input-group full-col">
             <label>Pilih Match</label>
             <select id="match-select" onchange="updateMatchDetails()"></select>
-        </div>
+        }
         <div class="input-group"><label>Tanggal</label><input type="text" id="match-date" readonly></div>
         <div class="input-group"><label>Jam</label><input type="text" id="start-time" readonly></div>
         <div class="input-group full-col">
@@ -91,7 +91,9 @@
     let shuffleCount = 0;
     let currentList = [];
     let isLocked = false;
-    let globalAbsent = [];
+    let globalAbsent = []; // Data absen dari Sheets (orang yang gak masuk)
+    // --- GUE TAMBAHKAN VARIABEL BARU UNTUK KARTU KUNING ---
+    let yellowCardData = []; // Data akumulasi kartu dari Sheets
 
     function initApp() {
         syncData();
@@ -111,6 +113,15 @@
             }
 
             allMatchesData = rows.filter(r => r[0] !== "");
+            // --- GUE TAMBAHKAN LOGIKA UNTUK MENGAMBIL DATA KARTU KUNING ---
+            yellowCardData = playerMaster.filter(p => {
+                const playerRow = rows.find(row => row[0] === p);
+                // Cek apakah di Sheets lo, kolom F (index 5) isinya "BEST PLAYER OF THE WEEK"
+                // Kalau iya, berarti dia best player minggu lalu (logika yang lo pake di klasemen)
+                // Disini kita asumsikan lo ingin nampilin kartu kuning berdasarkan best player minggu lalu
+                return playerRow && playerRow[4] && playerRow[4].toLowerCase().includes("best player");
+            });
+
             renderDropdown();
             document.getElementById('sync-status').innerText = "✅ Koneksi Stabil";
         } catch (e) { 
@@ -151,7 +162,8 @@
         document.getElementById('duration').value = data[4];
         document.getElementById('witness-name').value = data[5];
 
-        // 1. Ambil data absen TERBARU dari Google Sheets
+        // 1. Ambil data absen TERBARU dari Google Sheets (kolom 'Absen' G)
+        // Ini adalah data orang yang gak masuk kerja
         const sheetAbsentRaw = data[6] ? data[6].split(';').map(n => n.trim()).filter(n => n !== "").sort().join(';') : "";
         globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()) : [];
         
@@ -195,7 +207,10 @@
     function renderAbsentStatus() {
         document.getElementById('absen-list-display').innerHTML = playerMaster.map(p => {
             const isAbs = globalAbsent.includes(p);
-            return `<div class="absen-item" style="color:${isAbs ? '#ff4d4d' : '#00ff88'}">${isAbs ? '❌' : '✅'} ${p}</div>`;
+            // --- GUE TAMBAHKAN LOGIKA UNTUK MENAMPILKAN KARTU KUNING DI STATUS ---
+            const isYel = yellowCardData.includes(p);
+            // Kartu Kuning (Yel) diutamakan (dianggap absen hukuman)
+            return `<div class="absen-item" style="color:${isYel ? '#ff4d4d' : (isAbs ? '#ffc107' : '#00ff88')}">${isYel ? '❌ Kartu' : (isAbs ? '❌ Gak Masuk' : '✅ Main')} ${p}</div>`;
         }).join('');
     }
 
@@ -208,17 +223,29 @@
         return { start: fmt(startTotal), end: fmt(endTotal) };
     }
 
+    // --- GUE UPDATE FUNGSI SHUFFLE UNTUK MENERAPKAN LOGIKA BARU ---
     function shuffleData() {
         if (isLocked) return;
         document.getElementById('draw-list').classList.add('is-blind');
-        let active = playerMaster.filter(p => !globalAbsent.includes(p)).sort(() => Math.random() - 0.5);
-        let abs = globalAbsent.sort(() => Math.random() - 0.5);
-        currentList = [...active, ...abs];
+        
+        // 1. Orang yang gak masuk DAN gak kena kartu
+        let active = playerMaster.filter(p => !globalAbsent.includes(p) && !yellowCardData.includes(p)).sort(() => Math.random() - 0.5);
+        
+        // 2. Orang yang gak masuk kerja (Gak Masuk)
+        let abs = globalAbsent.filter(p => !yellowCardData.includes(p)).sort(() => Math.random() - 0.5);
+        
+        // 3. Orang yang kena akumulasi kartu (Diambil dari logika best player lo)
+        // Orang ini harus paling bontot
+        let yel = yellowCardData.sort(() => Math.random() - 0.5);
+        
+        // Gabungkan: [Aktif] + [Gak Masuk Kocok] + [Kartu Bontot]
+        currentList = [...active, ...abs, ...yel];
         shuffleCount++;
         document.getElementById('count').innerText = shuffleCount;
         renderList();
     }
 
+    // --- GUE UPDATE FUNGSI RENDER LIST UNTUK MENERAPKAN LOGIKA BARU ---
     function renderList() {
         if (currentList.length === 0) {
             document.getElementById('draw-list').innerHTML = "";
@@ -227,12 +254,23 @@
         const jm = document.getElementById('start-time').value;
         const dr = document.getElementById('duration').value;
         document.getElementById('draw-list').innerHTML = currentList.map((name, i) => {
-            const isAbs = globalAbsent.includes(name);
+            // --- GUE TAMBAHKAN LOGIKA UNTUK MENENTUKAN JENIS ABSEN ---
+            const isYel = yellowCardData.includes(name); // Akumulasi Kartu (Bontot)
+            const isAbs = globalAbsent.includes(name); // Gak Masuk Kerja
+
+            // Definisikan variabel kartu kuning (yellowCardsHTML) dulu sebelum dipanggil
+            let yellowCardsHTML = "";
+            for (let j = 0; j < Math.min(parseInt(name.yellowCards), 3); j++) {
+                yellowCardsHTML += `<span style="display:inline-block; width:10px; height:14px; background:#facc15; border-radius:2px; margin-left:5px; border:1px solid rgba(0,0,0,0.2); vertical-align: middle;" title="Pelanggaran"></span>`;
+            }
+
             const t = calculateSchedule(jm, i, dr);
-            return `<div class="draw-item" style="${isAbs ? 'opacity:0.5; border-left:red 5px solid;' : ''}">
-                <span><span class="rank">#${i+1}</span> <b>${name.toUpperCase()}</b> 
-                <span style="color:var(--gold);margin-left:8px">${isAbs ? '' : '('+t.start+'-'+t.end+')'}</span>
-                ${isAbs ? '(ABSEN)' : ''}</span>
+            
+            // Gak Masuk Kocok & Kartu Bontot pakai style buram yang sama
+            return `<div class="draw-item" style="${isAbs || isYel ? 'opacity:0.5; border-left:red 5px solid;' : ''}">
+                <span><span class="rank">#${i+1}</span> <b>${name.toUpperCase()}${yellowCardsHTML}</b> 
+                <span style="color:var(--gold);margin-left:8px">${isAbs || isYel ? '' : '('+t.start+'-'+t.end+')'}</span>
+                ${isYel ? '(ABSEN AKUMULASIKARTU)' : (isAbs ? '(ABSEN)' : '')}</span>
             </div>`;
         }).join('');
     }
@@ -300,9 +338,12 @@
         rawMsg += "*HASIL DRAWING:*\n";
         
         currentList.forEach((name, i) => {
+            const isYel = yellowCardData.includes(name);
             const isAbs = globalAbsent.includes(name);
             const t = calculateSchedule(jm, i, dr);
-            if (isAbs) {
+            if (isYel) {
+                rawMsg += (i + 1) + ". " + name.toUpperCase() + " (ABSEN AKUMULASIKARTU)\n";
+            } else if (isAbs) {
                 rawMsg += (i + 1) + ". " + name.toUpperCase() + " (ABSEN)\n";
             } else {
                 rawMsg += (i + 1) + ". " + name.toUpperCase() + " [" + t.start + "-" + t.end + "]\n";
@@ -338,5 +379,3 @@
 </script>
 </body>
 </html>
-
-
