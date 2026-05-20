@@ -88,7 +88,7 @@
         setInterval(syncData, 5000);
     }
 
-    // Fungsi pintar pembagi CSV agar support koma (,) maupun titik koma (;)
+    // Fungsi pembagi CSV pintar untuk mendeteksi pembatas koma (,) atau titik koma (;) otomatis
     function parseCSVLine(line) {
         const delimiter = line.includes(';') ? ';' : ',';
         return line.split(delimiter).map(c => c.trim().replace(/"/g, ''));
@@ -101,10 +101,15 @@
             const csvMatch = await resMatch.text();
             const rowsMatch = csvMatch.split('\n').filter(l => l.trim() !== '').slice(1).map(parseCSVLine);
             
-            const resetFound = rowsMatch.some(row => row[7] && row[7].toUpperCase() === "RESET");
-            if (resetFound) { hardReset(); return; }
+            // Perbaikan Logika Reset: Mengecek kata "RESET" di seluruh baris Kolom H (index 7) agar tidak macet
+            const resetFound = rowsMatch.some(row => row[7] && row[7].toUpperCase().trim() === "RESET");
+            if (resetFound) { 
+                hardReset(); 
+                return; 
+            }
 
-            allMatchesData = rowsMatch.filter(r => r[0] !== "");
+            // Menyaring data match agar baris instruksi reset di bawah tidak ikut masuk dropdown
+            allMatchesData = rowsMatch.filter(r => r[0] && r[0].trim() !== "" && r[0].toUpperCase() !== "MATCH NO");
 
             // 2. Fetch Data Kartu Kuning Master (Sheet1)
             const resMaster = await fetch(`${masterSheetUrl}&nocache=${new Date().getTime()}`);
@@ -283,8 +288,18 @@
         window.open("https://wa.me/?text=" + encodeURIComponent(rawMsg), '_blank');
     }
 
-    function hardReset() { localStorage.clear(); alert("Sistem di-Reset Admin!"); location.reload(); }
-    async function manualSync() { const btn = event.target; btn.innerText = "⏳..."; await syncData(); btn.innerText = "REFRESH"; }
+    function hardReset() { 
+        localStorage.clear(); 
+        alert("Sistem di-Reset Admin!"); 
+        location.reload(); 
+    }
+    
+    async function manualSync() { 
+        const btn = event.target; 
+        btn.innerText = "⏳..."; 
+        await syncData(); 
+        btn.innerText = "REFRESH"; 
+    }
 
     window.onload = initApp;
 </script>
