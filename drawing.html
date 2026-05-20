@@ -116,8 +116,8 @@
             const csvMatch = await resMatch.text();
             const rowsMatch = csvMatch.split('\n').filter(l => l.trim() !== '').slice(1).map(parseCSVLine);
             
-            // Pengaman Reset Otomatis di H2
-            if (rowsMatch[0] && rowsMatch[0][7] && rowsMatch[0][7].toUpperCase().trim() === "RESET") { 
+            // FIX RESET: Sekarang mendeteksi teks "RESET" di Kolom K (Indeks kolom ke-10) sesuai posisi barunya
+            if (rowsMatch[0] && rowsMatch[0][10] && rowsMatch[0][10].toUpperCase().trim() === "RESET") { 
                 hardReset(); 
                 return; 
             }
@@ -200,17 +200,17 @@
         document.getElementById('count').innerText = shuffleCount;
     }
 
+    // FIX STATUS PEMAIN: Menghilangkan teks status awal (MAIN, ABSEN, AKUMULASI), tersisa langsung nama dengan pembeda warna saja
     function renderAbsentStatus() {
         document.getElementById('absen-list-display').innerHTML = playerMaster.map(p => {
             const isAbs = globalAbsent.some(name => name.toLowerCase().trim() === p.toLowerCase().trim());
             const isYel = yellowCardData.some(name => name.toLowerCase().trim() === p.toLowerCase().trim());
             
-            let currentStyle = '#00ff88'; 
-            let labelStatus = 'MAIN';
-            if (isYel) { currentStyle = 'var(--red)'; labelStatus = 'AKUMULASI'; } 
-            else if (isAbs) { currentStyle = 'var(--yellow)'; labelStatus = 'ABSEN'; }
+            let currentStyle = '#00ff88'; // Default Hijau untuk pemain aktif
+            if (isYel) { currentStyle = 'var(--red)'; } // Merah untuk Akumulasi
+            else if (isAbs) { currentStyle = 'var(--yellow)'; } // Kuning/Oranye untuk Absen
 
-            return `<div class="absen-item" style="color:${currentStyle}">● ${labelStatus} ${p.toUpperCase()}</div>`;
+            return `<div class="absen-item" style="color:${currentStyle}">● ${p.toUpperCase()}</div>`;
         }).join('');
     }
 
@@ -308,10 +308,8 @@
             const t = calculateSchedule(document.getElementById('start-time').value, i, document.getElementById('duration').value);
             
             if (yellowCardData.some(x => x.toLowerCase().trim() === name.toLowerCase().trim())) {
-                // Yang Akumulasi tetep dikunci dipaling bawah tanpa jam
                 rawMsg += `${i+1}. ${name.toUpperCase()} (AKUMULASI KARTU)\n`;
             } else {
-                // FIX: Orang absen otomatis dapet jam main normal & tulisan (ABSEN) dihilangkan total!
                 rawMsg += `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}]\n`;
             }
         });
