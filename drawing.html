@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DRAWING CENTER | PREMIUM STABLE</title>
+    <title>DRAWING CENTER | COOPERATIVE MODE</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #d4af37; --dark: #0a0a0a; --white: #ffffff; --blue: #00f2ff; --red: #ff4d4d; --yellow: #ffc107; }
@@ -88,28 +88,27 @@
         setInterval(syncData, 5000);
     }
 
-    // Fungsi pemisah baris CSV pintar untuk mengantisipasi data koma ganda
+    // Fungsi Parser CSV Standar RFC 4180: Memotong kolom secara akurat walaupun isi cell memakai tanda koma
     function parseCSVLine(line) {
-        let result = [];
-        let current = '';
-        let inQuotes = false;
+        let values = [];
+        let matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
         
-        // Cek tipe separator primer data sheet
-        const separator = line.includes(';') ? ';' : ',';
-
-        for (let i = 0; i < line.length; i++) {
-            let char = line[i];
-            if (char === '"') {
-                inQuotes = !inQuotes;
-            } else if (char === separator && !inQuotes) {
-                result.push(current.trim().replace(/^"|"$/g, ''));
-                current = '';
-            } else {
-                current += char;
+        // Jika regex gagal karena pola string kustom, gunakan fallback splitter pintar
+        if (matches.length === 0) {
+            let result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                let char = line[i];
+                if (char === '"') { inQuotes = !inQuotes; }
+                else if (char === ',' && !inQuotes) { result.push(current.trim()); current = ''; }
+                else { current += char; }
             }
+            result.push(current.trim());
+            return result.map(c => c.replace(/^"|"$/g, ''));
         }
-        result.push(current.trim().replace(/^"|"$/g, ''));
-        return result;
+        
+        return matches.map(c => c.trim().replace(/^"|"$/g, ''));
     }
 
     async function syncData() {
@@ -117,13 +116,16 @@
             // 1. Fetch Data Match (Sheet2)
             const resMatch = await fetch(`${drawingSheetUrl}&nocache=${new Date().getTime()}`);
             const csvMatch = await resMatch.text();
-            const rowsMatch = csvMatch.split('\n').filter(l => l.trim() !== '').slice(1).map(parseCSVLine);
             
-            // Deteksi Global Admin RESET
+            // Split baris data
+            const linesMatch = csvMatch.split('\n').filter(l => l.trim() !== '');
+            const rowsMatch = linesMatch.slice(1).map(parseCSVLine);
+            
+            // Deteksi global RESET admin di kolom H (index 7)
             const resetFound = rowsMatch.some(row => row[7] && row[7].toUpperCase().trim() === "RESET");
             if (resetFound) { hardReset(); return; }
 
-            // Filter agar baris kosong / baris reset tidak masuk ke pilihan match dropdown
+            // Menyaring baris kosong dan memastikan baris header data tidak masuk
             allMatchesData = rowsMatch.filter(r => r[0] && r[0].trim() !== "" && r[0].toUpperCase() !== "MATCH NO");
 
             // 2. Fetch Data Kartu Kuning Master (Sheet1)
@@ -139,9 +141,7 @@
                 if (row && row[7]) { 
                     const cardCount = parseInt(row[7]) || 0;
                     playerCardMap[p] = cardCount;
-                    if (cardCount >= 2) {
-                        yellowCardData.push(p); 
-                    }
+                    if (cardCount >= 2) { yellowCardData.push(p); }
                 } else {
                     playerCardMap[p] = 0;
                 }
@@ -158,9 +158,12 @@
         const select = document.getElementById('match-select');
         const currentVal = select.value;
         let html = '<option value="">-- Pilih Match --</option>';
+        
         allMatchesData.forEach((data, index) => { 
+            // FIX: Hanya mengambil kolom pertama saja (data[0]) untuk teks dropdown pilihan
             html += `<option value="${index}">${data[0].toUpperCase()}</option>`; 
         });
+        
         if (select.innerHTML !== html) {
             select.innerHTML = html;
             if (currentVal !== "" && allMatchesData[currentVal]) { select.value = currentVal; }
@@ -179,6 +182,7 @@
         document.getElementById('duration').value = data[4] || '';
         document.getElementById('witness-name').value = data[5] || '';
 
+        // Deteksi pemisah semicolon (;) untuk daftar absen pemain di kolom G (index 6)
         const sheetAbsentRaw = data[6] ? data[6].split(';').map(n => n.trim()).filter(n => n !== "").sort().join(';') : "";
         globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()).filter(n => n !== "") : [];
         
@@ -208,10 +212,9 @@
             const isAbs = globalAbsent.includes(p);
             const isYel = yellowCardData.includes(p);
             
-            // Konfigurasi warna estetik langsung pada nama orangnya tanpa embel-embel kata lain
             let currentStyle = '#00ff88'; // Hijau normal
-            if (isYel) currentStyle = 'var(--red)'; // Merah Akumulasi
-            else if (isAbs) currentStyle = 'var(--yellow)'; // Kuning Gak Masuk
+            if (isYel) currentStyle = 'var(--red)'; // Merah solid akumulasi
+            else if (isAbs) currentStyle = 'var(--yellow)'; // Kuning absen normal
 
             return `<div class="absen-item" style="color:${currentStyle}">● ${p.toUpperCase()}</div>`;
         }).join('');
@@ -257,10 +260,9 @@
 
             const t = calculateSchedule(jm, i, dr);
             
-            // Styling baris list berdasarkan status kartu atau absen
             let itemStyle = "border-left: 5px solid var(--gold);";
             let textColor = "white";
-            let timeHTML = `<span style="color:var(--gold);margin-left:8px">(${t.start}-${t.end})</span>`;
+            let timeHTML = `<span style="color:var(--gold);margin-left:8px">( ${t.start} - ${t.end} )</span>`;
 
             if (isYel) {
                 itemStyle = "opacity:0.4; border-left: 5px solid var(--red); background: rgba(255, 77, 77, 0.05);";
