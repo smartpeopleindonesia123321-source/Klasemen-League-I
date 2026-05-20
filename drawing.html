@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DRAWING CENTER | COOPERATIVE MODE</title>
+    <title>DRAWING CENTER | PREMIUM FIXED</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #d4af37; --dark: #0a0a0a; --white: #ffffff; --blue: #00f2ff; --red: #ff4d4d; --yellow: #ffc107; }
@@ -51,9 +51,11 @@
         </div>
         <div class="input-group"><label>Durasi (Mnt)</label><input type="text" id="duration" readonly></div>
         <div class="input-group"><label>Saksi</label><input type="text" id="witness-name" readonly></div>
-        <div class="input-group full-col">
-            <label>Status Pemain</label>
-            <div class="absen-container" id="absen-list-display"></div>
+        <div class="input-grid full-col" style="margin-bottom:0px;">
+            <div class="input-group full-col">
+                <label>Status Pemain</label>
+                <div class="absen-container" id="absen-list-display"></div>
+            </div>
         </div>
     </div>
 
@@ -88,47 +90,42 @@
         setInterval(syncData, 5000);
     }
 
-    // Fungsi Parser CSV Standar RFC 4180: Memotong kolom secara akurat walaupun isi cell memakai tanda koma
+    // Fungsi pemisah baris CSV standar Google Sheets (Koma murni)
     function parseCSVLine(line) {
-        let values = [];
-        let matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
-        
-        // Jika regex gagal karena pola string kustom, gunakan fallback splitter pintar
-        if (matches.length === 0) {
-            let result = [];
-            let current = '';
-            let inQuotes = false;
-            for (let i = 0; i < line.length; i++) {
-                let char = line[i];
-                if (char === '"') { inQuotes = !inQuotes; }
-                else if (char === ',' && !inQuotes) { result.push(current.trim()); current = ''; }
-                else { current += char; }
+        let result = [];
+        let current = '';
+        let inQuotes = false;
+
+        for (let i = 0; i < line.length; i++) {
+            let char = line[i];
+            if (char === '"') {
+                inQuotes = !inQuotes; // Abaikan koma jika berada di dalam tanda kutip teks
+            } else if (char === ',' && !inQuotes) {
+                result.push(current.trim().replace(/^"|"$/g, ''));
+                current = '';
+            } else {
+                current += char;
             }
-            result.push(current.trim());
-            return result.map(c => c.replace(/^"|"$/g, ''));
         }
-        
-        return matches.map(c => c.trim().replace(/^"|"$/g, ''));
+        result.push(current.trim().replace(/^"|"$/g, ''));
+        return result;
     }
 
     async function syncData() {
         try {
-            // 1. Fetch Data Match (Sheet2)
+            // 1. Ambil Data Match (Sheet2)
             const resMatch = await fetch(`${drawingSheetUrl}&nocache=${new Date().getTime()}`);
             const csvMatch = await resMatch.text();
+            const rowsMatch = csvMatch.split('\n').filter(l => l.trim() !== '').slice(1).map(parseCSVLine);
             
-            // Split baris data
-            const linesMatch = csvMatch.split('\n').filter(l => l.trim() !== '');
-            const rowsMatch = linesMatch.slice(1).map(parseCSVLine);
-            
-            // Deteksi global RESET admin di kolom H (index 7)
+            // Cek Trigger Reset Admin
             const resetFound = rowsMatch.some(row => row[7] && row[7].toUpperCase().trim() === "RESET");
             if (resetFound) { hardReset(); return; }
 
-            // Menyaring baris kosong dan memastikan baris header data tidak masuk
+            // Filter baris kosong agar tidak merusak UI dropdown
             allMatchesData = rowsMatch.filter(r => r[0] && r[0].trim() !== "" && r[0].toUpperCase() !== "MATCH NO");
 
-            // 2. Fetch Data Kartu Kuning Master (Sheet1)
+            // 2. Ambil Data Kartu Kuning (Sheet1)
             const resMaster = await fetch(`${masterSheetUrl}&nocache=${new Date().getTime()}`);
             const csvMaster = await resMaster.text();
             const rowsMaster = csvMaster.split('\n').filter(l => l.trim() !== '').slice(1).map(parseCSVLine);
@@ -141,7 +138,9 @@
                 if (row && row[7]) { 
                     const cardCount = parseInt(row[7]) || 0;
                     playerCardMap[p] = cardCount;
-                    if (cardCount >= 2) { yellowCardData.push(p); }
+                    if (cardCount >= 2) {
+                        yellowCardData.push(p); // Masuk list akumulasi jika kartu kuning >= 2
+                    }
                 } else {
                     playerCardMap[p] = 0;
                 }
@@ -160,10 +159,12 @@
         let html = '<option value="">-- Pilih Match --</option>';
         
         allMatchesData.forEach((data, index) => { 
-            // FIX: Hanya mengambil kolom pertama saja (data[0]) untuk teks dropdown pilihan
-            html += `<option value="${index}">${data[0].toUpperCase()}</option>`; 
+            // Ambil spesifik kolom pertama saja (index 0 yaitu Match No)
+            if (data[0]) {
+                html += `<option value="${index}">${data[0].toUpperCase()}</option>`; 
+            }
         });
-        
+
         if (select.innerHTML !== html) {
             select.innerHTML = html;
             if (currentVal !== "" && allMatchesData[currentVal]) { select.value = currentVal; }
@@ -182,7 +183,7 @@
         document.getElementById('duration').value = data[4] || '';
         document.getElementById('witness-name').value = data[5] || '';
 
-        // Deteksi pemisah semicolon (;) untuk daftar absen pemain di kolom G (index 6)
+        // Ambil data absen dari Kolom G (index 6) dengan pemisah semicolon (;)
         const sheetAbsentRaw = data[6] ? data[6].split(';').map(n => n.trim()).filter(n => n !== "").sort().join(';') : "";
         globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()).filter(n => n !== "") : [];
         
@@ -209,12 +210,15 @@
 
     function renderAbsentStatus() {
         document.getElementById('absen-list-display').innerHTML = playerMaster.map(p => {
-            const isAbs = globalAbsent.includes(p);
-            const isYel = yellowCardData.includes(p);
+            const isAbs = globalAbsent.some(name => name.toLowerCase().trim() === p.toLowerCase().trim());
+            const isYel = yellowCardData.some(name => name.toLowerCase().trim() === p.toLowerCase().trim());
             
-            let currentStyle = '#00ff88'; // Hijau normal
-            if (isYel) currentStyle = 'var(--red)'; // Merah solid akumulasi
-            else if (isAbs) currentStyle = 'var(--yellow)'; // Kuning absen normal
+            let currentStyle = '#00ff88'; // Default Hijau (Main)
+            if (isYel) {
+                currentStyle = 'var(--red)'; // Merah (Akumulasi Kartu dari Sheet1)
+            } else if (isAbs) {
+                currentStyle = 'var(--yellow)'; // Kuning (Absen/Gak Main dari Sheet2)
+            }
 
             return `<div class="absen-item" style="color:${currentStyle}">● ${p.toUpperCase()}</div>`;
         }).join('');
@@ -233,9 +237,10 @@
         if (isLocked) return;
         document.getElementById('draw-list').classList.add('is-blind');
         
-        let active = playerMaster.filter(p => !globalAbsent.includes(p) && !yellowCardData.includes(p)).sort(() => Math.random() - 0.5);
-        let abs = globalAbsent.filter(p => !yellowCardData.includes(p)).sort(() => Math.random() - 0.5);
-        let yel = yellowCardData.sort(() => Math.random() - 0.5);
+        // Filter pemisahan kategori list saat diacak
+        let active = playerMaster.filter(p => !globalAbsent.some(x => x.toLowerCase().trim() === p.toLowerCase().trim()) && !yellowCardData.some(x => x.toLowerCase().trim() === p.toLowerCase().trim())).sort(() => Math.random() - 0.5);
+        let abs = playerMaster.filter(p => globalAbsent.some(x => x.toLowerCase().trim() === p.toLowerCase().trim()) && !yellowCardData.some(x => x.toLowerCase().trim() === p.toLowerCase().trim())).sort(() => Math.random() - 0.5);
+        let yel = playerMaster.filter(p => yellowCardData.some(x => x.toLowerCase().trim() === p.toLowerCase().trim())).sort(() => Math.random() - 0.5);
         
         currentList = [...active, ...abs, ...yel];
         shuffleCount++;
@@ -249,8 +254,8 @@
         const dr = document.getElementById('duration').value;
         
         document.getElementById('draw-list').innerHTML = currentList.map((name, i) => {
-            const isYel = yellowCardData.includes(name);
-            const isAbs = globalAbsent.includes(name);
+            const isYel = yellowCardData.some(x => x.toLowerCase().trim() === name.toLowerCase().trim());
+            const isAbs = globalAbsent.some(x => x.toLowerCase().trim() === name.toLowerCase().trim());
             const totalCards = playerCardMap[name] || 0;
 
             let cardsHTML = "";
@@ -317,8 +322,8 @@
         
         currentList.forEach((name, i) => {
             const t = calculateSchedule(document.getElementById('start-time').value, i, document.getElementById('duration').value);
-            if (yellowCardData.includes(name)) rawMsg += `${i+1}. ${name.toUpperCase()} (AKUMULASI KARTU)\n`;
-            else if (globalAbsent.includes(name)) rawMsg += `${i+1}. ${name.toUpperCase()} (ABSEN)\n`;
+            if (yellowCardData.some(x => x.toLowerCase().trim() === name.toLowerCase().trim())) rawMsg += `${i+1}. ${name.toUpperCase()} (AKUMULASI KARTU)\n`;
+            else if (globalAbsent.some(x => x.toLowerCase().trim() === name.toLowerCase().trim())) rawMsg += `${i+1}. ${name.toUpperCase()} (ABSEN)\n`;
             else rawMsg += `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}]\n`;
         });
         window.open("https://wa.me/?text=" + encodeURIComponent(rawMsg), '_blank');
