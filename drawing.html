@@ -118,17 +118,6 @@
             
             allMatchesData = rowsMatch.filter(r => r[0] && r[0].trim() !== "" && r[0].toUpperCase().startsWith("MATCH"));
 
-            // FIX DETEKSI RESET: Menggunakan nama match yang aktif, bukan sekadar indeks angka mentah
-            const select = document.getElementById('match-select');
-            if (select && select.value !== "") {
-                const activeMatchName = select.value.toUpperCase().trim();
-                const currentMatchRow = allMatchesData.find(r => r[0] && r[0].toUpperCase().trim() === activeMatchName);
-                if (currentMatchRow && currentMatchRow[10] && currentMatchRow[10].toUpperCase().trim() === "RESET") {
-                    hardReset();
-                    return;
-                }
-            }
-
             const resMaster = await fetch(`${masterSheetUrl}&nocache=${new Date().getTime()}`);
             const csvMaster = await resMaster.text();
             const rowsMaster = csvMaster.split('\n').filter(l => l.trim() !== '').slice(1).map(parseCSVLine);
@@ -148,16 +137,19 @@
             });
 
             renderDropdown();
+            
+            // Jalankan update data agar sinkronisasi background tetap presisi memperbarui detail di layar
+            updateMatchDetails();
+
             document.getElementById('sync-status').innerText = "✅ Koneksi Stabil";
         } catch (e) { 
             document.getElementById('sync-status').innerText = "⚠️ Koneksi Terganggu";
         }
     }
 
-    // FIX DROPDOWN LOMPAT: Menggunakan teks judul MATCH (misal: MATCH 10) sebagai value, bukan indeks baris lagi!
     function renderDropdown() {
         const select = document.getElementById('match-select');
-        const currentSelectedText = select.value; // Menyimpan nama match yang sedang aktif dipilih user
+        const currentSelectedText = select.value; 
         
         let html = '<option value="">-- Pilih Match --</option>';
         allMatchesData.forEach((data) => { 
@@ -167,21 +159,28 @@
 
         if (select.innerHTML !== html) {
             select.innerHTML = html;
-            // Kembalikan pilihan user dengan aman menggunakan nama match-nya
             if (currentSelectedText !== "") { 
                 select.value = currentSelectedText; 
             }
         }
     }
 
+    // AMAN: Pengecekan instruksi RESET dikunci penuh di sini (Hanya jalan jika match aktif terpilih)
     function updateMatchDetails() {
         const select = document.getElementById('match-select');
+        if (!select) return;
+        
         const matchName = select.value;
         if (matchName === "") { resetUIForNewMatch(); return; }
 
-        // Cari data baris berdasarkan string nama MATCH-nya
         const data = allMatchesData.find(r => r[0] && r[0].toUpperCase().trim() === matchName.toUpperCase().trim());
         if (!data) { resetUIForNewMatch(); return; }
+
+        // Cek Kolom K (Indeks ke-10) secara akurat dari match yang terpilih di layar saja
+        if (data[10] && data[10].toUpperCase().trim() === "RESET") {
+            hardReset();
+            return;
+        }
 
         document.getElementById('match-date').value = data[1] || '';
         document.getElementById('teams').value = data[2] || '';
@@ -192,7 +191,6 @@
         const sheetAbsentRaw = data[6] ? data[6].split(';').map(n => n.trim()).filter(n => n !== "").sort().join(';') : "";
         globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()).filter(n => n !== "") : [];
         
-        // Simpan data local storage menggunakan string nama MATCH agar konstan
         const savedData = localStorage.getItem('match_lock_' + matchName);
         if (savedData) {
             const parsed = JSON.parse(savedData);
@@ -206,7 +204,9 @@
                 applyLockUI();
             }
         } else {
-            resetUIForNewMatch();
+            if (!isLocked) {
+                // Biarkan user mengacak baru jika status localstorage kosong
+            }
         }
 
         renderAbsentStatus();
