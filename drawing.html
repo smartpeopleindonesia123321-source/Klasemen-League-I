@@ -116,13 +116,18 @@
             const csvMatch = await resMatch.text();
             const rowsMatch = csvMatch.split('\n').filter(l => l.trim() !== '').slice(1).map(parseCSVLine);
             
-            // FIX RESET: Sekarang mendeteksi teks "RESET" di Kolom K (Indeks kolom ke-10) sesuai posisi barunya
-            if (rowsMatch[0] && rowsMatch[0][10] && rowsMatch[0][10].toUpperCase().trim() === "RESET") { 
-                hardReset(); 
-                return; 
-            }
-
+            // Filter hanya baris yang valid diawali kata MATCH
             allMatchesData = rowsMatch.filter(r => r[0] && r[0].trim() !== "" && r[0].toUpperCase().startsWith("MATCH"));
+
+            // FIX DETEKSI RESET: Cek apakah match yang sedang dipilih di dropdown memiliki instruksi RESET di kolom K
+            const select = document.getElementById('match-select');
+            if (select && select.value !== "") {
+                const currentMatchRow = allMatchesData[select.value];
+                if (currentMatchRow && currentMatchRow[10] && currentMatchRow[10].toUpperCase().trim() === "RESET") {
+                    hardReset();
+                    return;
+                }
+            }
 
             const resMaster = await fetch(`${masterSheetUrl}&nocache=${new Date().getTime()}`);
             const csvMaster = await resMaster.text();
@@ -200,15 +205,14 @@
         document.getElementById('count').innerText = shuffleCount;
     }
 
-    // FIX STATUS PEMAIN: Menghilangkan teks status awal (MAIN, ABSEN, AKUMULASI), tersisa langsung nama dengan pembeda warna saja
     function renderAbsentStatus() {
         document.getElementById('absen-list-display').innerHTML = playerMaster.map(p => {
             const isAbs = globalAbsent.some(name => name.toLowerCase().trim() === p.toLowerCase().trim());
             const isYel = yellowCardData.some(name => name.toLowerCase().trim() === p.toLowerCase().trim());
             
-            let currentStyle = '#00ff88'; // Default Hijau untuk pemain aktif
-            if (isYel) { currentStyle = 'var(--red)'; } // Merah untuk Akumulasi
-            else if (isAbs) { currentStyle = 'var(--yellow)'; } // Kuning/Oranye untuk Absen
+            let currentStyle = '#00ff88'; 
+            if (isYel) { currentStyle = 'var(--red)'; } 
+            else if (isAbs) { currentStyle = 'var(--yellow)'; } 
 
             return `<div class="absen-item" style="color:${currentStyle}">● ${p.toUpperCase()}</div>`;
         }).join('');
