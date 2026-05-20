@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DRAWING CENTER | PRO MODE</title>
+    <title>DRAWING CENTER | PRO MODE FINAL</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #d4af37; --dark: #0a0a0a; --white: #ffffff; --blue: #00f2ff; --red: #ff4d4d; --yellow: #ffc107; }
@@ -112,21 +112,18 @@
 
     async function syncData() {
         try {
-            // Ambil Data Match (Sheet2)
             const resMatch = await fetch(`${drawingSheetUrl}&nocache=${new Date().getTime()}`);
             const csvMatch = await resMatch.text();
             const rowsMatch = csvMatch.split('\n').filter(l => l.trim() !== '').slice(1).map(parseCSVLine);
             
-            // Pengaman Reset Otomatis: Hanya cek jika tulisan RESET ada di Kolom H Baris ke-2 (Indeks 7)
+            // Pengaman Reset Otomatis di H2
             if (rowsMatch[0] && rowsMatch[0][7] && rowsMatch[0][7].toUpperCase().trim() === "RESET") { 
                 hardReset(); 
                 return; 
             }
 
-            // Memisahkan baris murni berawalan kata MATCH
             allMatchesData = rowsMatch.filter(r => r[0] && r[0].trim() !== "" && r[0].toUpperCase().startsWith("MATCH"));
 
-            // Ambil Data Kartu Kuning (Sheet1)
             const resMaster = await fetch(`${masterSheetUrl}&nocache=${new Date().getTime()}`);
             const csvMaster = await resMaster.text();
             const rowsMaster = csvMaster.split('\n').filter(l => l.trim() !== '').slice(1).map(parseCSVLine);
@@ -179,7 +176,6 @@
         document.getElementById('duration').value = data[4] || '';
         document.getElementById('witness-name').value = data[5] || '';
 
-        // Membaca Kolom G (Indeks ke-6) sebagai kolom data Absen yang valid
         const sheetAbsentRaw = data[6] ? data[6].split(';').map(n => n.trim()).filter(n => n !== "").sort().join(';') : "";
         globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()).filter(n => n !== "") : [];
         
@@ -248,7 +244,6 @@
         
         document.getElementById('draw-list').innerHTML = currentList.map((name, i) => {
             const isYel = yellowCardData.some(x => x.toLowerCase().trim() === name.toLowerCase().trim());
-            const isAbs = globalAbsent.some(x => x.toLowerCase().trim() === name.toLowerCase().trim());
             const totalCards = playerCardMap[name] || 0;
 
             let cardsHTML = "";
@@ -266,11 +261,6 @@
                 itemStyle = "opacity:0.3; border-left: 5px solid var(--red); background: rgba(255, 77, 77, 0.05);";
                 textColor = "var(--red)";
                 timeHTML = "";
-            } else if (isAbs) {
-                // Sesuai request: Tampilan web orang absen (Regi) dibuat bersih & normal, dapet porsi durasi waktu
-                itemStyle = "border-left: 5px solid var(--yellow);";
-                textColor = "white"; 
-                timeHTML = `<span style="color:var(--gold);margin-left:8px">( ${t.start} - ${t.end} )</span>`;
             }
 
             return `<div class="draw-item" style="${itemStyle}">
@@ -312,14 +302,16 @@
     function shareToWA() {
         const select = document.getElementById('match-select');
         let m = select.selectedIndex > 0 ? select.options[select.selectedIndex].text : "MATCH TERKUNCI";
-        let rawMsg = "*" + m.toUpperCase() + "*\n*TIM:* " + document.getElementById('teams').value.toUpperCase() + "\n*TGL:* " + document.getElementById('match-date').value.toUpperCase() + "\n\n⚖️ Saksi: " + document.getElementById('witness-name').value + "\n🎲 Acakan: " + shuffleCount + "x\n\n*HASIL DRAWING: * \n";
+        let rawMsg = "*" + m.toUpperCase() + "*\n*TIM:* " + document.getElementById('teams').value.toUpperCase() + "\n*TGL:* " + document.getElementById('match-date').value.toUpperCase() + "\n\n⚖️ Saksi: " + document.getElementById('witness-name').value + "\n🎲 Acakan: " + shuffleCount + "x\n\n*HASIL DRAWING:*\n";
         
         currentList.forEach((name, i) => {
             const t = calculateSchedule(document.getElementById('start-time').value, i, document.getElementById('duration').value);
+            
             if (yellowCardData.some(x => x.toLowerCase().trim() === name.toLowerCase().trim())) {
+                // Yang Akumulasi tetep dikunci dipaling bawah tanpa jam
                 rawMsg += `${i+1}. ${name.toUpperCase()} (AKUMULASI KARTU)\n`;
             } else {
-                // Sesuai request: Orang absen tidak ditandai teks "(ABSEN)" sama sekali pada pesan teks WA
+                // FIX: Orang absen otomatis dapet jam main normal & tulisan (ABSEN) dihilangkan total!
                 rawMsg += `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}]\n`;
             }
         });
