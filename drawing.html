@@ -14,7 +14,6 @@
         .input-group { display: flex; flex-direction: column; gap: 5px; }
         .input-group label { font-size: 11px; color: var(--gold); font-weight: bold; text-transform: uppercase; }
         input, select { background: #252525; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; font-family: 'Kanit'; font-size: 14px; width: 100%; box-sizing: border-box; }
-        /* Style dropdown saat aktif meski match di-lock */
         select { border: 1px solid #444; cursor: pointer; }
         .absen-container { background: #111; padding: 10px; border-radius: 8px; border: 1px solid #333; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; }
         .absen-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #ccc; }
@@ -28,18 +27,18 @@
         #btn-wa { background: #25d366; color: white; display: none; text-decoration: none; align-items: center; justify-content: center; padding: 15px; border-radius: 8px; font-weight: bold; }
         .status-lock { color: var(--blue); margin-top: 15px; font-weight: bold; display: none; }
         textarea#teams {
-        background: #252525;
-        border: 1px solid #444;
-        color: white;
-        padding: 12px;
-        border-radius: 8px;
-        font-family: 'Kanit';
-        font-size: 14px;
-        width: 100%;
-        box-sizing: border-box;
-        resize: none; 
-        height: 80px; /* Biar agak tinggi kotaknya */
-        line-height: 1.4;
+            background: #252525;
+            border: 1px solid #444;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Kanit';
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+            resize: none; 
+            height: 80px;
+            line-height: 1.4;
         }
     </style>
 </head>
@@ -56,12 +55,12 @@
         <div class="input-group full-col">
             <label>Pilih Match</label>
             <select id="match-select" onchange="updateMatchDetails()"></select>
-        }
+        </div>
         <div class="input-group"><label>Tanggal</label><input type="text" id="match-date" readonly></div>
         <div class="input-group"><label>Jam</label><input type="text" id="start-time" readonly></div>
         <div class="input-group full-col">
-        <label>Tim yang Bertanding</label>
-        <textarea id="teams" readonly maxlength="1000" placeholder="List tim..."></textarea>
+            <label>Tim yang Bertanding</label>
+            <textarea id="teams" readonly maxlength="1000" placeholder="List tim..."></textarea>
         </div>
         <div class="input-group"><label>Durasi (Mnt)</label><input type="text" id="duration" readonly></div>
         <div class="input-group"><label>Saksi</label><input type="text" id="witness-name" readonly></div>
@@ -84,16 +83,21 @@
 </div>
 
 <script>
+    // URL publikasi gid=353274036 (Sheet2) untuk data match utama
     const drawingSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=353274036&single=true&output=csv';
+    
+    // URL publikasi gid=0 (Sheet1) KHUSUS untuk mengambil data Kartu Kuning secara real-time
+    const masterSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=0&single=true&output=csv';
+
     const playerMaster = ["Dandi", "Asep", "Rizal", "Aries", "Ikmal", "Regi", "Yanti", "Erni", "Dicky", "Maya"];
     
     let allMatchesData = [];
     let shuffleCount = 0;
     let currentList = [];
     let isLocked = false;
-    let globalAbsent = []; // Data absen dari Sheets (orang yang gak masuk)
-    // --- GUE TAMBAHKAN VARIABEL BARU UNTUK KARTU KUNING ---
-    let yellowCardData = []; // Data akumulasi kartu dari Sheets
+    let globalAbsent = []; // Orang yang gak masuk kerja dari Sheet2 kolom G
+    let yellowCardData = []; // Menyimpan list nama pemain yang kena kartu >= 2
+    let playerCardMap = {}; // Map untuk mencatat jumlah kartu tiap pemain { "Dandi": 1, "Asep": 2 }
 
     function initApp() {
         syncData();
@@ -102,24 +106,41 @@
 
     async function syncData() {
         try {
-            const res = await fetch(`${drawingSheetUrl}&nocache=${new Date().getTime()}`);
-            const csv = await res.text();
-            const rows = csv.split('\n').slice(1).map(r => r.split(',').map(c => c.trim().replace(/"/g, '')));
+            // 1. Fetch data Match dan Absen Gak Masuk Kerja dari Sheet2 (gid=353274036)
+            const resMatch = await fetch(`${drawingSheetUrl}&nocache=${new Date().getTime()}`);
+            const csvMatch = await resMatch.text();
+            const rowsMatch = csvMatch.split('\n').slice(1).map(r => r.split(',').map(c => c.trim().replace(/"/g, '')));
             
-            const resetFound = rows.some(row => row[7] && row[7].toUpperCase() === "RESET");
+            const resetFound = rowsMatch.some(row => row[7] && row[7].toUpperCase() === "RESET");
             if (resetFound) {
                 hardReset();
                 return;
             }
 
-            allMatchesData = rows.filter(r => r[0] !== "");
-            // --- GUE TAMBAHKAN LOGIKA UNTUK MENGAMBIL DATA KARTU KUNING ---
-            yellowCardData = playerMaster.filter(p => {
-                const playerRow = rows.find(row => row[0] === p);
-                // Cek apakah di Sheets lo, kolom F (index 5) isinya "BEST PLAYER OF THE WEEK"
-                // Kalau iya, berarti dia best player minggu lalu (logika yang lo pake di klasemen)
-                // Disini kita asumsikan lo ingin nampilin kartu kuning berdasarkan best player minggu lalu
-                return playerRow && playerRow[4] && playerRow[4].toLowerCase().includes("best player");
+            allMatchesData = rowsMatch.filter(r => r[0] !== "");
+
+            // 2. Fetch data Kartu Kuning real-time dari Sheet1 (gid=0)
+            const resMaster = await fetch(`${masterSheetUrl}&nocache=${new Date().getTime()}`);
+            const csvMaster = await resMaster.text();
+            const rowsMaster = csvMaster.split('\n').slice(1).map(r => r.split(',').map(c => c.trim().replace(/"/g, '')));
+
+            // Reset data peta kartu sebelum diisi ulang
+            playerCardMap = {};
+            yellowCardData = [];
+
+            playerMaster.forEach(p => {
+                // Cari kecocokan nama di Sheet1 Kolom A
+                const row = rowsMaster.find(r => r[0] && r[0].toLowerCase() === p.toLowerCase());
+                if (row && row[7]) { // Kolom H adalah index 7
+                    const cardCount = parseInt(row[7]) || 0;
+                    playerCardMap[p] = cardCount;
+                    // Jika kartu kuning 2 atau lebih, otomatis masuk daftar akumulasi kartu
+                    if (cardCount >= 2) {
+                        yellowCardData.push(p);
+                    }
+                } else {
+                    playerCardMap[p] = 0;
+                }
             });
 
             renderDropdown();
@@ -162,8 +183,6 @@
         document.getElementById('duration').value = data[4];
         document.getElementById('witness-name').value = data[5];
 
-        // 1. Ambil data absen TERBARU dari Google Sheets (kolom 'Absen' G)
-        // Ini adalah data orang yang gak masuk kerja
         const sheetAbsentRaw = data[6] ? data[6].split(';').map(n => n.trim()).filter(n => n !== "").sort().join(';') : "";
         globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()) : [];
         
@@ -171,13 +190,9 @@
         
         if (savedData) {
             const parsed = JSON.parse(savedData);
-            
-            // 2. Cek data absen yang tersimpan di HP (kalau ada)
-            // Kita bikin pembanding biar kalau lo ubah absen di Sheets, HP otomatis ngereset
             const localAbsentRaw = parsed.absentSnapshot || "";
 
             if (sheetAbsentRaw !== localAbsentRaw) {
-                // JIKA ABSEN BERUBAH: Paksa reset khusus untuk match ini
                 localStorage.removeItem('match_lock_' + idx);
                 isLocked = false;
                 currentList = [];
@@ -185,14 +200,12 @@
                 resetUIForNewMatch();
                 console.log("Data absen berubah, sistem otomatis unlock match ini.");
             } else {
-                // JIKA ABSEN SAMA: Pakai data yang sudah terkunci
                 currentList = parsed.list;
                 shuffleCount = parsed.count;
                 isLocked = true;
                 applyLockUI();
             }
         } else {
-            // BELUM ADA DATA TERKUNCI
             isLocked = false;
             currentList = [];
             shuffleCount = 0;
@@ -207,10 +220,18 @@
     function renderAbsentStatus() {
         document.getElementById('absen-list-display').innerHTML = playerMaster.map(p => {
             const isAbs = globalAbsent.includes(p);
-            // --- GUE TAMBAHKAN LOGIKA UNTUK MENAMPILKAN KARTU KUNING DI STATUS ---
             const isYel = yellowCardData.includes(p);
-            // Kartu Kuning (Yel) diutamakan (dianggap absen hukuman)
-            return `<div class="absen-item" style="color:${isYel ? '#ff4d4d' : (isAbs ? '#ffc107' : '#00ff88')}">${isYel ? '❌ Kartu' : (isAbs ? '❌ Gak Masuk' : '✅ Main')} ${p}</div>`;
+            let statusStyle = '#00ff88'; // Default main (hijau)
+            let textStatus = '✅ Main';
+            
+            if (isYel) {
+                statusStyle = '#ff4d4d'; // Akumulasi kartu (merah)
+                textStatus = '❌ Akumulasi Kartu';
+            } else if (isAbs) {
+                statusStyle = '#ffc107'; // Gak masuk kerja (kuning emas)
+                textStatus = '❌ Gak Masuk';
+            }
+            return `<div class="absen-item" style="color:${statusStyle}">${textStatus} ${p}</div>`;
         }).join('');
     }
 
@@ -223,29 +244,26 @@
         return { start: fmt(startTotal), end: fmt(endTotal) };
     }
 
-    // --- GUE UPDATE FUNGSI SHUFFLE UNTUK MENERAPKAN LOGIKA BARU ---
     function shuffleData() {
         if (isLocked) return;
         document.getElementById('draw-list').classList.add('is-blind');
         
-        // 1. Orang yang gak masuk DAN gak kena kartu
+        // 1. Pemain Aktif (Masuk kerja DAN kartu kuning < 2)
         let active = playerMaster.filter(p => !globalAbsent.includes(p) && !yellowCardData.includes(p)).sort(() => Math.random() - 0.5);
         
-        // 2. Orang yang gak masuk kerja (Gak Masuk)
+        // 2. Pemain Gak Masuk Kerja (dikocok di urutan sebelum terbawah)
         let abs = globalAbsent.filter(p => !yellowCardData.includes(p)).sort(() => Math.random() - 0.5);
         
-        // 3. Orang yang kena akumulasi kartu (Diambil dari logika best player lo)
-        // Orang ini harus paling bontot
+        // 3. Pemain Akumulasi Kartu Kuning (>= 2) -> TERDAMPAR DI PALING BONTOT UTAMA
         let yel = yellowCardData.sort(() => Math.random() - 0.5);
         
-        // Gabungkan: [Aktif] + [Gak Masuk Kocok] + [Kartu Bontot]
+        // Susun urutan: Aktif -> Gak Masuk Kocok -> Akumulasi Kartu Hukuman
         currentList = [...active, ...abs, ...yel];
         shuffleCount++;
         document.getElementById('count').innerText = shuffleCount;
         renderList();
     }
 
-    // --- GUE UPDATE FUNGSI RENDER LIST UNTUK MENERAPKAN LOGIKA BARU ---
     function renderList() {
         if (currentList.length === 0) {
             document.getElementById('draw-list').innerHTML = "";
@@ -254,23 +272,22 @@
         const jm = document.getElementById('start-time').value;
         const dr = document.getElementById('duration').value;
         document.getElementById('draw-list').innerHTML = currentList.map((name, i) => {
-            // --- GUE TAMBAHKAN LOGIKA UNTUK MENENTUKAN JENIS ABSEN ---
-            const isYel = yellowCardData.includes(name); // Akumulasi Kartu (Bontot)
-            const isAbs = globalAbsent.includes(name); // Gak Masuk Kerja
+            const isYel = yellowCardData.includes(name);
+            const isAbs = globalAbsent.includes(name);
+            const totalCards = playerCardMap[name] || 0;
 
-            // Definisikan variabel kartu kuning (yellowCardsHTML) dulu sebelum dipanggil
+            // Generate kotak indikator kartu kecil di samping nama
             let yellowCardsHTML = "";
-            for (let j = 0; j < Math.min(parseInt(name.yellowCards), 3); j++) {
-                yellowCardsHTML += `<span style="display:inline-block; width:10px; height:14px; background:#facc15; border-radius:2px; margin-left:5px; border:1px solid rgba(0,0,0,0.2); vertical-align: middle;" title="Pelanggaran"></span>`;
+            for (let j = 0; j < Math.min(totalCards, 3); j++) {
+                yellowCardsHTML += `<span style="display:inline-block; width:10px; height:14px; background:#facc15; border-radius:2px; margin-left:4px; border:1px solid rgba(0,0,0,0.3); vertical-align: middle;"></span>`;
             }
 
             const t = calculateSchedule(jm, i, dr);
             
-            // Gak Masuk Kocok & Kartu Bontot pakai style buram yang sama
             return `<div class="draw-item" style="${isAbs || isYel ? 'opacity:0.5; border-left:red 5px solid;' : ''}">
-                <span><span class="rank">#${i+1}</span> <b>${name.toUpperCase()}${yellowCardsHTML}</b> 
+                <span><span class="rank">#${i+1}</span> <b>${name.toUpperCase()}</b>${yellowCardsHTML} 
                 <span style="color:var(--gold);margin-left:8px">${isAbs || isYel ? '' : '('+t.start+'-'+t.end+')'}</span>
-                ${isYel ? '(ABSEN AKUMULASIKARTU)' : (isAbs ? '(ABSEN)' : '')}</span>
+                ${isYel ? '<b style="color:#ff4d4d;">(ABSEN AKUMULASIKARTU)</b>' : (isAbs ? '(ABSEN)' : '')}</span>
             </div>`;
         }).join('');
     }
@@ -285,7 +302,6 @@
             const dataToSave = {
                 list: currentList,
                 count: shuffleCount,
-                // SIMPAN STATUS ABSEN SAAT INI SEBAGAI PENANDA
                 absentSnapshot: globalAbsent.sort().join(';') 
             };
             localStorage.setItem('match_lock_' + idx, JSON.stringify(dataToSave));
@@ -297,7 +313,6 @@
         document.getElementById('draw-list').classList.remove('is-blind');
         document.getElementById('btn-shuffle').style.display = "none";
         document.getElementById('btn-lock').style.display = "none";
-        // BARIS DIBAWAH INI GUE UBAH AGAR DROPDOWN TETAP BISA DIKLIK
         document.getElementById('match-select').disabled = false; 
         document.getElementById('status').style.display = "block";
         document.getElementById('btn-wa').style.display = "flex";
@@ -323,13 +338,12 @@
             m = "MATCH TERKUNCI";
         }
                 
-        const tm = document.getElementById('teams').value.trim(); // Tambah trim biar gak ada spasi liar
+        const tm = document.getElementById('teams').value.trim(); 
         const tg = document.getElementById('match-date').value; 
         const jm = document.getElementById('start-time').value;
         const dr = document.getElementById('duration').value;
         const saksi = document.getElementById('witness-name').value;
 
-        // Gunakan satu variabel string panjang, jangan pakai enter manual di dalam kode
         let rawMsg = "*" + m.toUpperCase() + "*\n";
         rawMsg += "*TIM:* " + tm.toUpperCase() + "\n";
         rawMsg += "*TGL:* " + tg.toUpperCase() + "\n\n";
@@ -350,10 +364,7 @@
             }
         });
         
-        // Encode total agar simbol || dan spasi aman
         const encodedMsg = encodeURIComponent(rawMsg);
-        
-        // Buka link WA
         window.open("https://wa.me/?text=" + encodedMsg, '_blank');
     }
 
