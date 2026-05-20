@@ -283,3 +283,63 @@
         const idx = document.getElementById('match-select').value;
         if (idx === "" || currentList.length === 0) return alert("Pilih match / acak dulu!");
         if (confirm("KUNCI HASIL MATCH INI?")) {
+            isLocked = true;
+            localStorage.setItem('match_lock_' + idx, JSON.stringify({ list: currentList, count: shuffleCount, absentSnapshot: globalAbsent.sort().join(';') }));
+            applyLockUI();
+        }
+    }
+
+    function applyLockUI() {
+        document.getElementById('draw-list').classList.remove('is-blind');
+        document.getElementById('btn-shuffle').style.display = "none";
+        document.getElementById('btn-lock').style.display = "none";
+        document.getElementById('status').style.display = "block";
+        document.getElementById('btn-wa').style.display = "flex";
+        renderList();
+    }
+
+    function resetUIForNewMatch() {
+        isLocked = false;
+        shuffleCount = 0;
+        currentList = [];
+        document.getElementById('draw-list').classList.add('is-blind');
+        document.getElementById('btn-shuffle').style.display = "block";
+        document.getElementById('btn-lock').style.display = "block";
+        document.getElementById('status').style.display = "none";
+        document.getElementById('btn-wa').style.display = "none";
+    }
+
+    function shareToWA() {
+        const select = document.getElementById('match-select');
+        let m = select.selectedIndex > 0 ? select.options[select.selectedIndex].text : "MATCH TERKUNCI";
+        let rawMsg = "*" + m.toUpperCase() + "*\n*TIM:* " + document.getElementById('teams').value.toUpperCase() + "\n*TGL:* " + document.getElementById('match-date').value.toUpperCase() + "\n\n⚖️ Saksi: " + document.getElementById('witness-name').value + "\n🎲 Acakan: " + shuffleCount + "x\n\n*HASIL DRAWING: * \n";
+        
+        currentList.forEach((name, i) => {
+            const t = calculateSchedule(document.getElementById('start-time').value, i, document.getElementById('duration').value);
+            if (yellowCardData.some(x => x.toLowerCase().trim() === name.toLowerCase().trim())) {
+                rawMsg += `${i+1}. ${name.toUpperCase()} (AKUMULASI KARTU)\n`;
+            } else {
+                // Sesuai request: Orang absen tidak ditandai teks "(ABSEN)" sama sekali pada pesan teks WA
+                rawMsg += `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}]\n`;
+            }
+        });
+        window.open("https://wa.me/?text=" + encodeURIComponent(rawMsg), '_blank');
+    }
+
+    function hardReset() { 
+        localStorage.clear(); 
+        alert("Sistem berhasil di-RESET otomatis oleh Admin via Google Sheets!"); 
+        location.reload(); 
+    }
+    
+    async function manualSync(e) { 
+        const btn = e.target; 
+        btn.innerText = "⏳..."; 
+        await syncData(); 
+        btn.innerText = "REFRESH"; 
+    }
+
+    window.onload = initApp;
+</script>
+</body>
+</html>
