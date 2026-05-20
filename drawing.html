@@ -112,19 +112,21 @@
 
     async function syncData() {
         try {
-            // 1. Ambil Data Match (Sheet2)
+            // Ambil Data Match (Sheet2)
             const resMatch = await fetch(`${drawingSheetUrl}&nocache=${new Date().getTime()}`);
             const csvMatch = await resMatch.text();
             const rowsMatch = csvMatch.split('\n').filter(l => l.trim() !== '').slice(1).map(parseCSVLine);
             
-            // FIX: Deteksi Trigger Reset Admin di Kolom K (Indeks ke-10) sesuai posisi spreadsheet lo
-            const resetFound = rowsMatch.some(row => row[10] && row[10].toUpperCase().trim() === "RESET");
-            if (resetFound) { hardReset(); return; }
+            // Pengaman Reset Otomatis: Hanya cek jika tulisan RESET ada di Kolom H Baris ke-2 (Indeks 7)
+            if (rowsMatch[0] && rowsMatch[0][7] && rowsMatch[0][7].toUpperCase().trim() === "RESET") { 
+                hardReset(); 
+                return; 
+            }
 
-            // Filter data match agar baris kosong tidak masuk
-            allMatchesData = rowsMatch.filter(r => r[0] && r[0].trim() !== "" && r[0].toUpperCase() !== "MATCH NO");
+            // Memisahkan baris murni berawalan kata MATCH
+            allMatchesData = rowsMatch.filter(r => r[0] && r[0].trim() !== "" && r[0].toUpperCase().startsWith("MATCH"));
 
-            // 2. Ambil Data Kartu Kuning (Sheet1)
+            // Ambil Data Kartu Kuning (Sheet1)
             const resMaster = await fetch(`${masterSheetUrl}&nocache=${new Date().getTime()}`);
             const csvMaster = await resMaster.text();
             const rowsMaster = csvMaster.split('\n').filter(l => l.trim() !== '').slice(1).map(parseCSVLine);
@@ -156,9 +158,7 @@
         let html = '<option value="">-- Pilih Match --</option>';
         
         allMatchesData.forEach((data, index) => { 
-            if (data[0]) {
-                html += `<option value="${index}">${data[0].toUpperCase()}</option>`; 
-            }
+            html += `<option value="${index}">${data[0].toUpperCase()}</option>`; 
         });
 
         if (select.innerHTML !== html) {
@@ -179,6 +179,7 @@
         document.getElementById('duration').value = data[4] || '';
         document.getElementById('witness-name').value = data[5] || '';
 
+        // Membaca Kolom G (Indeks ke-6) sebagai kolom data Absen yang valid
         const sheetAbsentRaw = data[6] ? data[6].split(';').map(n => n.trim()).filter(n => n !== "").sort().join(';') : "";
         globalAbsent = data[6] ? data[6].split(';').map(n => n.trim()).filter(n => n !== "") : [];
         
@@ -209,10 +210,11 @@
             const isYel = yellowCardData.some(name => name.toLowerCase().trim() === p.toLowerCase().trim());
             
             let currentStyle = '#00ff88'; 
-            if (isYel) { currentStyle = 'var(--red)'; } 
-            else if (isAbs) { currentStyle = 'var(--yellow)'; }
+            let labelStatus = 'MAIN';
+            if (isYel) { currentStyle = 'var(--red)'; labelStatus = 'AKUMULASI'; } 
+            else if (isAbs) { currentStyle = 'var(--yellow)'; labelStatus = 'ABSEN'; }
 
-            return `<div class="absen-item" style="color:${currentStyle}">● ${p.toUpperCase()}</div>`;
+            return `<div class="absen-item" style="color:${currentStyle}">● ${labelStatus} ${p.toUpperCase()}</div>`;
         }).join('');
     }
 
@@ -261,17 +263,18 @@
             let timeHTML = `<span style="color:var(--gold);margin-left:8px">( ${t.start} - ${t.end} )</span>`;
 
             if (isYel) {
-                itemStyle = "opacity:0.4; border-left: 5px solid var(--red); background: rgba(255, 77, 77, 0.05);";
+                itemStyle = "opacity:0.3; border-left: 5px solid var(--red); background: rgba(255, 77, 77, 0.05);";
                 textColor = "var(--red)";
                 timeHTML = "";
             } else if (isAbs) {
-                itemStyle = "opacity:0.4; border-left: 5px solid var(--yellow);";
-                textColor = "var(--yellow)";
-                timeHTML = "";
+                // Sesuai request: Tampilan web orang absen (Regi) dibuat bersih & normal, dapet porsi durasi waktu
+                itemStyle = "border-left: 5px solid var(--yellow);";
+                textColor = "white"; 
+                timeHTML = `<span style="color:var(--gold);margin-left:8px">( ${t.start} - ${t.end} )</span>`;
             }
 
             return `<div class="draw-item" style="${itemStyle}">
-                <span style="color:${textColor}; flex-grow:1;"><span class="rank" style="${isYel || isAbs ? 'color:'+textColor : ''}">#${i+1}</span> <b style="letter-spacing:0.5px">${name.toUpperCase()}</b>${cardsHTML} ${timeHTML}</span>
+                <span style="color:${textColor}; flex-grow:1;"><span class="rank" style="${isYel ? 'color:'+textColor : ''}">#${i+1}</span> <b style="letter-spacing:0.5px">${name.toUpperCase()}</b>${cardsHTML} ${timeHTML}</span>
             </div>`;
         }).join('');
     }
@@ -280,60 +283,3 @@
         const idx = document.getElementById('match-select').value;
         if (idx === "" || currentList.length === 0) return alert("Pilih match / acak dulu!");
         if (confirm("KUNCI HASIL MATCH INI?")) {
-            isLocked = true;
-            localStorage.setItem('match_lock_' + idx, JSON.stringify({ list: currentList, count: shuffleCount, absentSnapshot: globalAbsent.sort().join(';') }));
-            applyLockUI();
-        }
-    }
-
-    function applyLockUI() {
-        document.getElementById('draw-list').classList.remove('is-blind');
-        document.getElementById('btn-shuffle').style.display = "none";
-        document.getElementById('btn-lock').style.display = "none";
-        document.getElementById('status').style.display = "block";
-        document.getElementById('btn-wa').style.display = "flex";
-        renderList();
-    }
-
-    function resetUIForNewMatch() {
-        isLocked = false;
-        shuffleCount = 0;
-        currentList = [];
-        document.getElementById('draw-list').classList.add('is-blind');
-        document.getElementById('btn-shuffle').style.display = "block";
-        document.getElementById('btn-lock').style.display = "block";
-        document.getElementById('status').style.display = "none";
-        document.getElementById('btn-wa').style.display = "none";
-    }
-
-    function shareToWA() {
-        const select = document.getElementById('match-select');
-        let m = select.selectedIndex > 0 ? select.options[select.selectedIndex].text : "MATCH TERKUNCI";
-        let rawMsg = "*" + m.toUpperCase() + "*\n*TIM:* " + document.getElementById('teams').value.toUpperCase() + "\n*TGL:* " + document.getElementById('match-date').value.toUpperCase() + "\n\n⚖️ Saksi: " + document.getElementById('witness-name').value + "\n🎲 Acakan: " + shuffleCount + "x\n\n*HASIL DRAWING:*\n";
-        
-        currentList.forEach((name, i) => {
-            const t = calculateSchedule(document.getElementById('start-time').value, i, document.getElementById('duration').value);
-            if (yellowCardData.some(x => x.toLowerCase().trim() === name.toLowerCase().trim())) rawMsg += `${i+1}. ${name.toUpperCase()} (AKUMULASI KARTU)\n`;
-            else if (globalAbsent.some(x => x.toLowerCase().trim() === name.toLowerCase().trim())) rawMsg += `${i+1}. ${name.toUpperCase()} (ABSEN)\n`;
-            else rawMsg += `${i+1}. ${name.toUpperCase()} [${t.start}-${t.end}]\n`;
-        });
-        window.open("https://wa.me/?text=" + encodeURIComponent(rawMsg), '_blank');
-    }
-
-    function hardReset() { 
-        localStorage.clear(); 
-        alert("Sistem berhasil di-RESET otomatis oleh Admin via Google Sheets!"); 
-        location.reload(); 
-    }
-    
-    async function manualSync(e) { 
-        const btn = e.target; 
-        btn.innerText = "⏳..."; 
-        await syncData(); 
-        btn.innerText = "REFRESH"; 
-    }
-
-    window.onload = initApp;
-</script>
-</body>
-</html>
