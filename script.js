@@ -419,14 +419,14 @@ openModal = function(name, logo) {
 
 const predatorDatabase = {
     "Dandi": { slogan: "THE MOUNTAIN CRUSHER", music: "assets/dandi.mp3" },
-    "Aldi": { slogan: "THE WHITE SHADOW", music: "assets/Aldi.mp3" },
+    "Aldi": { slogan: "THE WHITE SHADOW", music: "assets/aldi.mp3" },
     "Regi": { slogan: "THE ARCTIC GUARDIAN", music: "assets/regi.mp3" },
     "Rizal": { slogan: "THE MIDNIGHT HUNTER", music: "assets/rizal.mp3" },
     "Asep": { slogan: "THE IRON HORN", music: "assets/asep.mp3" },
     "Aries": { slogan: "THE GOLDEN EMPEROR", music: "assets/aries.mp3" },
     "Ikmal": { slogan: "THE FOREST GHOST", music: "assets/ikmal.mp3" },
-    "Muiz": { slogan: "THE SPEED DEMON", music: "assets/Muiz.mp3" },
-    "Abdul": { slogan: "THE MYSTIC PHANTOM", music: "assets/Abdul.mp3" },
+    "Muiz": { slogan: "THE SPEED DEMON", music: "assets/muiz.mp3" },
+    "Abdul": { slogan: "THE MYSTIC PHANTOM", music: "assets/abdul.mp3" },
     "Dicky": { slogan: "THE KING OF THE JUNGLE", music: "assets/dicky.mp3" }
 };
 
