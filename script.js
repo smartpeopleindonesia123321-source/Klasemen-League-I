@@ -2,14 +2,14 @@ const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQ
 
 const animalDatabase = {
     "Dandi": { sp: "Dandi The Grizzly Bear", atk: 95, def: 90, spd: 70, desc: 'Kekuatan murni yang tak terbendung : Sebagai predator puncak dari pegunungan utara, Dandi mewakili kekuatan fisik mentah yang mampu merobek pertahanan apa pun dengan sekali ayunan cakar. Tubuhnya yang masif dilapisi lemak tebal dan otot padat, menjadikannya tank alami yang sangat sulit ditumbangkan.' },
-    "Erni": { sp: "Erni The Angora Cat", atk: 65, def: 55, spd: 92, desc: 'Gerakan halus namun penuh perhitungan : Jangan tertipu oleh bulu putihnya yang elegan dan lembut, karena Erni adalah perwujudan dari kecepatan dan presisi yang mematikan di medan tempur. Ia bergerak layaknya bayangan yang meluncur di atas lantai marmer.' },
+    "Aldi": { sp: "Aldi The Angora Cat", atk: 65, def: 55, spd: 92, desc: 'Gerakan halus namun penuh perhitungan : Jangan tertipu oleh bulu putihnya yang elegan dan lembut, karena Aldi adalah perwujudan dari kecepatan dan presisi yang mematikan di medan tempur. Ia bergerak layaknya bayangan yang meluncur di atas lantai marmer.' },
     "Regi": { sp: "Regi The Siberian Husky", atk: 80, def: 85, spd: 88, desc: 'Loyalitas tanpa batas dan keberanian : Dibentuk oleh kerasnya badai salju abadi, Regi memiliki daya tahan jantung dan stamina yang hampir mustahil untuk dipatahkan. Ia adalah petarung yang mengandalkan disiplin dan kerja keras.' },
     "Rizal": { sp: "Rizal The Snow Wolf", atk: 88, def: 75, spd: 95, desc: 'Pemburu taktis yang sangat cerdas : Rizal adalah manifestasi dari kecerdasan taktis yang dipadukan dengan kecepatan kilat di atas hamparan es. Ia mampu memanfaatkan celah terkecil dalam pertahanan lawan.' },
     "Asep": { sp: "Asep The Spanish Bull", atk: 92, def: 88, spd: 75, desc: 'Simbol kekuatan tak terbendung : Begitu Asep mulai memacu langkahnya, tidak ada dinding atau barisan pertahanan yang mampu menghentikan momentum destruktifnya. Ia adalah simbol energi kinetik yang tak terbendung.' },
     "Aries": { sp: "Aries The Siberian Lion", atk: 96, def: 82, spd: 85, desc: 'Aumannya adalah peringatan musuh : Menggabungkan keanggunan seorang raja dengan keganasan predator es, Aries mendominasi medan perang lewat aura intimidasi dan kekuatan serangan yang luar biasa.' },
     "Ikmal": { sp: "Ikmal The reindeer", atk: 70, def: 75, spd: 94, desc: 'Kelincahan yang sulit ditangkap : Ikmal adalah master dalam seni navigasi di medan yang sulit, menggunakan kaki-kakinya yang ramping untuk melakukan akselerasi instan yang membingungkan mata.' },
-    "Yanti": { sp: "Yanti The african Rabbit", atk: 60, def: 50, spd: 98, desc: 'Daya ledak kecepatan mengejutkan : Sebagai individu tercepat dalam daftar ini, Yanti adalah keajaiban biomekanik yang mampu berpindah posisi dalam sekejap mata sebelum saraf lawan sempat bereaksi.' },
-    "Maya": { sp: "Maya The Chinese Panda", atk: 85, def: 95, spd: 60, desc: 'Rahang kuat di balik ketenangan : Di balik perawakannya yang tenang dan menggemaskan, Maya adalah benteng berjalan dengan pertahanan yang hampir mustahil ditembus oleh serangan konvensional.' },
+    "Muiz": { sp: "Muiz The african Rabbit", atk: 60, def: 50, spd: 98, desc: 'Daya ledak kecepatan mengejutkan : Sebagai individu tercepat dalam daftar ini, Muiz adalah keajaiban biomekanik yang mampu berpindah posisi dalam sekejap mata sebelum saraf lawan sempat bereaksi.' },
+    "Abdul": { sp: "Abdul The Chinese Panda", atk: 85, def: 95, spd: 60, desc: 'Rahang kuat di balik ketenangan : Di balik perawakannya yang tenang dan menggemaskan, Abdul adalah benteng berjalan dengan pertahanan yang hampir mustahil ditembus oleh serangan konvensional.' },
     "Dicky": { sp: "Dicky The King Of Kong", atk: 98, def: 98, spd: 65, desc: 'Benteng pertahanan terakhir : Berdiri sebagai puncak hierarki kekuatan, Dicky adalah raksasa yang memiliki keseimbangan sempurna antara serangan penghancur dan pertahanan yang absolut.' }
 };
 
@@ -390,14 +390,14 @@ function shareToWA() {
 
 const jerseyColors = {
     "Dandi": { primary: "#4b2c20", secondary: "#d4af37" },
-    "Erni": { primary: "#f3f4f6", secondary: "#60a5fa" },
+    "Aldi": { primary: "#f3f4f6", secondary: "#60a5fa" },
     "Regi": { primary: "#2d3436", secondary: "#00f2ff" },
     "Rizal": { primary: "#636e72", secondary: "#ffffff" },
     "Asep": { primary: "#8b0000", secondary: "#facc15" },
     "Aries": { primary: "#1a1a1a", secondary: "#fbbf24" },
     "Ikmal": { primary: "#3f6212", secondary: "#a3e635" },
-    "Yanti": { primary: "#be185d", secondary: "#f472b6" },
-    "Maya": { primary: "#000000", secondary: "#ffffff" },
+    "Muiz": { primary: "#be185d", secondary: "#f472b6" },
+    "Abdul": { primary: "#000000", secondary: "#ffffff" },
     "Dicky": { primary: "#1e1b4b", secondary: "#d4af37" }
 };
 
@@ -419,14 +419,14 @@ openModal = function(name, logo) {
 
 const predatorDatabase = {
     "Dandi": { slogan: "THE MOUNTAIN CRUSHER", music: "assets/dandi.mp3" },
-    "Erni": { slogan: "THE WHITE SHADOW", music: "assets/erni.mp3" },
+    "Aldi": { slogan: "THE WHITE SHADOW", music: "assets/Aldi.mp3" },
     "Regi": { slogan: "THE ARCTIC GUARDIAN", music: "assets/regi.mp3" },
     "Rizal": { slogan: "THE MIDNIGHT HUNTER", music: "assets/rizal.mp3" },
     "Asep": { slogan: "THE IRON HORN", music: "assets/asep.mp3" },
     "Aries": { slogan: "THE GOLDEN EMPEROR", music: "assets/aries.mp3" },
     "Ikmal": { slogan: "THE FOREST GHOST", music: "assets/ikmal.mp3" },
-    "Yanti": { slogan: "THE SPEED DEMON", music: "assets/yanti.mp3" },
-    "Maya": { slogan: "THE MYSTIC PHANTOM", music: "assets/maya.mp3" },
+    "Muiz": { slogan: "THE SPEED DEMON", music: "assets/Muiz.mp3" },
+    "Abdul": { slogan: "THE MYSTIC PHANTOM", music: "assets/Abdul.mp3" },
     "Dicky": { slogan: "THE KING OF THE JUNGLE", music: "assets/dicky.mp3" }
 };
 
