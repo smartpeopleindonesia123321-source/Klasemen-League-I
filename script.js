@@ -389,16 +389,16 @@ function shareToWA() {
 }
 
 const jerseyColors = {
-    "Dandi": { primary: "#4b2c20", secondary: "#d4af37" },
-    "Aldi": { primary: "#f3f4f6", secondary: "#60a5fa" },
-    "Regi": { primary: "#2d3436", secondary: "#00f2ff" },
-    "Rizal": { primary: "#636e72", secondary: "#ffffff" },
-    "Asep": { primary: "#8b0000", secondary: "#facc15" },
-    "Aries": { primary: "#1a1a1a", secondary: "#fbbf24" },
-    "Ikmal": { primary: "#3f6212", secondary: "#a3e635" },
-    "Muiz": { primary: "#be185d", secondary: "#f472b6" },
-    "Abdul": { primary: "#000000", secondary: "#ffffff" },
-    "Dicky": { primary: "#1e1b4b", secondary: "#d4af37" }
+    "Dandi": { primary: "#3d2314", secondary: "#b8860b" }, // Grizzly Bear: Cokelat kayu gelap & Emas liar
+    "Aldi": { primary: "#0f172a", secondary: "#06b6d4" },  // Megalodon Shark: Biru laut dalam & Neon cyan/air
+    "Regi": { primary: "#111111", secondary: "#a855f7" },  // Black Panther: Hitam pekat & Ungu aura malam
+    "Rizal": { primary: "#ea580c", secondary: "#1e293b" }, // Siberian Tiger: Jingga harimau & Hitam loreng
+    "Asep": { primary: "#7f1d1d", secondary: "#f59e0b" },  // Spanish Bull: Merah matador & Kuning keemasan
+    "Aries": { primary: "#d97706", secondary: "#451a03" }, // Siberian Lion: Emas surai singa & Cokelat tua
+    "Ikmal": { primary: "#854d0e", secondary: "#facc15" }, // Golden Eagle: Cokelat bulu elang & Emas sayap
+    "Muiz": { primary: "#78350f", secondary: "#e2e8f0" },  // Mustang Stallion: Cokelat kuda liar & Putih perak
+    "Abdul": { primary: "#0f172a", secondary: "#e2e8f0" }, // Arctic Wolf: Biru es gelap & Putih salju
+    "Dicky": { primary: "#991b1b", secondary: "#f59e0b" }, // Red Dragon: Merah naga membara & Emas api
 };
 
 const originalOpenModal = openModal;
