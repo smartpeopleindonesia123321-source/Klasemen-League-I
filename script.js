@@ -9,7 +9,7 @@ const animalDatabase = {
     "Aries": { sp: "Aries The Siberian Lion", atk: 96, def: 82, spd: 85, desc: 'Raja singa es pemuncak rantai makanan : Aries adalah singa jantan berwibawa dengan surai lebat di tengah padang salju. Menggabungkan ketenangan seorang raja rimba dan kekuatan cengkraman rahang singa, aumannya menggelegar sebagai tanda dominasi mutlak di medan tempur.' },
     "Ikmal": { sp: "Ikmal The Golden Eagle", atk: 82, def: 65, spd: 99, desc: 'Cengkraman elang emas dari angkasa : Ikmal adalah burung elang berbulu emas dengan bentangan sayap lebar dan penglihatan teleskopik. Memantau seluruh arena dari langit tinggi, ia menukik tajam dengan kecepatan kilat untuk mencengkeram target menggunakan kuku kakinya yang tajam.' },
     "Muiz": { sp: "Muiz The Mustang Stallion", atk: 78, def: 70, spd: 98, desc: 'Lari kencang kuda liar padang rumput : Muiz adalah kuda jantan mustang yang memiliki stamina tanpa batas dan derap langkah yang bertenaga. Mengandalkan otot kaki yang kuat serta kecepatan lari yang konstan, ia sanggup melakukan sprint jarak jauh tanpa mengenal lelah.' },
-    "Abdul": { sp: "Abdul The Arctic Wolf", atk: 88, def: 82, spd: 92, desc: 'Insting memburu serigala salju : Abdul adalah serigala kutub berbulu putih tebal dengan tatapan mata dingin yang tajam. Memanfaatkan insting kawanan dan penciuman serigala yang peka, ia bergerak lincah menembus medan es untuk mengunci pergerakan musuh secara presisi.' },
+    "Erni": { sp: "Erni The Arctic Wolf", atk: 88, def: 82, spd: 92, desc: 'Insting memburu serigala salju : Erni adalah serigala kutub berbulu putih tebal dengan tatapan mata dingin yang tajam. Memanfaatkan insting kawanan dan penciuman serigala yang peka, ia bergerak lincah menembus medan es untuk mengunci pergerakan musuh secara presisi.' },
     "Dicky": { sp: "Dicky The Red Dragon", atk: 99, def: 99, spd: 75, desc: 'Semburan naga merah raksasa : Dicky adalah naga mitologi bersisik keras sekuat baja dengan bentangan sayap berapi. Berada di puncak tertinggi hierarki makhluk mistis, kebasan ekor raksasa dan semburan nafas apinya memberikan ancaman absolut tanpa celah.' }
 };
 
@@ -397,7 +397,7 @@ const jerseyColors = {
     "Aries": { primary: "#d97706", secondary: "#451a03" }, // Siberian Lion: Emas surai singa & Cokelat tua
     "Ikmal": { primary: "#854d0e", secondary: "#facc15" }, // Golden Eagle: Cokelat bulu elang & Emas sayap
     "Muiz": { primary: "#78350f", secondary: "#e2e8f0" },  // Mustang Stallion: Cokelat kuda liar & Putih perak
-    "Abdul": { primary: "#0f172a", secondary: "#e2e8f0" }, // Arctic Wolf: Biru es gelap & Putih salju
+    "Erni": { primary: "#0f172a", secondary: "#e2e8f0" }, // Arctic Wolf: Biru es gelap & Putih salju
     "Dicky": { primary: "#991b1b", secondary: "#f59e0b" }, // Red Dragon: Merah naga membara & Emas api
 };
 
@@ -426,7 +426,7 @@ const predatorDatabase = {
     "Aries": { slogan: "THE GOLDEN EMPEROR", music: "assets/aries.mp3" },
     "Ikmal": { slogan: "THE KING OF WIND", music: "assets/ikmal.mp3" },
     "Muiz": { slogan: "THE SPEED DEMON", music: "assets/muiz.mp3" },
-    "Abdul": { slogan: "THE MYSTIC PHANTOM", music: "assets/abdul.mp3" },
+    "Erni": { slogan: "THE MYSTIC PHANTOM", music: "assets/Erni.mp3" },
     "Dicky": { slogan: "THE KING OF DRAGON", music: "assets/dicky.mp3" }
 };
 
