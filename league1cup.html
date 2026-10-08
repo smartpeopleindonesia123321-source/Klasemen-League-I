@@ -43,18 +43,18 @@
         }
 
         .player-name { font-size: 16px; font-weight: 900; margin-bottom: 12px; text-transform: uppercase; border-bottom: 1px solid var(--accent); padding-bottom: 8px; display: block; }
-        .team-list { display: flex; justify-content: center; flex-wrap: gap; gap: 8px; }
+        .team-list { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
 
-        .country-box { width: 55px; text-align: center; transition: 0.3s; position: relative; }
+        .country-box { width: 75px; text-align: center; transition: 0.3s; position: relative; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); }
         .country-box.gugur { filter: grayscale(100%); opacity: 0.4; }
         
-        .country-box.juara1 .flag-img { border: 2px solid #ffd700; box-shadow: 0 0 15px #ffd700; }
-        .country-box.juara1::after { content: '👑'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 12px; }
-        .country-box.juara2 .flag-img { border: 2px solid #e5e4e2; box-shadow: 0 0 10px #e5e4e2; }
-        .country-box.juara3 .flag-img { border: 2px solid #cd7f32; box-shadow: 0 0 10px #cd7f32; }
+        .country-box.juara1 { border: 2px solid #ffd700; box-shadow: 0 0 15px #ffd700; }
+        .country-box.juara1::after { content: '👑'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 12px; }
+        .country-box.juara2 { border: 2px solid #e5e4e2; box-shadow: 0 0 10px #e5e4e2; }
+        .country-box.juara3 { border: 2px solid #cd7f32; box-shadow: 0 0 10px #cd7f32; }
 
-        .flag-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 3px; border: 1px solid transparent; background: #222; }
-        .country-name { font-size: 8px; font-weight: bold; display: block; margin-top: 4px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .country-name { font-size: 10px; font-weight: bold; display: block; margin-top: 4px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .country-status { font-size: 8px; color: var(--text-dim); display: block; margin-top: 2px; }
 
         .section-container {
             margin: 20px auto;
@@ -90,7 +90,6 @@
             font-size: 13px;
         }
 
-        .idr-val { font-size: 9px; color: var(--money); background: rgba(74, 222, 128, 0.1); padding: 1px 5px; border-radius: 3px; margin-left: 6px; border: 1px solid rgba(74, 222, 128, 0.1); }
         .btn-back { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 8px 16px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; font-weight: bold; font-size: 12px; }
     </style>
 </head>
@@ -126,7 +125,7 @@
     </div>
 
     <script>
-        // Ganti URL GID di bawah ini sesuai dengan GID Sheet 7 / Sheet 8 baru lu di Google Sheets
+        // Pastikan GID ini mengarah ke Sheet 7 / Sheet 8 tempat data League-1 Cup lu berada
         const CUP_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=MASUKKAN_GID_SHEET_BARU_DISINI&single=true&output=csv';
 
         async function loadLeagueCup() {
@@ -144,8 +143,9 @@
                 let allData = [];
 
                 rows.forEach(line => {
-                    const col = line.split(',').map(c => c.trim().replace(/"/g, ''));
-                    if (!col[0]) return;
+                    // Membersihkan kutip dan memecah kolom berdasarkan koma
+                    const col = line.split(',').map(c => c.trim().replace(/^"["']?|["']?["']$/g, '').replace(/^["']\vert{}["']$/g, ''));
+                    if (!col[0] || col[0].toLowerCase().includes('function') || col[0].toLowerCase().includes('var')) return;
 
                     let mObj = { 
                         name: col[0], teams: [], totalPts: 0, totalGD: 0, 
@@ -153,7 +153,7 @@
                     };
                     let teamsHTML = "";
 
-                    // Karena 1 manager pegang 3 tim, polanya di Excel: Kolom 1 = Nama, Kolom 2 = Tim 1, Kolom 3 = Status 1, Kolom 4 = Tim 2, Kolom 5 = Status 2, Kolom 6 = Tim 3, Kolom 7 = Status 3
+                    // Kolom Excel: A=Nama(0), B=Tim1(1), C=Status1(2), D=Tim2(3), E=Status2(4), F=Tim3(5), G=Status3(6)
                     for (let i = 1; i <= 6; i += 2) {
                         const negara = col[i];
                         const statusRaw = col[i+1] ? col[i+1].toLowerCase() : "0-0-0-0-0 (aktif)";
@@ -181,14 +181,16 @@
                         else if (isJuara2) statusClass = "juara2";
                         else if (isJuara3) statusClass = "juara3";
 
-                        // Catatan: Pastikan file bendera tersedia atau pakai fallback un.png jika pakai flagcdn
                         teamsHTML += `<div class="country-box ${statusClass}">
-                            <img src="https://flagcdn.com/w80/un.png" class="flag-img" title="${negara}">
                             <span class="country-name">${negara}</span>
+                            <span class="country-status">${statusRaw.includes('gugur') ? 'Gugur' : (isJuara1 ? 'Juara 1' : (isJuara2 ? 'Juara 2' : (isJuara3 ? 'Juara 3' : 'Aktif')))}</span>
                         </div>`;
                     }
-                    allData.push(mObj);
-                    container.innerHTML += `<div class="player-card"><span class="player-name">${mObj.name}</span><div class="team-list">${teamsHTML}</div></div>`;
+                    
+                    if(mObj.teams.length > 0) {
+                        allData.push(mObj);
+                        container.innerHTML += `<div class="player-card"><span class="player-name">${mObj.name}</span><div class="team-list">${teamsHTML}</div></div>`;
+                    }
                 });
 
                 allData.sort((a, b) => {
