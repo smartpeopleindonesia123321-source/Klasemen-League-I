@@ -53,7 +53,8 @@
         .country-box.juara2 { border: 2px solid #e5e4e2; box-shadow: 0 0 10px #e5e4e2; }
         .country-box.juara3 { border: 2px solid #cd7f32; box-shadow: 0 0 10px #cd7f32; }
 
-        .country-name { font-size: 10px; font-weight: bold; display: block; margin-top: 4px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .team-logo { width: 35px; height: 35px; object-fit: contain; margin: 0 auto 4px auto; display: block; }
+        .country-name { font-size: 9px; font-weight: bold; display: block; margin-top: 2px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .country-status { font-size: 8px; color: var(--text-dim); display: block; margin-top: 2px; }
 
         .section-container {
@@ -125,8 +126,47 @@
     </div>
 
     <script>
-        // LINK CSV SHEET7 LU YANG ASLI (GID: 1587940246)
         const CUP_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=1587940246&single=true&output=csv';
+
+        // KAMUS LOGO TIM (Sesuaikan path/link gambar logo klub masing-masing di sini)
+        const teamLogos = {
+            "Persija Jakarta": "images/persija.png",
+            "Semen Padang": "images/semenpadang.png",
+            "PSPS Pekanbaru": "images/psps.png",
+            "Persebaya Surabaya": "images/persebaya.png",
+            "PSBS Biak": "images/psbs.png",
+            "Persiraja Banda Aceh": "images/persiraja.png",
+            "Bali United FC": "images/baliunited.png",
+            "PS Barito Putera": "images/barito.png",
+            "Adhyaksa FC Bekasi": "images/adhyaksa.png",
+            "Arema FC": "images/arema.png",
+            "Pss sleman": "images/pss.png",
+            "Persiku Kudus": "images/persiku.png",
+            "PSM Makassar": "images/psm.png",
+            "PSMS Medan": "images/psms.png",
+            "Persiba Balikpapan": "images/persiba.png",
+            "Dewa United": "images/dewa.png",
+            "Persipura Jayapura": "images/persipura.png",
+            "Isenmulang Kalteng": "images/isenmulang.png",
+            "Persis Solo": "images/persis.png",
+            "Persela Lamongan": "images/persela.png",
+            "Sumsel united": "images/sumsel.png",
+            "Java united": "images/java.png",
+            "PSIM Yogyakarta": "images/psim.png",
+            "Persikad": "images/persikad.png",
+            "Bhayangkara FC": "images/bhayangkara.png",
+            "Deltras FC": "images/deltras.png",
+            "Garudayaksa FC": "images/garudayaksa.png",
+            "Persik kediri": "images/persik.png",
+            "Persijap Jepara": "images/persijap.png",
+            "PSGC Ciamis": "images/psgc.png",
+            "Madura United FC": "images/madura.png",
+            "Psis semarang": "images/psis.png",
+            "Kendal Tornado FC": "images/kendal.png",
+            "Persita": "images/persita.png",
+            "Rans Nusantara FC": "images/rans.png",
+            "de Red FC": "images/dered.png"
+        };
 
         async function loadLeagueCup() {
             try {
@@ -149,7 +189,6 @@
                     const col = line.split(',').map(c => c.trim().replace(/^["']|["']$/g, '').replace(/""/g, '"'));
                     const managerName = col[0];
 
-                    // Validasi ketat agar baris kosong atau teks sistem terbuang
                     if (!managerName || managerName.toLowerCase().includes('function') || managerName.toLowerCase().includes('var') || managerName.toLowerCase().includes('q(')) continue;
 
                     let mObj = { 
@@ -158,7 +197,6 @@
                     };
                     let teamsHTML = "";
 
-                    // Kolom B(1) & C(2) = Tim 1, Kolom D(3) & E(4) = Tim 2, Kolom F(5) & G(6) = Tim 3
                     for (let j = 1; j <= 5; j += 2) {
                         const negara = col[j];
                         const statusRaw = col[j+1] ? col[j+1].toLowerCase() : "0-0-0-0(aktif)";
@@ -192,7 +230,11 @@
                         else if (isJuara2) statusText = 'Juara 2 🥈';
                         else if (isJuara3) statusText = 'Juara 3 🥉';
 
+                        // Ambil logo dari kamus, jika tidak ada pakai logo default atau placeholder
+                        let logoSrc = teamLogos[negara] || 'images/default-logo.png';
+
                         teamsHTML += `<div class="country-box ${statusClass}">
+                            <img src="${logoSrc}" class="team-logo" alt="${negara}" onerror="this.src='https://flagcdn.com/w80/un.png'">
                             <span class="country-name">${negara}</span>
                             <span class="country-status">${statusText}</span>
                         </div>`;
