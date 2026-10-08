@@ -45,7 +45,7 @@
         .player-name { font-size: 16px; font-weight: 900; margin-bottom: 12px; text-transform: uppercase; border-bottom: 1px solid var(--accent); padding-bottom: 8px; display: block; }
         .team-list { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
 
-        .country-box { width: 75px; text-align: center; transition: 0.3s; position: relative; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); }
+        .country-box { width: 95px; text-align: center; transition: 0.3s; position: relative; background: rgba(255,255,255,0.03); padding: 6px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); }
         .country-box.gugur { filter: grayscale(100%); opacity: 0.4; }
         
         .country-box.juara1 { border: 2px solid #ffd700; box-shadow: 0 0 15px #ffd700; }
@@ -125,14 +125,14 @@
     </div>
 
     <script>
-        // Pastikan GID ini mengarah ke Sheet 7 / Sheet 8 tempat data League-1 Cup lu berada
-        const CUP_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=MASUKKAN_GID_SHEET_BARU_DISINI&single=true&output=csv';
+        // MASUKKAN LINK CSV PUBLISH DARI GOOGLE SHEETS (DARI TAB SHEET7 LU) DI SINI:
+        const CUP_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=1587940246&single=true&output=csv';
 
         async function loadLeagueCup() {
             try {
                 const res = await fetch(`${CUP_SHEET_URL}&nocache=${new Date().getTime()}`);
                 const csv = await res.text();
-                const rows = csv.split('\n').slice(1);
+                const rows = csv.split('\n');
                 
                 const container = document.getElementById('wc-container');
                 const managerBody = document.getElementById('leaderboard-manager');
@@ -142,22 +142,27 @@
 
                 let allData = [];
 
-                rows.forEach(line => {
-                    // Membersihkan kutip dan memecah kolom berdasarkan koma
-                    const col = line.split(',').map(c => c.trim().replace(/^"["']?|["']?["']$/g, '').replace(/^["']\vert{}["']$/g, ''));
-                    if (!col[0] || col[0].toLowerCase().includes('function') || col[0].toLowerCase().includes('var')) return;
+                // Membaca baris data manager dari Sheet7
+                for (let i = 0; i < rows.length; i++) {
+                    const line = rows[i];
+                    if (!line || line.trim() === "") continue;
+
+                    const col = line.split(',').map(c => c.trim().replace(/^["']|["']$/g, '').replace(/""/g, '"'));
+                    const managerName = col[0];
+
+                    if (!managerName || managerName.toLowerCase().includes('function') || managerName.toLowerCase().includes('var')) continue;
 
                     let mObj = { 
-                        name: col[0], teams: [], totalPts: 0, totalGD: 0, 
+                        name: managerName, teams: [], totalPts: 0, totalGD: 0, 
                         totalGF: 0, totalGA: 0, tP: 0, tM: 0, tS: 0, tK: 0 
                     };
                     let teamsHTML = "";
 
-                    // Kolom Excel: A=Nama(0), B=Tim1(1), C=Status1(2), D=Tim2(3), E=Status2(4), F=Tim3(5), G=Status3(6)
-                    for (let i = 1; i <= 6; i += 2) {
-                        const negara = col[i];
-                        const statusRaw = col[i+1] ? col[i+1].toLowerCase() : "0-0-0-0-0 (aktif)";
-                        if (!negara) continue;
+                    // Kolom B(1) & C(2) = Tim 1, Kolom D(3) & E(4) = Tim 2, Kolom F(5) & G(6) = Tim 3
+                    for (let j = 1; j <= 5; j += 2) {
+                        const negara = col[j];
+                        const statusRaw = col[j+1] ? col[j+1].toLowerCase() : "0-0-0-0 (aktif)";
+                        if (!negara || negara === "") continue;
 
                         const isGugur = statusRaw.includes("gugur");
                         const isJuara1 = statusRaw.includes("juara1");
@@ -181,9 +186,15 @@
                         else if (isJuara2) statusClass = "juara2";
                         else if (isJuara3) statusClass = "juara3";
 
+                        let statusText = 'Aktif';
+                        if (isGugur) statusText = 'Gugur';
+                        else if (isJuara1) statusText = 'Juara 1 👑';
+                        else if (isJuara2) statusText = 'Juara 2 🥈';
+                        else if (isJuara3) statusText = 'Juara 3 🥉';
+
                         teamsHTML += `<div class="country-box ${statusClass}">
                             <span class="country-name">${negara}</span>
-                            <span class="country-status">${statusRaw.includes('gugur') ? 'Gugur' : (isJuara1 ? 'Juara 1' : (isJuara2 ? 'Juara 2' : (isJuara3 ? 'Juara 3' : 'Aktif')))}</span>
+                            <span class="country-status">${statusText}</span>
                         </div>`;
                     }
                     
@@ -191,8 +202,9 @@
                         allData.push(mObj);
                         container.innerHTML += `<div class="player-card"><span class="player-name">${mObj.name}</span><div class="team-list">${teamsHTML}</div></div>`;
                     }
-                });
+                }
 
+                // Sorting berdasarkan Poin, Selisih Gol, Gol Memasukkan
                 allData.sort((a, b) => {
                     if (b.totalPts !== a.totalPts) return b.totalPts - a.totalPts;
                     if (b.totalGD !== a.totalGD) return b.totalGD - a.totalGD;
