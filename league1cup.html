@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEAGUE-1 CUP - 36 TEAMS EDITION</title>
+    <style>
+        :root {
+            --bg: #0a0a0c;
+            --card-bg: #161b22;
+            --accent: #facc15;
+            --text: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.6);
+            --money: #4ade80; 
+            --gugur-text: rgba(255, 255, 255, 0.25);
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 10px;
+            text-align: center;
+        }
+
+        h1 { color: var(--accent); text-shadow: 0 0 10px rgba(250, 204, 21, 0.3); margin-bottom: 5px; font-size: 1.5rem; }
+        .subtitle { font-size: 10px; color: var(--text-dim); margin-bottom: 20px; letter-spacing: 2px; }
+
+        .wc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            max-width: 1200px;
+            margin: 0 auto 30px auto;
+        }
+
+        .player-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .player-name { font-size: 16px; font-weight: 900; margin-bottom: 12px; text-transform: uppercase; border-bottom: 1px solid var(--accent); padding-bottom: 8px; display: block; }
+        .team-list { display: flex; justify-content: center; flex-wrap: gap; gap: 8px; }
+
+        .country-box { width: 55px; text-align: center; transition: 0.3s; position: relative; }
+        .country-box.gugur { filter: grayscale(100%); opacity: 0.4; }
+        
+        .country-box.juara1 .flag-img { border: 2px solid #ffd700; box-shadow: 0 0 15px #ffd700; }
+        .country-box.juara1::after { content: '👑'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 12px; }
+        .country-box.juara2 .flag-img { border: 2px solid #e5e4e2; box-shadow: 0 0 10px #e5e4e2; }
+        .country-box.juara3 .flag-img { border: 2px solid #cd7f32; box-shadow: 0 0 10px #cd7f32; }
+
+        .flag-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 3px; border: 1px solid transparent; background: #222; }
+        .country-name { font-size: 8px; font-weight: bold; display: block; margin-top: 4px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .section-container {
+            margin: 20px auto;
+            max-width: 1100px;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(250, 204, 21, 0.2);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-top: 10px;
+        }
+
+        .l-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 500px; }
+        .l-table th { background: rgba(250, 204, 21, 0.1); color: var(--accent); padding: 10px; border-bottom: 2px solid var(--accent); white-space: nowrap; }
+        .l-table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); white-space: nowrap; }
+
+        .row-gugur td { color: var(--gugur-text) !important; }
+        .manager-detail-card { background: #1c2128; margin-bottom: 20px; border-radius: 8px; overflow: hidden; border-left: 4px solid var(--accent); }
+        
+        .manager-header {
+            background: rgba(250, 204, 21, 0.1);
+            padding: 10px 15px;
+            text-align: left;
+            font-weight: bold;
+            color: var(--accent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .idr-val { font-size: 9px; color: var(--money); background: rgba(74, 222, 128, 0.1); padding: 1px 5px; border-radius: 3px; margin-left: 6px; border: 1px solid rgba(74, 222, 128, 0.1); }
+        .btn-back { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 8px 16px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; font-weight: bold; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+    <button class="btn-back" onclick="window.location.href='index.html'">⬅ KEMBALI KE LIGA-I</button>
+    
+    <h1>LEAGUE-1 CUP EDITION</h1>
+    <p class="subtitle">36 TEAMS • 12 MANAGERS • 3 TEAMS EACH</p>
+
+    <div id="wc-container" class="wc-grid"></div>
+
+    <div class="section-container">
+        <h2 style="color: var(--accent); margin-bottom: 10px; font-size: 16px;">LEAGUE-1 CUP STANDING MANAGERS</h2>
+        <div class="table-responsive">
+            <table class="l-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th style="text-align: left;">MANAGER</th>
+                        <th>MP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th>
+                        <th style="color: #4ade80;">PTS</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-manager"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section-container" style="background: transparent; border: none; padding: 0;">
+        <h2 style="color: var(--accent); margin-bottom: 15px; font-size: 16px;">SQUAD BREAKDOWN (3 TEAMS PER MANAGER)</h2>
+        <div id="detailed-teams-container"></div>
+    </div>
+
+    <script>
+        // Ganti URL GID di bawah ini sesuai dengan GID Sheet 7 / Sheet 8 baru lu di Google Sheets
+        const CUP_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=MASUKKAN_GID_SHEET_BARU_DISINI&single=true&output=csv';
+
+        async function loadLeagueCup() {
+            try {
+                const res = await fetch(`${CUP_SHEET_URL}&nocache=${new Date().getTime()}`);
+                const csv = await res.text();
+                const rows = csv.split('\n').slice(1);
+                
+                const container = document.getElementById('wc-container');
+                const managerBody = document.getElementById('leaderboard-manager');
+                const detailedContainer = document.getElementById('detailed-teams-container');
+                
+                container.innerHTML = ""; managerBody.innerHTML = ""; detailedContainer.innerHTML = "";
+
+                let allData = [];
+
+                rows.forEach(line => {
+                    const col = line.split(',').map(c => c.trim().replace(/"/g, ''));
+                    if (!col[0]) return;
+
+                    let mObj = { 
+                        name: col[0], teams: [], totalPts: 0, totalGD: 0, 
+                        totalGF: 0, totalGA: 0, tP: 0, tM: 0, tS: 0, tK: 0 
+                    };
+                    let teamsHTML = "";
+
+                    // Karena 1 manager pegang 3 tim, polanya di Excel: Kolom 1 = Nama, Kolom 2 = Tim 1, Kolom 3 = Status 1, Kolom 4 = Tim 2, Kolom 5 = Status 2, Kolom 6 = Tim 3, Kolom 7 = Status 3
+                    for (let i = 1; i <= 6; i += 2) {
+                        const negara = col[i];
+                        const statusRaw = col[i+1] ? col[i+1].toLowerCase() : "0-0-0-0-0 (aktif)";
+                        if (!negara) continue;
+
+                        const isGugur = statusRaw.includes("gugur");
+                        const isJuara1 = statusRaw.includes("juara1");
+                        const isJuara2 = statusRaw.includes("juara2");
+                        const isJuara3 = statusRaw.includes("juara3");
+                        
+                        const parts = statusRaw.split(' ')[0].split('-');
+                        let w = parseInt(parts[0]) || 0, d = parseInt(parts[1]) || 0, l = parseInt(parts[2]) || 0;
+                        let gf = parseInt(parts[3]) || 0, ga = parseInt(parts[4]) || 0;
+                        
+                        let pts = (w * 3) + (d * 1);
+                        let gd = gf - ga;
+
+                        mObj.teams.push({ name: negara, p: (w+d+l), w, d, l, gf, ga, gd, pts, isGugur, isJuara1, isJuara2, isJuara3 });
+                        mObj.totalPts += pts; mObj.totalGD += gd; mObj.totalGF += gf; mObj.totalGA += ga;
+                        mObj.tP += (w+d+l); mObj.tM += w; mObj.tS += d; mObj.tK += l;
+
+                        let statusClass = "";
+                        if (isGugur) statusClass = "gugur";
+                        else if (isJuara1) statusClass = "juara1";
+                        else if (isJuara2) statusClass = "juara2";
+                        else if (isJuara3) statusClass = "juara3";
+
+                        // Catatan: Pastikan file bendera tersedia atau pakai fallback un.png jika pakai flagcdn
+                        teamsHTML += `<div class="country-box ${statusClass}">
+                            <img src="https://flagcdn.com/w80/un.png" class="flag-img" title="${negara}">
+                            <span class="country-name">${negara}</span>
+                        </div>`;
+                    }
+                    allData.push(mObj);
+                    container.innerHTML += `<div class="player-card"><span class="player-name">${mObj.name}</span><div class="team-list">${teamsHTML}</div></div>`;
+                });
+
+                allData.sort((a, b) => {
+                    if (b.totalPts !== a.totalPts) return b.totalPts - a.totalPts;
+                    if (b.totalGD !== a.totalGD) return b.totalGD - a.totalGD;
+                    return b.totalGF - a.totalGF;
+                }).forEach((m, idx) => {
+                    managerBody.innerHTML += `<tr>
+                        <td>${idx+1}</td>
+                        <td style="text-align:left"><b>${m.name}</b></td>
+                        <td>${m.tP}</td><td>${m.tM}</td><td>${m.tS}</td><td>${m.tK}</td>
+                        <td>${m.totalGF}</td><td>${m.totalGA}</td>
+                        <td style="font-weight:bold;color:#facc15">${m.totalGD > 0 ? '+' + m.totalGD : m.totalGD}</td>
+                        <td style="font-weight:bold;color:#4ade80">${m.totalPts}</td>
+                    </tr>`;
+
+                    let tRows = m.teams.map(t => {
+                        let rowClass = t.isGugur ? 'row-gugur' : '';
+                        let labelJuara = t.isJuara1 ? ' (J1)' : (t.isJuara2 ? ' (J2)' : (t.isJuara3 ? ' (J3)' : (t.isGugur ? ' (X)' : '')));
+                        return `<tr class="${rowClass}">
+                            <td style="text-align:left"><b>${t.name}</b>${labelJuara}</td>
+                            <td>${t.p}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td>
+                            <td>${t.gf}</td><td>${t.ga}</td>
+                            <td>${t.gd > 0 ? '+' + t.gd : t.gd}</td>
+                            <td style="font-weight:bold;color:${t.isGugur ? 'inherit' : '#4ade80'}">${t.pts}</td>
+                        </tr>`}).join('');
+
+                    detailedContainer.innerHTML += `
+                        <div class="manager-detail-card">
+                            <div class="manager-header">
+                                <span>${m.name}'s SQUAD (3 TEAMS)</span>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="l-table">
+                                    <thead><tr><th style="text-align:left">TIM</th><th>MP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>PTS</th></tr></thead>
+                                    <tbody>${tRows}</tbody>
+                                </table>
+                            </div>
+                        </div>`;
+                });
+            } catch (e) { console.error(e); }
+        }
+        window.onload = loadLeagueCup;
+        setInterval(loadLeagueCup, 60000);
+    </script>
+</body>
+</html>
