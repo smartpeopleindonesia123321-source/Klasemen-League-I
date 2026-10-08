@@ -125,7 +125,7 @@
     </div>
 
     <script>
-        // MASUKKAN LINK CSV PUBLISH DARI GOOGLE SHEETS (DARI TAB SHEET7 LU) DI SINI:
+        // LINK CSV SHEET7 LU YANG ASLI (GID: 1587940246)
         const CUP_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4v_ziMtwhRpQxS5ZnIbO9olIrUlzAAx8X5kS_Yr-Mv_GqDqSsg4Lc-1YNugRqElvUClbXnsf5gu12/pub?gid=1587940246&single=true&output=csv';
 
         async function loadLeagueCup() {
@@ -142,7 +142,6 @@
 
                 let allData = [];
 
-                // Membaca baris data manager dari Sheet7
                 for (let i = 0; i < rows.length; i++) {
                     const line = rows[i];
                     if (!line || line.trim() === "") continue;
@@ -150,7 +149,8 @@
                     const col = line.split(',').map(c => c.trim().replace(/^["']|["']$/g, '').replace(/""/g, '"'));
                     const managerName = col[0];
 
-                    if (!managerName || managerName.toLowerCase().includes('function') || managerName.toLowerCase().includes('var')) continue;
+                    // Validasi ketat agar baris kosong atau teks sistem terbuang
+                    if (!managerName || managerName.toLowerCase().includes('function') || managerName.toLowerCase().includes('var') || managerName.toLowerCase().includes('q(')) continue;
 
                     let mObj = { 
                         name: managerName, teams: [], totalPts: 0, totalGD: 0, 
@@ -161,7 +161,7 @@
                     // Kolom B(1) & C(2) = Tim 1, Kolom D(3) & E(4) = Tim 2, Kolom F(5) & G(6) = Tim 3
                     for (let j = 1; j <= 5; j += 2) {
                         const negara = col[j];
-                        const statusRaw = col[j+1] ? col[j+1].toLowerCase() : "0-0-0-0 (aktif)";
+                        const statusRaw = col[j+1] ? col[j+1].toLowerCase() : "0-0-0-0(aktif)";
                         if (!negara || negara === "") continue;
 
                         const isGugur = statusRaw.includes("gugur");
@@ -204,7 +204,6 @@
                     }
                 }
 
-                // Sorting berdasarkan Poin, Selisih Gol, Gol Memasukkan
                 allData.sort((a, b) => {
                     if (b.totalPts !== a.totalPts) return b.totalPts - a.totalPts;
                     if (b.totalGD !== a.totalGD) return b.totalGD - a.totalGD;
