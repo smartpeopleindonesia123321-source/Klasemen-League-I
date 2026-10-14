@@ -240,7 +240,7 @@ function renderTable(players) {
             tr.className = "rank-2";
         } else if(currentRank === 3) {
             tr.className = "rank-3";
-        } else if(currentRank === 9 || currentRank === 10) {
+        } else if(currentRank === 11 || currentRank === 12) {
             tr.className = "degradasi";
         }
 
