@@ -48,7 +48,21 @@
             background: rgba(255, 255, 255, 0.2);
             transform: translateX(-3px);
         }
-        /* Tabel Khusus FIFA Ranking */
+
+        /* Layout Grid untuk 2 Tabel */
+        .fifa-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        @media screen and (max-width: 1024px) {
+            .fifa-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Styling Tabel */
         .fifa-table-container {
             width: 100%;
             overflow-x: auto;
@@ -58,23 +72,33 @@
             border: 1px solid rgba(255,255,255,0.1);
             margin-bottom: 30px;
         }
-        #fifaTable {
+        .table-title {
+            background: #7f1d1d;
+            color: #fff;
+            padding: 12px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        #fifaTable, #weightTable {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
         }
-        #fifaTable th {
-            background: #7f1d1d !important;
+        #fifaTable th, #weightTable th {
+            background: #581c1c !important;
             color: #fca5a5;
-            padding: 12px 10px;
+            padding: 10px;
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border-bottom: 2px solid #991b1b;
+            border-bottom: 2px solid #7f1d1d;
         }
-        #fifaTable td {
-            padding: 10px;
-            font-size: 13px;
+        #fifaTable td, #weightTable td {
+            padding: 8px 10px;
+            font-size: 12px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             vertical-align: middle;
         }
@@ -82,11 +106,11 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             font-weight: 900;
-            font-size: 12px;
+            font-size: 11px;
         }
         .r-1 { background: var(--gold); color: #000; box-shadow: 0 0 10px rgba(246,211,101,0.5); }
         .r-2 { background: var(--silver); color: #fff; }
@@ -102,11 +126,14 @@
         body.light-mode .fifa-hero {
             background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
         }
-        body.light-mode #fifaTable th {
+        body.light-mode .table-title,
+        body.light-mode #fifaTable th, 
+        body.light-mode #weightTable th {
             background: #991b1b !important;
             color: #fff;
         }
-        body.light-mode #fifaTable td {
+        body.light-mode #fifaTable td, 
+        body.light-mode #weightTable td {
             color: #111 !important;
             border-bottom: 1px solid rgba(0,0,0,0.08);
         }
@@ -118,7 +145,7 @@
 <body>
     <div class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</div>
 
-    <div class="container" style="max-width: 1000px;">
+    <div class="container" style="max-width: 1250px;">
         <a href="index.html" class="back-btn">← KEMBALI KE KLASEMEN UTAMA</a>
 
         <div class="fifa-hero">
@@ -128,27 +155,92 @@
 
         <div id="status" style="text-align:center; margin-bottom:15px; font-weight:bold; font-size:12px; color:var(--accent);">MENGAMBIL DATA SHEET 9...</div>
 
-        <div class="fifa-table-container">
-            <table id="fifaTable">
-                <thead>
-                    <tr>
-                        <th width="8%" style="text-align:center;">PERINGKAT</th>
-                        <th width="22%">NAMA LENGKAP</th>
-                        <th width="12%" style="text-align:center;">GELAR SINGKAT</th>
-                        <th width="38%">RINCIAN GELAR & SERTIFIKASI</th>
-                        <th width="10%" style="text-align:center;">POINT</th>
-                        <th width="10%" style="text-align:center;">TOTAL</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Data ditarik otomatis dari Sheet 9 -->
-                </tbody>
-            </table>
+        <!-- Layout 2 Kolom -->
+        <div class="fifa-layout">
+            
+            <!-- Kolom Kiri: Klasemen FIFA Points & Rincian Gelar -->
+            <div class="fifa-table-container">
+                <div class="table-title">KLASEMEN FIFA POINTS & GELAR</div>
+                <table id="fifaTable">
+                    <thead>
+                        <tr>
+                            <th width="7%" style="text-align:center;">POS</th>
+                            <th width="18%">NAMA LENGKAP</th>
+                            <th width="10%" style="text-align:center;">GELAR</th>
+                            <th width="37%">RINCIAN GELAR & SERTIFIKASI</th>
+                            <th width="9%" style="text-align:center;">POINT</th>
+                            <th width="10%" style="text-align:center;">TOTAL</th>
+                            <th width="9%" style="text-align:center;">GELAR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data ditarik otomatis dari Sheet 9 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Kolom Kanan: Referensi Bobot FIFA Point -->
+            <div class="fifa-table-container">
+                <div class="table-title">REFERENSI BOBOT POIN</div>
+                <table id="weightTable">
+                    <thead>
+                        <tr>
+                            <th width="15%" style="text-align:center;">NO</th>
+                            <th width="65%">GELAR</th>
+                            <th width="20%" style="text-align:center;">POINT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td style="text-align:center;">1</td><td>LEAGUE-1 2026 CHAMPION 25/26</td><td style="text-align:center; font-weight:bold; color:var(--accent);">200</td></tr>
+                        <tr><td style="text-align:center;">2</td><td>LEAGUE-1 2026 RUNNER UP 25/26</td><td style="text-align:center; font-weight:bold; color:var(--accent);">150</td></tr>
+                        <tr><td style="text-align:center;">3</td><td>LEAGUE-1 2026 THIRD PLACE 25/26</td><td style="text-align:center; font-weight:bold; color:var(--accent);">100</td></tr>
+                        <tr><td style="text-align:center;">4</td><td>WORLD CUP 2026 1ST PLACE</td><td style="text-align:center; font-weight:bold; color:var(--accent);">100</td></tr>
+                        <tr><td style="text-align:center;">5</td><td>WORLD CUP 2026 2ND PLACE</td><td style="text-align:center; font-weight:bold; color:var(--accent);">75</td></tr>
+                        <tr><td style="text-align:center;">6</td><td>WORLD CUP 2026 3RD PLACE</td><td style="text-align:center; font-weight:bold; color:var(--accent);">50</td></tr>
+                        <tr><td style="text-align:center;">7</td><td>PRESIDENT CUP 2026 1ST PLACE</td><td style="text-align:center; font-weight:bold; color:var(--accent);">50</td></tr>
+                        <tr><td style="text-align:center;">8</td><td>PRESIDENT CUP 2026 2ND PLACE</td><td style="text-align:center; font-weight:bold; color:var(--accent);">35</td></tr>
+                        <tr><td style="text-align:center;">9</td><td>PRESIDENT CUP 2026 3RD PLACE</td><td style="text-align:center; font-weight:bold; color:var(--accent);">25</td></tr>
+                        <tr><td style="text-align:center;">10</td><td>AFC 2 ELITE 2025 TROPHY</td><td style="text-align:center; font-weight:bold; color:var(--accent);">50</td></tr>
+                        <tr><td style="text-align:center;">11</td><td>TIMNAS 2025 TROPHY</td><td style="text-align:center; font-weight:bold; color:var(--accent);">50</td></tr>
+                        <tr><td style="text-align:center;">12</td><td>LEAGUE-1 2026 BEST ADMIN AWARD 25/26</td><td style="text-align:center; font-weight:bold; color:var(--accent);">15</td></tr>
+                        <tr><td style="text-align:center;">13</td><td>LEAGUE-1 2026 BEST PLAYER 25/26</td><td style="text-align:center; font-weight:bold; color:var(--accent);">15</td></tr>
+                        <tr><td style="text-align:center;">14</td><td>LEAGUE-1 2026 BEST WITTNESS 25/26</td><td style="text-align:center; font-weight:bold; color:var(--accent);">15</td></tr>
+                        <tr><td style="text-align:center;">15</td><td>LEAGUE-1 2026 FAIR PLAY TROPHY 25/26</td><td style="text-align:center; font-weight:bold; color:var(--accent);">15</td></tr>
+                        <tr><td style="text-align:center;">16</td><td>LEAGUE-1 2026 GOLDEN BOOT 25/26</td><td style="text-align:center; font-weight:bold; color:var(--accent);">15</td></tr>
+                        <tr><td style="text-align:center;">17</td><td>LEAGUE-1 2026 PUSKAS TROPHY 25/26</td><td style="text-align:center; font-weight:bold; color:var(--accent);">15</td></tr>
+                        <tr><td style="text-align:center;">18</td><td>DEWATA CUP 2026 CHAMPION</td><td style="text-align:center; font-weight:bold; color:var(--accent);">30</td></tr>
+                        <tr><td style="text-align:center;">19</td><td>DEWATA CUP 2026 RUNNER UP</td><td style="text-align:center; font-weight:bold; color:var(--accent);">20</td></tr>
+                        <tr><td style="text-align:center;">20</td><td>DEWATA CUP 2026 THIRD PLACE</td><td style="text-align:center; font-weight:bold; color:var(--accent);">10</td></tr>
+                        <tr><td style="text-align:center;">21</td><td>HYUNDAI AFF CUP 2026 CHAMPION</td><td style="text-align:center; font-weight:bold; color:var(--accent);">50</td></tr>
+                        <tr><td style="text-align:center;">22</td><td>HYUNDAI AFF CUP 2026 RUNNER UP</td><td style="text-align:center; font-weight:bold; color:var(--accent);">35</td></tr>
+                        <tr><td style="text-align:center;">23</td><td>HYUNDAI AFF CUP 2026 THIRD PLACE</td><td style="text-align:center; font-weight:bold; color:var(--accent);">25</td></tr>
+                        <tr><td style="text-align:center;">24</td><td>LEAGUE-1 2026 CHAMPION 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">200</td></tr>
+                        <tr><td style="text-align:center;">25</td><td>LEAGUE-1 2026 RUNNER UP 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">150</td></tr>
+                        <tr><td style="text-align:center;">26</td><td>LEAGUE-1 2026 THIRD PLACE 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">100</td></tr>
+                        <tr><td style="text-align:center;">27</td><td>LEAGUE-1 2026 PERINGKAT 4 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">80</td></tr>
+                        <tr><td style="text-align:center;">28</td><td>LEAGUE-1 2026 PERINGKAT 5 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">70</td></tr>
+                        <tr><td style="text-align:center;">29</td><td>LEAGUE-1 2026 PERINGKAT 6 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">60</td></tr>
+                        <tr><td style="text-align:center;">30</td><td>LEAGUE-1 2026 PERINGKAT 7 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">50</td></tr>
+                        <tr><td style="text-align:center;">31</td><td>LEAGUE-1 2026 PERINGKAT 8 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">40</td></tr>
+                        <tr><td style="text-align:center;">32</td><td>LEAGUE-1 2026 PERINGKAT 9 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">30</td></tr>
+                        <tr><td style="text-align:center;">33</td><td>LEAGUE-1 2026 PERINGKAT 10 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">20</td></tr>
+                        <tr><td style="text-align:center;">34</td><td>LEAGUE-1 2026 BEST ADMIN AWARD 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">15</td></tr>
+                        <tr><td style="text-align:center;">35</td><td>LEAGUE-1 2026 BEST PLAYER 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">50</td></tr>
+                        <tr><td style="text-align:center;">36</td><td>LEAGUE-1 2026 BEST WITTNESS 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">15</td></tr>
+                        <tr><td style="text-align:center;">37</td><td>LEAGUE-1 2026 FAIR PLAY TROPHY 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">15</td></tr>
+                        <tr><td style="text-align:center;">38</td><td>LEAGUE-1 2026 GOLDEN BOOT 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">35</td></tr>
+                        <tr><td style="text-align:center;">39</td><td>LEAGUE-1 2026 PUSKAS TROPHY 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">15</td></tr>
+                        <tr><td style="text-align:center;">40</td><td>CHAMPIONS AFC 2 ELITE TROPHY 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">50</td></tr>
+                        <tr><td style="text-align:center;">41</td><td>RUNNER UP AFC 2 ELITE TROPHY 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">35</td></tr>
+                        <tr><td style="text-align:center;">42</td><td>THIRD PLACE AFC 2 ELITE TROPHY 26/27</td><td style="text-align:center; font-weight:bold; color:var(--accent);">25</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
         </div>
     </div>
 
     <script>
-        // Link CSV dari Google Spreadsheet kamu (mengambil Sheet9 / GID spesifik atau tab terkait)
         const sheetUrl = 'https://docs.google.com/spreadsheets/d/1ifbI8sm8ZTBv28ycOj_-H0-P0-y-xQZqK9nA0ROayn4/export?format=csv&gid=1764010019';
 
         async function loadFifaData() {
@@ -157,7 +249,6 @@
                 const csvText = await response.text();
                 
                 const rows = csvText.split('\n').map(row => {
-                    // Parser baris CSV sederhana dengan penanganan koma di dalam tanda kutip
                     const cols = [];
                     let inQuotes = false;
                     let current = '';
@@ -179,43 +270,65 @@
                 const tbody = document.querySelector("#fifaTable tbody");
                 tbody.innerHTML = "";
 
-                // Lewati header baris pertama (index 0)
+                let currentPeringkat = "";
+                let currentNama = "";
+                let currentTotal = "";
+                let currentJumlahGelar = "";
+
                 for (let i = 1; i < rows.length; i++) {
                     let cols = rows[i];
-                    if (cols.length < 6 || !cols[1]) continue; // Lewati baris kosong
+                    if (!cols || cols.length < 4 || cols.every(c => c === "")) continue;
 
-                    let peringkat = cols[0] || i;
-                    let nama = cols[1] || '';
+                    if (cols[0] && cols[0] !== "") currentPeringkat = cols[0];
+                    if (cols[1] && cols[1] !== "") currentNama = cols[1];
+                    if (cols[5] && cols[5] !== "") currentTotal = cols[5];
+                    if (cols[6] && cols[6] !== "") currentJumlahGelar = cols[6];
+
                     let gelarSingkat = cols[2] || '-';
                     let rincianGelar = cols[3] || '-';
                     let point = cols[4] || '0';
-                    let total = cols[5] || '0';
 
                     let badgeClass = "";
-                    if (peringkat == "1") badgeClass = "r-1";
-                    else if (peringkat == "2") badgeClass = "r-2";
-                    else if (peringkat == "3") badgeClass = "r-3";
+                    if (currentPeringkat == "1") badgeClass = "r-1";
+                    else if (currentPeringkat == "2") badgeClass = "r-2";
+                    else if (currentPeringkat == "3") badgeClass = "r-3";
 
+                    let isMainRow = cols[1] && cols[1] !== "";
                     let tr = document.createElement("tr");
-                    tr.innerHTML = `
-                        <td style="text-align:center;"><span class="rank-badge ${badgeClass}">${peringkat}</span></td>
-                        <td><strong>${nama}</strong></td>
-                        <td style="text-align:center;"><span style="background:rgba(255,255,255,0.08); padding:2px 6px; border-radius:4px; font-size:11px;">${gelarSingkat}</span></td>
-                        <td><span class="sub-row-detail">${rincianGelar}</span></td>
-                        <td style="text-align:center; font-weight:bold; color:var(--accent);">${point}</td>
-                        <td style="text-align:center; font-weight:900; color:#facc15; font-size:14px;">${total}</td>
-                    `;
+
+                    if (isMainRow) {
+                        tr.style.borderTop = "2px solid rgba(255, 255, 255, 0.15)";
+                        tr.innerHTML = `
+                            <td style="text-align:center;"><span class="rank-badge ${badgeClass}">${currentPeringkat}</span></td>
+                            <td><strong>${currentNama}</strong></td>
+                            <td style="text-align:center;"><span style="background:rgba(255,255,255,0.08); padding:2px 6px; border-radius:4px; font-size:11px;">${gelarSingkat}</span></td>
+                            <td><span class="sub-row-detail">${rincianGelar}</span></td>
+                            <td style="text-align:center; font-weight:bold; color:var(--accent);">${point}</td>
+                            <td style="text-align:center; font-weight:900; color:#facc15; font-size:13px;">${currentTotal}</td>
+                            <td style="text-align:center; font-weight:bold; color:#fff;">${currentJumlahGelar}</td>
+                        `;
+                    } else {
+                        tr.innerHTML = `
+                            <td></td>
+                            <td></td>
+                            <td style="text-align:center;"><span style="background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:4px; font-size:11px; opacity:0.8;">${gelarSingkat}</span></td>
+                            <td><span class="sub-row-detail" style="opacity:0.85;">${rincianGelar}</span></td>
+                            <td style="text-align:center; font-weight:bold; color:var(--accent); opacity:0.9;">${point}</td>
+                            <td></td>
+                            <td></td>
+                        `;
+                    }
+
                     tbody.appendChild(tr);
                 }
 
-                document.getElementById('status').innerText = "LIVE • DATA FIFA POINTS TERKONEKSI";
+                document.getElementById('status').innerText = "LIVE • DATA FIFA POINTS & RINCIAN GELAR TERKONEKSI";
             } catch (error) {
                 console.error(error);
                 document.getElementById('status').innerText = "GAGAL MEMUAT DATA SHEET 9";
             }
         }
 
-        // Theme Toggle Support
         function toggleTheme() {
             const body = document.body;
             const btn = document.getElementById('themeBtn');
