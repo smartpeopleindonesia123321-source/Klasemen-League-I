@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA RANKING & POINTS | FOOTBALL LEAGUE-I</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .fifa-hero {
+            background: linear-gradient(135deg, #8b2626 0%, #3f1212 100%);
+            border: 2px solid #ef4444;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(139, 38, 38, 0.4);
+        }
+        .fifa-hero h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+            font-style: italic;
+        }
+        .fifa-hero p {
+            margin: 5px 0 0 0;
+            font-size: 0.85rem;
+            color: #fca5a5;
+            letter-spacing: 1px;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: 0.3s;
+        }
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-3px);
+        }
+        /* Tabel Khusus FIFA Ranking */
+        .fifa-table-container {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: var(--container-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+        }
+        #fifaTable {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        #fifaTable th {
+            background: #7f1d1d !important;
+            color: #fca5a5;
+            padding: 12px 10px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #991b1b;
+        }
+        #fifaTable td {
+            padding: 10px;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            vertical-align: middle;
+        }
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-weight: 900;
+            font-size: 12px;
+        }
+        .r-1 { background: var(--gold); color: #000; box-shadow: 0 0 10px rgba(246,211,101,0.5); }
+        .r-2 { background: var(--silver); color: #fff; }
+        .r-3 { background: var(--bronze); color: #fff; }
+        
+        .sub-row-detail {
+            font-size: 11px;
+            color: #aaa;
+            font-style: italic;
+        }
+        
+        /* Light Mode Adjustments */
+        body.light-mode .fifa-hero {
+            background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+        }
+        body.light-mode #fifaTable th {
+            background: #991b1b !important;
+            color: #fff;
+        }
+        body.light-mode #fifaTable td {
+            color: #111 !important;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+        body.light-mode .sub-row-detail {
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</div>
+
+    <div class="container" style="max-width: 1000px;">
+        <a href="index.html" class="back-btn">← KEMBALI KE KLASEMEN UTAMA</a>
+
+        <div class="fifa-hero">
+            <h1>FIFA WORLD & LEAGUE RANKING</h1>
+            <p>Pemeriksaan Resmi Poin, Gelar, dan Sertifikasi Kompetisi</p>
+        </div>
+
+        <div id="status" style="text-align:center; margin-bottom:15px; font-weight:bold; font-size:12px; color:var(--accent);">MENGAMBIL DATA SHEET 9...</div>
+
+        <div class="fifa-table-container">
+            <table id="fifaTable">
+                <thead>
+                    <tr>
+                        <th width="8%" style="text-align:center;">PERINGKAT</th>
+                        <th width="22%">NAMA LENGKAP</th>
+                        <th width="12%" style="text-align:center;">GELAR SINGKAT</th>
+                        <th width="38%">RINCIAN GELAR & SERTIFIKASI</th>
+                        <th width="10%" style="text-align:center;">POINT</th>
+                        <th width="10%" style="text-align:center;">TOTAL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data ditarik otomatis dari Sheet 9 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Link CSV dari Google Spreadsheet kamu (mengambil Sheet9 / GID spesifik atau tab terkait)
+        const sheetUrl = 'https://docs.google.com/spreadsheets/d/1ifbI8sm8ZTBv28ycOj_-H0-P0-y-xQZqK9nA0ROayn4/export?format=csv&gid=1764010019';
+
+        async function loadFifaData() {
+            try {
+                const response = await fetch(`${sheetUrl}&nocache=${new Date().getTime()}`);
+                const csvText = await response.text();
+                
+                const rows = csvText.split('\n').map(row => {
+                    // Parser baris CSV sederhana dengan penanganan koma di dalam tanda kutip
+                    const cols = [];
+                    let inQuotes = false;
+                    let current = '';
+                    for (let i = 0; i < row.length; i++) {
+                        let char = row[i];
+                        if (char === '"') {
+                            inQuotes = !inQuotes;
+                        } else if (char === ',' && !inQuotes) {
+                            cols.push(current.trim().replace(/^"|"$/g, ''));
+                            current = '';
+                        } else {
+                            current += char;
+                        }
+                    }
+                    cols.push(current.trim().replace(/^"|"$/g, ''));
+                    return cols;
+                });
+
+                const tbody = document.querySelector("#fifaTable tbody");
+                tbody.innerHTML = "";
+
+                // Lewati header baris pertama (index 0)
+                for (let i = 1; i < rows.length; i++) {
+                    let cols = rows[i];
+                    if (cols.length < 6 || !cols[1]) continue; // Lewati baris kosong
+
+                    let peringkat = cols[0] || i;
+                    let nama = cols[1] || '';
+                    let gelarSingkat = cols[2] || '-';
+                    let rincianGelar = cols[3] || '-';
+                    let point = cols[4] || '0';
+                    let total = cols[5] || '0';
+
+                    let badgeClass = "";
+                    if (peringkat == "1") badgeClass = "r-1";
+                    else if (peringkat == "2") badgeClass = "r-2";
+                    else if (peringkat == "3") badgeClass = "r-3";
+
+                    let tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td style="text-align:center;"><span class="rank-badge ${badgeClass}">${peringkat}</span></td>
+                        <td><strong>${nama}</strong></td>
+                        <td style="text-align:center;"><span style="background:rgba(255,255,255,0.08); padding:2px 6px; border-radius:4px; font-size:11px;">${gelarSingkat}</span></td>
+                        <td><span class="sub-row-detail">${rincianGelar}</span></td>
+                        <td style="text-align:center; font-weight:bold; color:var(--accent);">${point}</td>
+                        <td style="text-align:center; font-weight:900; color:#facc15; font-size:14px;">${total}</td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+
+                document.getElementById('status').innerText = "LIVE • DATA FIFA POINTS TERKONEKSI";
+            } catch (error) {
+                console.error(error);
+                document.getElementById('status').innerText = "GAGAL MEMUAT DATA SHEET 9";
+            }
+        }
+
+        // Theme Toggle Support
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('themeBtn');
+            body.classList.toggle('light-mode');
+            if (body.classList.contains('light-mode')) {
+                btn.innerHTML = '☀️';
+                localStorage.setItem('theme', 'light');
+            } else {
+                btn.innerHTML = '🌙';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                const btn = document.getElementById('themeBtn');
+                if(btn) btn.innerHTML = '☀️';
+            }
+            loadFifaData();
+        });
+    </script>
+</body>
+</html>
